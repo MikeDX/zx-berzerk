@@ -369,9 +369,9 @@ def main():
             emit_symbols(insns, equs, f)
         with open(d / "io_map.inc", "w") as f:
             emit_io_map(collect_io(insns), f)
-        with open(d / "hooks.asm", "w") as f:
+        with open(d / "hooks_stub.asm", "w") as f:
             emit_hooks_stub(f)
-        print(f"\nwrote {d}/rom_image.asm symbols.asm io_map.inc hooks.asm")
+        print(f"\nwrote {d}/rom_image.asm symbols.asm io_map.inc hooks_stub.asm")
 
     return 0
 

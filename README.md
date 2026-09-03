@@ -17,9 +17,10 @@ See [docs/PORT.md](docs/PORT.md).
 ## Build
 
 ```bash
-make convert  # ref/berzerk.asm → src/arcade/* + src/game/romdata.asm
-make          # → build/berzerk.tap  build/berzerk.sna
-make run      # assemble + load .sna in ZEsarUX (48K)
+make convert      # listing → src/arcade artefacts + romdata
+make arcade       # relocate PROM + build arcade host
+make run-arcade   # boot original game logic in ZEsarUX
+make run          # Phase-1 hand-ported shell
 ```
 
 ## Controls

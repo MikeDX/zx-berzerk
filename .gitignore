@@ -6,3 +6,4 @@
 *.sld
 .DS_Store
 tools/__pycache__
+tools/.venv/

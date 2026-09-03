@@ -1,10 +1,11 @@
 # Berzerk ZX Spectrum
 #
 # Targets:
-#   make        assemble → build/berzerk.tap + build/berzerk.sna
-#   make run    assemble, then open snapshot in ZEsarUX
-#   make tap    assemble, then open .tap in ZEsarUX
-#   make clean  remove build artefacts
+#   make / make run       Phase-1 hand-ported shell
+#   make arcade           relocate arcade PROM + build host
+#   make run-arcade       boot relocated PROM in ZEsarUX
+#   make convert          regenerate listing artefacts
+#   make clean
 
 PROJECT     := berzerk
 BUILD       := build
@@ -26,15 +27,42 @@ TAP         := $(BUILD)/$(PROJECT).tap
 LST         := $(BUILD)/$(PROJECT).lst
 SYM         := $(BUILD)/$(PROJECT).sym
 
-.PHONY: all assemble run tap clean check-tools convert
+.PHONY: all assemble arcade run run-arcade tap clean check-tools convert smoke-arcade
 
 all: assemble
 
 assemble: check-tools $(SNA) $(TAP)
 
+arcade: check-tools convert-reloc $(BUILD)/arcade.sna $(BUILD)/arcade.tap
+
+smoke-arcade: convert-reloc
+	@test -x tools/.venv/bin/python || { \
+	  echo "creating tools/.venv + z80…"; \
+	  python3 -m venv tools/.venv && tools/.venv/bin/pip install -q z80; }
+	tools/.venv/bin/python tools/smoke_arcade.py
+
 convert:
 	python3 tools/convert_ref.py --emit src/arcade
 	python3 tools/convert_ref.py src/game/romdata.asm
+
+convert-reloc: convert
+	python3 tools/reloc_rom.py src/arcade
+
+$(BUILD)/arcade.sna $(BUILD)/arcade.tap: src/arcade/host.asm \
+	src/arcade/host_mem.inc src/arcade/rom_reloc.asm \
+	src/arcade/hooks.asm src/arcade/blit.asm \
+	src/zx/screen.asm src/zx/input.asm \
+	tools/sjasm/BasicLib.asm $(BUILD)/.dir
+	$(SJASMPLUS) --nologo --fullpath \
+	  --lst=$(BUILD)/arcade.lst --sym=$(BUILD)/arcade.sym \
+	  -i$(CURDIR) \
+	  src/arcade/host.asm
+	@test -f $(BUILD)/arcade.sna && test -f $(BUILD)/arcade.tap
+	@echo "built $(BUILD)/arcade.sna $(BUILD)/arcade.tap"
+
+run-arcade: arcade
+	@test -n "$(ZESARUX)" || { echo "error: ZEsarUX not found"; exit 1; }
+	@"$(ZESARUX)" --noconfigfile --machine $(MACHINE) --snap "$(CURDIR)/$(BUILD)/arcade.sna"
 
 check-tools:
 	@test -n "$(SJASMPLUS)" || { \
