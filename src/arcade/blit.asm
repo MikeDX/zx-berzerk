@@ -170,7 +170,8 @@ xor_row:
     ld      (hl),a
     ret
 
-; XOR into fake Magic RAM. B=x C=y HL=pattern.
+; XOR into fake Magic RAM and the Spectrum bitmap (same pixels).
+; Full-screen frame_blit is too heavy to run from IRQ/$4E.
 magic_xor_sprite:
     call    sprite_setup
 .row:
@@ -203,7 +204,12 @@ magic_xor_sprite:
     pop     hl
     call    sprite_row_bits
     push    hl
-    ld      hl,(spr_addr)
+    call    xor_row                     ; Magic + hardware-style collide
+    pop     hl
+    pop     bc
+    push    bc
+    push    hl
+    call    zx_pixel_addr               ; same row on $4000
     ld      a,(spr_row)
     xor     (hl)
     ld      (hl),a

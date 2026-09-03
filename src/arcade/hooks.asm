@@ -64,7 +64,7 @@ hook_rtoax:
     ret
 
 hook_draw_sprite:
-    ; Magic plane only — Spectrum bitmap is presented by frame_blit.
+    ; Magic + $4000. IRQ SP=$A040 is tiny; use the private blit stack.
     ; IRQ uses SP=$A040 (~64 bytes); a 16-row sprite overflows that into PROM.
     push    af
     ld      a,i
@@ -90,7 +90,7 @@ hook_draw_sprite:
     ld      b,a
     ld      a,(draw_y)
     ld      c,a
-    call    magic_xor_sprite
+    call    magic_xor_sprite            ; Magic + Spectrum $4000
     pop     ix
     pop     hl
     pop     de
@@ -155,20 +155,11 @@ hook_in_p1:
 
 hook_in_status:
     ; Preserve HL — IRQ samples $4E before saving HL.
+    ; Do not present here: a 6K XOR blit is several Spectrum frames and
+    ; DRAW already XORs onto $4000. Only the IRQ prologue (SP still near
+    ; $A040) advances the fake vblank bit; collision INs must not.
     push    hl
     push    bc
-    ; Present once per IRQ prologue, not after every sprite collision IN
-    ; (that was ~100 full-screen blits/sec and made the game crawl).
-    ld      hl,0
-    add     hl,sp
-    ld      a,h
-    cp      ZX_SCRATCH_CMOS >> 8    ; IRQ SP page $A0
-    jr      nz,.noblit
-    ld      a,l
-    cp      $30                     ; still near $A040, not BOTTOM's deep frame
-    jr      c,.noblit
-    call    frame_blit
-.noblit:
     ld      c,0
     ld      a,(magic_collide)
     or      a
@@ -177,6 +168,14 @@ hook_in_status:
     ld      (magic_collide),a
     ld      c,%10000000
 .nocoll:
+    ld      hl,0
+    add     hl,sp
+    ld      a,h
+    cp      ZX_SCRATCH_CMOS >> 8    ; IRQ SP page $A0
+    jr      nz,.novb
+    ld      a,l
+    cp      $30                     ; prologue, not BOTTOM / DRAW
+    jr      c,.novb
     ld      a,(vblank_div)
     inc     a
     ld      (vblank_div),a
@@ -184,6 +183,9 @@ hook_in_status:
     ld      a,c
     jr      nz,.out
     or      %00000001
+    jr      .out
+.novb:
+    ld      a,c
 .out:
     pop     bc
     pop     hl
