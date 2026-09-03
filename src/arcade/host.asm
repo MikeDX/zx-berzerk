@@ -39,6 +39,10 @@ basend:
     jp      hook_out_magic
     ASSERT $ == HOOK_BOLT_PIXEL
     jp      hook_bolt_pixel
+    ASSERT $ == HOOK_COLOUR_FILL
+    jp      hook_colour_fill
+    ASSERT $ == HOOK_MAZE
+    jp      hook_maze
 
 host_start:
     di

@@ -329,3 +329,56 @@ magic_xor_pixel80:
     ld      (hl),a
     pop     hl
     ret
+
+; Arcade colour RAM at $8100 is 32×N cells, 8×4 pixels each (high nibble =
+; left 4px). Spectrum attrs are 8×8: one cell samples two colour rows.
+; Nibble IRGB (bit0=R,1=G,2=B,3=I) → ZX ink (B,R,G) + bright.
+attr_nib:
+    db      $00,$02,$04,$06,$01,$03,$05,$07
+    db      $40,$42,$44,$46,$41,$43,$45,$47
+
+attr_sync:
+    push    af
+    push    bc
+    push    de
+    push    hl
+    ld      hl,ZX_COLOR+$0100
+    ld      de,$5800
+    ld      c,24
+.as_row:
+    ld      b,32
+    push    hl
+.as_col:
+    ld      a,(hl)
+    rrca
+    rrca
+    rrca
+    rrca
+    and     15
+    push    hl
+    ld      hl,attr_nib
+    add     a,l
+    ld      l,a
+    jr      nc,.as_nc
+    inc     h
+.as_nc:
+    ld      a,(hl)
+    pop     hl
+    ld      (de),a
+    inc     hl
+    inc     de
+    djnz    .as_col
+    pop     hl
+    ld      a,l
+    add     a,64
+    ld      l,a
+    jr      nc,.as_nr
+    inc     h
+.as_nr:
+    dec     c
+    jr      nz,.as_row
+    pop     hl
+    pop     de
+    pop     bc
+    pop     af
+    ret

@@ -63,6 +63,8 @@ HOOK_IN_SYSTEM = ZX_HAL + 0x15
 HOOK_GAME_LOOP = ZX_HAL + 0x18
 HOOK_OUT_MAGIC = ZX_HAL + 0x1B
 HOOK_BOLT_PIXEL = ZX_HAL + 0x1E
+HOOK_COLOUR_FILL = ZX_HAL + 0x21
+HOOK_MAZE = ZX_HAL + 0x24
 
 ENTRY_HOOKS = {
     0x2817: "HOOK_DRAW_SPRITE",
@@ -77,6 +79,8 @@ ENTRY_HOOKS = {
     # `ld (hl),$80` after RTOAX: one shifted XOR pixel, not a raw byte store.
     # Skip ld + IN $4E + rlca (5) so the hook can return carry to the caller.
     0x1578: ("HOOK_BOLT_PIXEL", 5),
+    0x3657: "HOOK_COLOUR_FILL",
+    0x2540: "HOOK_MAZE",
 }
 
 # Ports → HAL. Active-low inputs idle as $FF. SYSTEM has coin/start keys.
@@ -374,6 +378,8 @@ HOOK_IN_SYSTEM       EQU ${HOOK_IN_SYSTEM:04X}
 HOOK_GAME_LOOP       EQU ${HOOK_GAME_LOOP:04X}
 HOOK_OUT_MAGIC       EQU ${HOOK_OUT_MAGIC:04X}
 HOOK_BOLT_PIXEL      EQU ${HOOK_BOLT_PIXEL:04X}
+HOOK_COLOUR_FILL     EQU ${HOOK_COLOUR_FILL:04X}
+HOOK_MAZE            EQU ${HOOK_MAZE:04X}
 
 ARC_COLD             EQU ${map_addr(0x1602):04X}
 ARC_ATTRACT          EQU ${map_addr(0x164B):04X}
@@ -382,6 +388,7 @@ ARC_ROOM_START       EQU ${map_addr(0x209D):04X}
 ARC_ROOM_MOVE        EQU ${map_addr(0x2160):04X}
 ARC_ROOM_JOBS        EQU ${map_addr(0x21A3):04X}
 ARC_IRQ              EQU ${map_addr(0x26AB):04X}
+ARC_MAZE_CONT        EQU ${map_addr(0x2543):04X}
 """
     )
 
@@ -468,8 +475,9 @@ def emit_berzerk_asm(path: Path) -> dict:
         "HOOK_DRAW_SPRITE", "HOOK_CLEAR_SCREEN", "HOOK_RTOAX", "HOOK_IN_P1",
         "HOOK_IN_STATUS", "HOOK_NMI", "HOOK_PRINT_CHAR", "HOOK_IN_SYSTEM",
         "HOOK_GAME_LOOP", "HOOK_OUT_MAGIC", "HOOK_BOLT_PIXEL",
+        "HOOK_COLOUR_FILL", "HOOK_MAZE",
         "ARC_COLD", "ARC_ATTRACT", "ARC_START_GAME", "ARC_ROOM_START", "ARC_IRQ",
-        "ARC_ROOM_MOVE", "ARC_ROOM_JOBS",
+        "ARC_ROOM_MOVE", "ARC_ROOM_JOBS", "ARC_MAZE_CONT",
     }
     # Collect code labels so EQUs that share a name don't collide.
     code_labels = {sanitize_label(lab) for i in insns for lab in i.labels}

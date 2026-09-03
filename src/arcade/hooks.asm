@@ -20,8 +20,14 @@ hook_clear_screen:
     ld      bc,$1800-1              ; 192 lines
     ld      (hl),0
     ldir
+    ld      hl,ZX_COLOR
+    ld      de,ZX_COLOR+1
+    ld      bc,$0800-1
+    ld      (hl),0
+    ldir
     xor     a
     ld      (magic_collide),a
+    call    attr_sync
     pop     hl
     pop     de
     pop     bc
@@ -34,11 +40,11 @@ hook_rtoax:
     ld      a,l
     ld      (rtoax_x),a
     ld      a,h
-    cp      192
-    jr      c,.yok
-    ld      a,191
-.yok:
     ld      (rtoax_y),a
+    cp      224
+    jr      c,.yok
+    ld      a,223
+.yok:
     ld      l,a
     ld      h,0
     add     hl,hl
@@ -114,15 +120,10 @@ magic_dest_xy:
     pop     hl
     ld      a,h
     cp      ZX_VIDEO >> 8
-    jr      c,.video                    ; below video → treat as video
+    jr      c,.video
     cp      ZX_MAGIC >> 8
     jr      c,.video                    ; $A8..$C3
-    cp      ZX_MAGIC_SCRATCH >> 8
-    jr      c,.magic                    ; $C4..$DB
-    ld      bc,ZX_MAGIC_SCRATCH         ; $DC..
-    jr      .sub
-.magic:
-    ld      bc,ZX_MAGIC
+    ld      bc,ZX_MAGIC                 ; magic + overflow scratch
     jr      .sub
 .video:
     ld      bc,ZX_VIDEO
@@ -187,6 +188,9 @@ hook_in_status:
     ld      a,c
     jr      nz,.out
     or      %00000001
+    push    af
+    call    attr_sync
+    pop     af
     jr      .out
 .novb:
     ld      a,c
@@ -330,3 +334,70 @@ hook_bolt_pixel:
     ld      a,(magic_collide)
     rrca
     ret
+
+; Arcade COLOUR_FILL ($3657): inline 5-byte params after CALL.
+hook_colour_fill:
+    pop     hl
+    ld      e,(hl)
+    inc     hl
+    ld      d,(hl)
+    inc     hl
+    ld      c,(hl)
+    inc     hl
+    ld      a,(hl)
+    inc     hl
+    ex      af,af'
+    ld      a,(hl)
+    inc     hl
+    push    hl                          ; resume after params
+    ld      hl,ZX_COLOR+$0100
+    add     hl,de
+    ex      af,af'
+    ld      b,a                         ; width
+    ex      af,af'                      ; A = colour
+    ld      de,$0020
+.cf_row:
+    push    bc
+    push    hl
+.cf_col:
+    ld      (hl),a
+    inc     hl
+    djnz    .cf_col
+    pop     hl
+    add     hl,de
+    pop     bc
+    dec     c
+    jr      nz,.cf_row
+    call    attr_sync
+    ret
+
+; Maze $2540 is also used after a room-exit scroll, which never CLEAR_SCREENs.
+; XOR-drawing a new maze over the old Magic plane seals the doors.
+hook_maze:
+    push    af
+    push    bc
+    push    de
+    push    hl
+    ld      hl,ZX_VIDEO
+    ld      de,ZX_VIDEO+1
+    ld      bc,$1C00-1
+    ld      (hl),0
+    ldir
+    ld      hl,ZX_MAGIC
+    ld      de,ZX_MAGIC+1
+    ld      bc,$1800-1
+    ld      (hl),0
+    ldir
+    ld      hl,$4000
+    ld      de,$4001
+    ld      bc,6144-1
+    ld      (hl),0
+    ldir
+    xor     a
+    ld      (magic_collide),a
+    pop     hl
+    pop     de
+    pop     bc
+    pop     af
+    ld      hl,($A745)
+    jp      ARC_MAZE_CONT

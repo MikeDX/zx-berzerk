@@ -7236,7 +7236,7 @@ M.TAB:
     ORG $853F
     ld   b,c
     ORG $8540
-    ld   hl,($A745)
+    jp  HOOK_MAZE              ; arcade $2540 hooked
     ORG $8543
     ld   ($A75C),hl
     ORG $8546
@@ -11760,11 +11760,7 @@ COLOUR_FILL_WHITE:
     ret
 COLOUR_FILL:
     ORG $9657
-    pop  hl ; get parameter address
-    ORG $9658
-    ld   e,(hl) ; Read 1st parameter (offset LSB)
-    ORG $9659
-    inc  hl
+    jp  HOOK_COLOUR_FILL              ; arcade $3657 hooked
     ORG $965A
     ld   d,(hl) ; Read 2nd parameter (offset MSB). DE now offset into colour lookup RAM
     ORG $965B
