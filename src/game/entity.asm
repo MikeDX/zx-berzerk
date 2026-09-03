@@ -1,6 +1,5 @@
 ; Shared entity move / draw / erase
 
-; IX = vector. Apply velocity when TIME hits 0.
 entity_move:
     ld      a,(ix+V_TIME)
     dec     a
@@ -16,6 +15,7 @@ entity_move:
     ld      (ix+V_PY),a
     ret
 
+; Restore old sprite footprint from wall mask
 entity_erase:
     ld      a,(ix+V_STATUS)
     bit     0,a
@@ -24,13 +24,9 @@ entity_erase:
     ld      c,(ix+V_OLDY)
     ld      l,(ix+V_SPR_L)
     ld      h,(ix+V_SPR_H)
-    ld      a,(draw_collide)
-    push    af
-    call    xor_sprite
-    pop     af
-    ld      (draw_collide),a
-    ret
+    jp      restore_sprite
 
+; Collide against wall mask; OR onto screen only if clear.
 entity_draw:
     ld      b,(ix+V_PX)
     ld      c,(ix+V_PY)
@@ -38,4 +34,23 @@ entity_draw:
     ld      (ix+V_OLDY),c
     ld      l,(ix+V_SPR_L)
     ld      h,(ix+V_SPR_H)
-    jp      xor_sprite
+    push    hl
+    push    bc
+    call    collide_sprite
+    pop     bc
+    pop     hl
+    ld      a,(draw_collide)
+    or      a
+    ret     nz                              ; leave undrawn; caller sets HIT
+    jp      or_sprite
+
+; True if sprite at IX overlaps wall (no draw)
+entity_hits_wall:
+    ld      b,(ix+V_PX)
+    ld      c,(ix+V_PY)
+    ld      l,(ix+V_SPR_L)
+    ld      h,(ix+V_SPR_H)
+    call    collide_sprite
+    ld      a,(draw_collide)
+    or      a
+    ret

@@ -1,6 +1,5 @@
-; Laser bolts
+; Laser bolts — plot against wall mask; restore pixels on erase
 
-; Clear all bolts
 bolts_clear:
     ld      hl,player_bolts
     ld      b,BOLT_SIZE * MAX_PBOLTS + BOLT_SIZE * MAX_RBOLTS
@@ -11,8 +10,6 @@ bolts_clear:
     djnz    .cl
     ret
 
-; Fire player bolt if a free slot exists.
-; Uses player_vec position + player_dir
 player_try_fire:
     ld      a,(player_dir)
     and     $0F
@@ -46,7 +43,6 @@ player_try_fire:
     ld      (iy+B_TY),a
     ret
 
-; Robot fire from IX robot toward DURL in A
 robot_try_fire:
     ld      c,a
     ld      a,(rbolts_max)
@@ -80,7 +76,6 @@ robot_try_fire:
     ld      (iy+B_TY),a
     ret
 
-; Advance all active bolts one step
 bolts_update:
     ld      iy,player_bolts
     ld      b,MAX_PBOLTS + MAX_RBOLTS
@@ -97,21 +92,16 @@ bolts_update:
     djnz    .loop
     ret
 
-; Step one bolt in IY
 bolt_step:
-    ; erase tail pixel if length > 0 by XOR again
     ld      a,(iy+B_LEN)
     or      a
     jr      z,.grow
-    ; if at max, shrink from tail
-    ld      a,(iy+B_LEN)
     ld      c,a
     ld      a,(iy+B_MAX)
     cp      c
-    jr      z,.shrink
+    jp      z,.shrink
 
 .grow:
-    ; move head
     ld      a,(iy+B_DIR)
     ld      b,(iy+B_X)
     ld      c,(iy+B_Y)
@@ -131,7 +121,6 @@ bolt_step:
     jr      z,.moved
     inc     c
 .moved:
-    ; offscreen?
     ld      a,b
     or      a
     jp      z,.kill
@@ -143,51 +132,58 @@ bolt_step:
     cp      192
     jp      nc,.kill
 
+    ; wall?
+    call    pixel_hits_wall
+    jp      c,.kill
+
     ld      (iy+B_X),b
     ld      (iy+B_Y),c
-    call    xor_pixel
-    jr      c,.hit_wall
+    call    plot_pixel
     ld      a,(iy+B_LEN)
     inc     a
     ld      (iy+B_LEN),a
-    ; AABB vs entities
     call    bolt_hit_check
     ret
 
-.hit_wall:
-    ; pixel already there — leave the colliding XOR undone? xor_pixel already flipped.
-    ; Flip back to restore wall, kill bolt.
+.kill:
+    ; wipe visible head (and tail if any)
     ld      b,(iy+B_X)
     ld      c,(iy+B_Y)
-    call    xor_pixel
-    call    bolt_hit_check
-.kill:
-    xor     a
-    ld      (iy+B_DIR),a
-    ret
-
-.shrink:
-    ; erase oldest tail — approximate: kill bolt trail by clearing dir
-    ; For simplicity when maxed, keep moving head and erase previous head
+    ld      a,(iy+B_LEN)
+    or      a
+    call    nz,restore_pixel
     ld      b,(iy+B_TX)
     ld      c,(iy+B_TY)
     ld      a,b
-    or      c
-    call    nz,xor_pixel
+    cp      (iy+B_X)
+    jr      nz,.rest_t
+    ld      a,c
+    cp      (iy+B_Y)
+    jr      z,.cleared
+.rest_t:
+    call    restore_pixel
+.cleared:
+    xor     a
+    ld      (iy+B_DIR),a
+    ld      (iy+B_LEN),a
+    ret
+
+.shrink:
+    ; restore old tail, advance tail marker to previous head, grow
+    ld      b,(iy+B_TX)
+    ld      c,(iy+B_TY)
+    call    restore_pixel
     ld      a,(iy+B_X)
     ld      (iy+B_TX),a
     ld      a,(iy+B_Y)
     ld      (iy+B_TY),a
-    jr      .grow
+    jp      .grow
 
-; Bolt head vs player / robots
 bolt_hit_check:
-    ; vs player
     ld      ix,player_vec
     ld      a,(ix+V_KIND)
     cp      KIND_PLAYER
     call    z,.vs_vec
-    ; vs robots
     ld      ix,robot_vecs
     ld      b,MAX_ROBOTS
 .rv:
@@ -212,7 +208,11 @@ bolt_hit_check:
     ret     m
     cp      16
     ret     nc
-    set     7,(ix+V_STATUS)                ; HIT
+    set     7,(ix+V_STATUS)
+    ; consume bolt
+    ld      b,(iy+B_X)
+    ld      c,(iy+B_Y)
+    call    restore_pixel
     xor     a
     ld      (iy+B_DIR),a
     ret

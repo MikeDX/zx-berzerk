@@ -103,8 +103,11 @@ otto_draw:
     ld      ix,otto_vec
     bit     1,(ix+V_STATUS)
     ret     z
-    ; draw without wall-death
-    call    entity_draw
-    xor     a
-    ld      (draw_collide),a
-    ret
+    ; OR only — Otto walks through walls
+    ld      b,(ix+V_PX)
+    ld      c,(ix+V_PY)
+    ld      (ix+V_OLDX),b
+    ld      (ix+V_OLDY),c
+    ld      l,(ix+V_SPR_L)
+    ld      h,(ix+V_SPR_H)
+    jp      or_sprite

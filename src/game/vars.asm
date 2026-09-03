@@ -33,6 +33,7 @@ robot_bolts:    ds BOLT_SIZE * MAX_RBOLTS
 draw_collide:   db 0
 spr_shift:      db 0
 spr_hleft:      db 0
-spr_xbyte:      db 0
+spr_addr:       dw 0
+spr_mask:       dw 0
 
 game_vars_end:

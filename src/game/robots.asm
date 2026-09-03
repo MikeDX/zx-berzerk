@@ -46,6 +46,16 @@ robots_spawn:
     jr      c,.yok
     ld      c,150
 .yok:
+    push    bc
+    ld      a,b
+    add     a,4
+    ld      b,a
+    ld      a,c
+    add     a,5
+    ld      c,a
+    call    pixel_hits_wall
+    pop     bc
+    jr      c,.skip
     call    robot_create
 .skip:
     pop     hl
