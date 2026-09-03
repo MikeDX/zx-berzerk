@@ -1,5 +1,47 @@
 ; XOR blit for arcade Magic-RAM semantics (draw == erase == XOR).
 
+; Composite ZX_VIDEO XOR ZX_MAGIC → Spectrum bitmap ($4000), 256×192.
+; Arcade display = video plane + magic XOR plane; we approximate that here.
+frame_blit:
+    di
+    push    af
+    push    bc
+    push    de
+    push    hl
+    push    ix
+    ld      de,ZX_VIDEO
+    ld      ix,ZX_MAGIC
+    ld      c,0                     ; y
+.y:
+    ld      b,0
+    push    de
+    push    bc
+    call    zx_pixel_addr
+    pop     bc
+    pop     de
+    push    bc
+    ld      b,32
+.x:
+    ld      a,(de)
+    xor     (ix+0)
+    ld      (hl),a
+    inc     de
+    inc     ix
+    inc     hl
+    djnz    .x
+    pop     bc
+    inc     c
+    ld      a,c
+    cp      192
+    jr      c,.y
+    pop     ix
+    pop     hl
+    pop     de
+    pop     bc
+    pop     af
+    ; leave IFFs as DI — callers re-enable; avoids IM1/$0038 if entered badly
+    ret
+
 sprite_setup:
     xor     a
     ld      (draw_collide),a

@@ -38,7 +38,7 @@ all: assemble
 assemble: check-tools spectrum-asm $(SNA) $(TAP)
 	@test -x tools/.venv/bin/python || { \
 	  python3 -m venv tools/.venv && tools/.venv/bin/pip install -q z80; }
-	tools/.venv/bin/python tools/smoke_sna.py 100000
+	tools/.venv/bin/python tools/smoke_sna.py 400000
 
 spectrum-asm:
 	python3 tools/emit_spectrum_asm.py -o src/arcade/berzerk.asm --map-inc src/arcade/mem_map.inc

@@ -31,8 +31,8 @@ basend:
     jp      hook_nmi                  ; $DC0F
     ASSERT $ == HOOK_PRINT_CHAR
     jp      hook_print_char           ; $DC12
-    ASSERT $ == HOOK_IN_SAFE
-    jp      hook_in_safe              ; $DC15
+    ASSERT $ == HOOK_IN_SYSTEM
+    jp      hook_in_system            ; $DC15
 
 host_start:
     di
@@ -61,9 +61,13 @@ host_start:
 
     INCLUDE "src/zx/screen.asm"
     INCLUDE "src/zx/input.asm"
+    INCLUDE "src/arcade/blit.asm"
+    INCLUDE "src/arcade/hooks.asm"
 
+; BSS after all HAL code — never place data between routines (NOP fall-through).
 magic_collide:  db 0
 vblank_div:     db 0
+blit_div:       db 0
 rtoax_x:        db 0
 rtoax_y:        db 0
 draw_x:         db 0
@@ -75,9 +79,6 @@ spr_w:          db 0
 spr_addr:       dw 0
 spr_mask:       dw 0
 spr_row:        db 0,0,0
-
-    INCLUDE "src/arcade/blit.asm"
-    INCLUDE "src/arcade/hooks.asm"
 
 host_end:
     ASSERT host_end <= ZX_COLOR

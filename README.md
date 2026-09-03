@@ -17,10 +17,9 @@ See [docs/PORT.md](docs/PORT.md).
 ## Build
 
 ```bash
-make convert      # listing → src/arcade artefacts + romdata
-make arcade       # relocate PROM + build arcade host
-make run-arcade   # boot original game logic in ZEsarUX
-make run          # Phase-1 hand-ported shell
+make                 # emit remapped asm + build/berzerk.sna/.tap + smoke
+make run             # boot in ZEsarUX
+make shell           # optional hand-ported shell
 ```
 
 ## Controls
@@ -32,8 +31,8 @@ make run          # Phase-1 hand-ported shell
 | Left   | O        | Left     |
 | Right  | P        | Right    |
 | Fire   | Space    | Fire     |
-
-Attract: push fire to start. Hold fire + direction to shoot.
+| Coin   | 0 or Enter | —      |
+| Start 1/2 | 1 / 2 | —      |
 
 ## Layout
 

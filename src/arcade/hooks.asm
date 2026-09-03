@@ -1,5 +1,8 @@
 ; Arcade ↔ Spectrum I/O hook implementations.
 ; Veneer JP table lives in host.asm at ZX_HAL.
+;
+; 1:1 remapped arcade code; HAL replaces hardware only (video/magic/input).
+; Shadow / RTOAX keep arcade Y=0 at top. Clip Y to 192 (arcade has 223).
 
 hook_clear_screen:
     push    af
@@ -25,6 +28,7 @@ hook_clear_screen:
     pop     af
     ret
 
+; HL = (X=L, Y=H) → magic address. Same contract as CALCULATE @ $29A3.
 hook_rtoax:
     push    bc
     ld      a,l
@@ -139,11 +143,11 @@ hook_in_p1:
     ret
 
 hook_in_status:
-    ; Bottom-of-screen (bit0) only when MAN_PTR looks like a guest RAM pointer.
-    ; Junk values (e.g. $1100) must not enable ERASE_PATTERN or we reset.
-    ; Must preserve HL — IRQ samples this port before pushing HL.
+    ; Preserve HL — IRQ samples $4E before saving HL.
+    ; frame_blit not called here yet (IM2 + long blit → $0038 in smoke).
+    ; Shadows fill during demo; present path still TODO (job-shell exit).
     push    hl
-    ld      hl,ZX_SCRATCH_CMOS + ($0876 - $0800)  ; MAN_PTR @ arcade $0876
+    ld      hl,ZX_SCRATCH_CMOS + ($0876 - $0800)  ; MAN_PTR
     ld      a,(hl)
     inc     hl
     ld      h,(hl)
@@ -151,7 +155,6 @@ hook_in_status:
     ld      a,h
     cp      ZX_SCRATCH_CMOS >> 8
     jr      c,.idle
-    ld      a,h
     cp      ZX_HAL >> 8
     jr      nc,.idle
     ld      a,(magic_collide)
@@ -187,14 +190,44 @@ hook_in_status:
     pop     hl
     ret
 
-; Cold start CALLs NMI as a subroutine; use RET not RETN.
 hook_nmi:
     ret
 
-hook_in_safe:
-    xor     a
+; SYSTEM $49 — active-low. Idle $FF.
+; Keys: 0 or ENTER = COIN1, 1 = START1, 2 = START2.
+hook_in_system:
+    push    bc
+    ld      a,$FF
+    ld      bc,$EFFE                    ; row with 0
+    in      c,(c)
+    bit     0,c
+    jr      nz,.noc0
+    res     7,a                         ; COIN1
+.noc0:
+    ld      bc,$BFFE                    ; ENTER
+    in      c,(c)
+    bit     0,c
+    jr      nz,.nocoin
+    res     7,a
+.nocoin:
+    ld      bc,$F7FE                    ; 1..5
+    in      c,(c)
+    bit     0,c
+    jr      nz,.nos1
+    res     0,a                         ; START1
+.nos1:
+    bit     1,c
+    jr      nz,.nos2
+    res     1,a                         ; START2
+.nos2:
+    pop     bc
     ret
 
+hook_in_safe:
+    ld      a,$FF
+    ret
+
+; Spectrum ROM font stand-in (arcade ordinal $1F = © → '*').
 hook_print_char:
     push    af
     push    bc
@@ -202,8 +235,14 @@ hook_print_char:
     push    hl
     ld      a,c
     and     $7F
+    cp      $1F
+    jr      nz,.not_copy
+    ld      a,'*'
+    jr      .glyph
+.not_copy:
     cp      32
     jr      c,.out
+.glyph:
     push    af
     call    magic_dest_xy
     ld      a,b
@@ -213,13 +252,22 @@ hook_print_char:
     and     31
     ld      b,a
     ld      a,c
+    cp      192
+    jr      c,.yok
+    ld      a,191
+.yok:
     rrca
     rrca
     rrca
     and     31
+    cp      24
+    jr      nc,.pop_out
     ld      c,a
     pop     af
     call    zx_print_char
+    jr      .out
+.pop_out:
+    pop     af
 .out:
     pop     hl
     pop     de

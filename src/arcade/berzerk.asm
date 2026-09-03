@@ -134,7 +134,7 @@ TODOs:
     ORG $6005
     ld   i,a
     ORG $6007
-    ld  a,0                 ; was IN ($61)
+    ld  a,$C0               ; F2 DIPs: bonus 5k+10k
     ORG $6009
     bit  0,a ; check if "Colour Test Mode" bit is set
     ORG $600B
@@ -865,7 +865,7 @@ COLOUR_TEST_MODE:
     ORG $6281
     jp  $6C0F      ; IN ($4E) → HOOK_IN_STATUS
     ORG $6284
-    ld  a,0                 ; was IN ($61)
+    ld  a,$C0               ; F2 DIPs: bonus 5k+10k
     ORG $6286
     and  $02
     ORG $6288
@@ -1614,7 +1614,7 @@ INPUT_TEST_MODE:
     ORG $6561
     ld   de,$8008 ; D = Y coordinate, E = X coordinate
     ORG $6564
-    ld  a,0                 ; was IN ($61)
+    ld  a,$C0               ; F2 DIPs: bonus 5k+10k
     ORG $6566
     call $6597 ; call PRINT_SET_BITS
     ORG $6569
@@ -1638,11 +1638,9 @@ INPUT_TEST_MODE:
     ORG $6580
     jp  $6C2B      ; IN ($48) → HOOK_IN_P1
     ORG $6585
-    ld  a,0                 ; was IN ($49)
-    ORG $6587
-    call $6596 ; call FLIP_THEN_PRINT_SET_BITS
+    jp  $6C34      ; IN ($49) → HOOK_IN_SYSTEM
     ORG $658A
-    jp  $6C34      ; IN ($4A) → HOOK_IN_P1
+    jp  $6C3D      ; IN ($4A) → HOOK_IN_P1
     ORG $658F
     jr   $6561 ; go back and read DIP switches until machine switched off!
 JP_PRINT_STRING_06B8:
@@ -1718,7 +1716,7 @@ BOOKKEEPING:
     ORG $6606
     out  ($4F),a ; disable interrupts
     ORG $6608
-    jp  $6C3D      ; IN ($4E) → HOOK_IN_STATUS
+    jp  $6C46      ; IN ($4E) → HOOK_IN_STATUS
     ORG $660D
     ld  a,0                 ; was IN ($65)
     ORG $660F
@@ -1798,7 +1796,7 @@ BOOKKEEPING:
     ORG $6651
     jr   nz,$6669 ; if bit is set, goto $0669
     ORG $6653
-    jp  $6C46      ; IN ($48) → HOOK_IN_P1
+    jp  $6C4F      ; IN ($48) → HOOK_IN_P1
     ORG $6657
     jr   nz,$664D ; if FIRE is NOT pressed (remember, its active LOW) goto $064D
     ORG $6659
@@ -2100,11 +2098,11 @@ CROSSHAIR_PATTERN_TEST_MODE:
     jp   $673A ; go and draw the crosshair again
 WAIT_FOR_1P_FIRE_BUTTON:
     ORG $6786
-    jp  $6C4E      ; IN ($48) → HOOK_IN_P1
+    jp  $6C57      ; IN ($48) → HOOK_IN_P1
     ORG $678A
     jr   nz,$6786 ; jump if FIRE not pressed (remember, button is ACTIVE_LOW so is deemed pressed when bit NOT set)
     ORG $678C
-    jp  $6C56      ; IN ($48) → HOOK_IN_P1
+    jp  $6C5F      ; IN ($48) → HOOK_IN_P1
     ORG $6790
     jr   z,$678C
     ORG $6792
@@ -3431,7 +3429,7 @@ MOVE_AND_DRAW_BOLT:
     ORG $7578
     ld   (hl),$80 ; write a single pixel for the bolt
     ORG $757A
-    jp  $6C5E      ; IN ($4E) → HOOK_IN_STATUS
+    jp  $6C67      ; IN ($4E) → HOOK_IN_STATUS
     ORG $757D
     ret
 CHECK_IF_BOLT_OFFSCREEN:
@@ -3647,9 +3645,7 @@ COLLISION_DETECTION:
     ORG $7640
     djnz $7630
     ORG $7642
-    ld  a,0                 ; was IN ($49)
-    ORG $7644
-    cpl
+    jp  $6C6E      ; IN ($49) → HOOK_IN_SYSTEM
     ORG $7645
     ld   hl,$A09F
     ORG $7648
@@ -4151,7 +4147,7 @@ V.LOOP:
     ORG $7811
     jr   z,$781E
     ORG $7813
-    jp  $6C65      ; IN ($4A) → HOOK_IN_P1
+    jp  $6C75      ; IN ($4A) → HOOK_IN_P1
     ORG $7817
     jr   z,$781E
     ORG $7819
@@ -4603,9 +4599,7 @@ DECREMENT_CREDITS:
     ORG $79A5
     ld   l,$03
     ORG $79A7
-    ld  a,0                 ; was IN ($49)
-    ORG $79A9
-    cpl
+    jp  $6C7D      ; IN ($49) → HOOK_IN_SYSTEM
     ORG $79AA
     and  l
     ORG $79AB
@@ -4815,7 +4809,7 @@ CLEAR_SCREEN:
     ORG $7A7F
     ei
     ORG $7A80
-    jp  $6C6D      ; IN ($4A) → HOOK_IN_P1
+    jp  $6C84      ; IN ($4A) → HOOK_IN_P1
     ORG $7A84
     jr   nz,$7A93
     ORG $7A86
@@ -5912,9 +5906,9 @@ MOVE_PLAYER:
     ORG $7EE5
     jr   z,$7EEB ; yes, goto $1EEB
     ORG $7EE7
-    jp  $6C75      ; IN ($4A) → HOOK_IN_P1
+    jp  $6C8C      ; IN ($4A) → HOOK_IN_P1
     ORG $7EEB
-    jp  $6C7D      ; IN ($48) → HOOK_IN_P1
+    jp  $6C94      ; IN ($48) → HOOK_IN_P1
     ORG $7EEF
     bit  4,a ; test fire button
     ORG $7EF1
@@ -7078,7 +7072,7 @@ UPDATE_SCORE:
     ORG $8377
     ld   de,$A749 ; load DE with address of DEATHS
     ORG $837A
-    ld  a,0                 ; was IN ($61)
+    ld  a,$C0               ; F2 DIPs: bonus 5k+10k
     ORG $837C
     bit  7,a ; test for BONUS LIFE AT 10000 DIP settings
     ORG $837E
@@ -7104,7 +7098,7 @@ UPDATE_SCORE:
     ORG $838E
     jp   $859A ; refresh display to show extra life
     ORG $8391
-    ld  a,0                 ; was IN ($61)
+    ld  a,$C0               ; F2 DIPs: bonus 5k+10k
     ORG $8393
     bit  6,a ; test for BONUS LIFE AT 5000 DIP setting
     ORG $8395
@@ -7973,7 +7967,7 @@ RANDOM:
     ORG $86B3
     push af
     ORG $86B4
-    jp  $6C85      ; IN ($4E) → HOOK_IN_STATUS
+    jp  $6C9C      ; IN ($4E) → HOOK_IN_STATUS
     ORG $86B7
     jr   c,$86D9
     ORG $86B9
@@ -7993,9 +7987,7 @@ RANDOM:
     ORG $86C2
     ld   c,a
     ORG $86C3
-    ld  a,0                 ; was IN ($49)
-    ORG $86C5
-    cpl
+    jp  $6CA3      ; IN ($49) → HOOK_IN_SYSTEM
     ORG $86C6
     ld   (hl),a
     ORG $86C7
@@ -8254,7 +8246,7 @@ WRITE_PATTERN:
     ORG $879A
     ld   hl,($A070) ; get pointer to next VECTOR to process from V.PTR
     ORG $879D
-    jp  $6C8C      ; IN ($4E) → HOOK_IN_STATUS
+    jp  $6CAA      ; IN ($4E) → HOOK_IN_STATUS
     ORG $87A1
     ret  z
     ORG $87A2
@@ -8977,11 +8969,10 @@ PRINT_STRING_297B:
     jp   (hl) ; jump to code immediately after string terminator byte
 RTOAX:
     ORG $89A1
-    jp  HOOK_RTOAX              ; arcade $29A1 hooked
-    ORG $89A4
-    db  $79
-    ORG $89A5
-    db  $43
+    ld   b,$90 ; Magic image RAM control bits - XOR write
+CALCULATE_MAGIC_IMAGE_RAM_ADDRESS:
+    ORG $89A3
+    jp  HOOK_RTOAX              ; arcade $29A3 hooked
     ORG $89A6
     or   a ; set zero flag if playing on upright cabinet
     ORG $89A7
@@ -10243,9 +10234,9 @@ INCREMENT_BY_1:
     ORG $8DD1
     or   a
     ORG $8DD2
-    jp  $6C94      ; IN ($48) → HOOK_IN_P1
+    jp  $6CB2      ; IN ($48) → HOOK_IN_P1
     ORG $8DD5
-    jp  $6C9B      ; IN ($4A) → HOOK_IN_P1
+    jp  $6CB9      ; IN ($4A) → HOOK_IN_P1
     ORG $8DD8
     call $897B ; call PRINT_STRING_297B
     ORG $8DDB            ; arcade $2DDB data
@@ -16923,72 +16914,92 @@ COLOUR_MAN:
     db  $CD,$96,$65
     jp  $6585
 
-    ORG $6C34    ; IN ($4A) island from $058A
+    ORG $6C34    ; IN ($49) island from $0585
+    call HOOK_IN_SYSTEM
+    db  $CD,$96,$65
+    jp  $658A
+
+    ORG $6C3D    ; IN ($4A) island from $058A
     call HOOK_IN_P1
     db  $CD,$96,$65
     jp  $658F
 
-    ORG $6C3D    ; IN ($4E) island from $0608
+    ORG $6C46    ; IN ($4E) island from $0608
     call HOOK_IN_STATUS
     db  $31,$00,$A7
     jp  $660D
 
-    ORG $6C46    ; IN ($48) island from $0653
+    ORG $6C4F    ; IN ($48) island from $0653
     call HOOK_IN_P1
     db  $CB,$67
     jp  $6657
 
-    ORG $6C4E    ; IN ($48) island from $0786
+    ORG $6C57    ; IN ($48) island from $0786
     call HOOK_IN_P1
     db  $CB,$67
     jp  $678A
 
-    ORG $6C56    ; IN ($48) island from $078C
+    ORG $6C5F    ; IN ($48) island from $078C
     call HOOK_IN_P1
     db  $CB,$67
     jp  $6790
 
-    ORG $6C5E    ; IN ($4E) island from $157A
+    ORG $6C67    ; IN ($4E) island from $157A
     call HOOK_IN_STATUS
     db  $07
     jp  $757D
 
-    ORG $6C65    ; IN ($4A) island from $1813
+    ORG $6C6E    ; IN ($49) island from $1642
+    call HOOK_IN_SYSTEM
+    db  $2F
+    jp  $7645
+
+    ORG $6C75    ; IN ($4A) island from $1813
     call HOOK_IN_P1
     db  $CB,$7F
     jp  $7817
 
-    ORG $6C6D    ; IN ($4A) island from $1A80
+    ORG $6C7D    ; IN ($49) island from $19A7
+    call HOOK_IN_SYSTEM
+    db  $2F
+    jp  $79AA
+
+    ORG $6C84    ; IN ($4A) island from $1A80
     call HOOK_IN_P1
     db  $CB,$7F
     jp  $7A84
 
-    ORG $6C75    ; IN ($4A) island from $1EE7
+    ORG $6C8C    ; IN ($4A) island from $1EE7
     call HOOK_IN_P1
     db  $18,$02
     jp  $7EEB
 
-    ORG $6C7D    ; IN ($48) island from $1EEB
+    ORG $6C94    ; IN ($48) island from $1EEB
     call HOOK_IN_P1
     db  $EE,$1F
     jp  $7EEF
 
-    ORG $6C85    ; IN ($4E) island from $26B4
+    ORG $6C9C    ; IN ($4E) island from $26B4
     call HOOK_IN_STATUS
     db  $1F
     jp  $86B7
 
-    ORG $6C8C    ; IN ($4E) island from $279D
+    ORG $6CA3    ; IN ($49) island from $26C3
+    call HOOK_IN_SYSTEM
+    db  $2F
+    jp  $86C6
+
+    ORG $6CAA    ; IN ($4E) island from $279D
     call HOOK_IN_STATUS
     db  $CB,$7F
     jp  $87A1
 
-    ORG $6C94    ; IN ($48) island from $2DD2
+    ORG $6CB2    ; IN ($48) island from $2DD2
     call HOOK_IN_P1
     db  $C8
     jp  $8DD5
 
-    ORG $6C9B    ; IN ($4A) island from $2DD5
+    ORG $6CB9    ; IN ($4A) island from $2DD5
     call HOOK_IN_P1
     db  $C9
     jp  $8DD8

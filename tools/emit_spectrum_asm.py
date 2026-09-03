@@ -35,7 +35,9 @@ ZX_SCRATCH_PAD = 0xA400  # arcade $4000–$43FF
 ZX_VIDEO = 0xA800  # arcade $4400–$5BFF (192 lines × 32)
 ZX_MAGIC_SCRATCH = 0xC000  # arcade $6000–$63FF
 ZX_MAGIC = 0xC400  # arcade $6400–$7BFF (192 lines × 32)
-ZX_HAL = 0xDC00  # host hooks / blit / input
+# Gap $DC00–$DFFF: magic row stride/flush can touch past $DBFF; do not pack HAL
+# against the magic plane.
+ZX_HAL = 0xE000  # host hooks / blit / input
 ZX_COLOR = 0xF000  # arcade $8000–$87FF
 ZX_STACK = 0xFFFE
 
@@ -54,26 +56,26 @@ HOOK_IN_P1 = ZX_HAL + 0x09
 HOOK_IN_STATUS = ZX_HAL + 0x0C
 HOOK_NMI = ZX_HAL + 0x0F
 HOOK_PRINT_CHAR = ZX_HAL + 0x12
-HOOK_IN_SAFE = ZX_HAL + 0x15
+HOOK_IN_SYSTEM = ZX_HAL + 0x15
 
 ENTRY_HOOKS = {
     0x2817: "HOOK_DRAW_SPRITE",
     0x1A4E: "HOOK_CLEAR_SCREEN",
-    0x29A1: "HOOK_RTOAX",
+    # RTOAX at $29A1 is `ld b,$90` then falls into CALCULATE at $29A3.
     0x29A3: "HOOK_RTOAX",
     0x1721: "HOOK_NMI",
     0x29DB: "HOOK_PRINT_CHAR",
 }
 
-# Ports → HAL veneer. Safe ports become `ld a,0` (2 bytes). Others JP island.
+# Ports → HAL. Active-low inputs idle as $FF. SYSTEM has coin/start keys.
 IN_HOOKS = {
     0x48: "HOOK_IN_P1",
     0x4A: "HOOK_IN_P1",
     0x4E: "HOOK_IN_STATUS",
-    0x49: "SAFE",
-    0x60: "SAFE",
-    0x61: "SAFE",
-    0x65: "SAFE",
+    0x49: "HOOK_IN_SYSTEM",
+    0x60: "IDLE_00",  # F3: input/crosshair tests OFF
+    0x61: "DIP_F2",   # F2: bonus life $C0, color test off
+    0x65: "IDLE_00",  # SW2 free-game bit0 active-HIGH → idle 0
 }
 
 # Force-emit ranges as remapped data words (listing mis-disassembles these).
@@ -229,7 +231,7 @@ HOOK_IN_P1           EQU ${HOOK_IN_P1:04X}
 HOOK_IN_STATUS       EQU ${HOOK_IN_STATUS:04X}
 HOOK_NMI             EQU ${HOOK_NMI:04X}
 HOOK_PRINT_CHAR      EQU ${HOOK_PRINT_CHAR:04X}
-HOOK_IN_SAFE         EQU ${HOOK_IN_SAFE:04X}
+HOOK_IN_SYSTEM       EQU ${HOOK_IN_SYSTEM:04X}
 
 ARC_COLD             EQU ${map_addr(0x1602):04X}
 ARC_ATTRACT          EQU ${map_addr(0x164B):04X}
@@ -320,7 +322,7 @@ def emit_berzerk_asm(path: Path) -> dict:
         "ZX_PROM", "ZX_SCRATCH_CMOS", "ZX_SCRATCH_PAD", "ZX_VIDEO",
         "ZX_MAGIC_SCRATCH", "ZX_MAGIC", "ZX_HAL", "ZX_COLOR", "ZX_STACK",
         "HOOK_DRAW_SPRITE", "HOOK_CLEAR_SCREEN", "HOOK_RTOAX", "HOOK_IN_P1",
-        "HOOK_IN_STATUS", "HOOK_NMI", "HOOK_PRINT_CHAR", "HOOK_IN_SAFE",
+        "HOOK_IN_STATUS", "HOOK_NMI", "HOOK_PRINT_CHAR", "HOOK_IN_SYSTEM",
         "ARC_COLD", "ARC_ATTRACT", "ARC_START_GAME", "ARC_ROOM_START", "ARC_IRQ",
     }
     # Collect code labels so EQUs that share a name don't collide.
@@ -437,9 +439,21 @@ def emit_berzerk_asm(path: Path) -> dict:
             if m_in:
                 port = int(m_in.group(1), 16)
                 hook = IN_HOOKS.get(port)
-                if hook == "SAFE":
+                if hook == "IDLE_FF":
+                    a(f"    ORG ${zx:04X}")
+                    a(f"    ld  a,$FF               ; was IN (${port:02X}) idle (active-low)")
+                    stats["in_hooks"] += 1
+                    addr = insn.addr + 2
+                    continue
+                if hook == "IDLE_00":
                     a(f"    ORG ${zx:04X}")
                     a(f"    ld  a,0                 ; was IN (${port:02X})")
+                    stats["in_hooks"] += 1
+                    addr = insn.addr + 2
+                    continue
+                if hook == "DIP_F2":
+                    a(f"    ORG ${zx:04X}")
+                    a(f"    ld  a,$C0               ; F2 DIPs: bonus 5k+10k")
                     stats["in_hooks"] += 1
                     addr = insn.addr + 2
                     continue

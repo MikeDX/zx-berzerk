@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Smoke-run build/berzerk.sna under a headless Z80 (Spectrum map).
 
-Catches reset ($0000) and verifies attract / IRQ after the IM2 I-page fix
-(I must be $97 so vector fetches hit remapped PROM at $97FF, not Spectrum ROM).
+Catches reset ($0000), IRQ-stack smash, and verifies attract after the IM2
+I-page fix (I must be $97 so vector fetches hit remapped PROM at $97FF).
 
   tools/.venv/bin/python tools/smoke_sna.py [insns]
 """
@@ -24,7 +24,8 @@ except ImportError:
 ARC_COLD = 0x7602
 ARC_ATTRACT = 0x764B
 ARC_IRQ = 0x86AB
-HOOK_BASE = 0xDC00
+HOOK_BASE = 0xE000
+IRQ_STACK_PAGE = 0xA0  # arcade ld sp,$0840 → $A040
 
 
 def load_sna(path: Path) -> tuple[bytearray, int, int]:
@@ -40,7 +41,7 @@ def load_sna(path: Path) -> tuple[bytearray, int, int]:
 
 
 def main() -> int:
-    insns = int(sys.argv[1]) if len(sys.argv) > 1 else 200_000
+    insns = int(sys.argv[1]) if len(sys.argv) > 1 else 400_000
     sna = ROOT / "build/berzerk.sna"
     if not sna.exists():
         print("error: build/berzerk.sna missing — run make first", file=sys.stderr)
@@ -51,6 +52,8 @@ def main() -> int:
     print(f"cold {bytes(mem[ARC_COLD:ARC_COLD+8]).hex()}")
     print(f"IM2 $97FF={bytes(mem[0x97FF:0x9801]).hex()} (want ab86)")
     print(f"IRQ {bytes(mem[ARC_IRQ:ARC_IRQ+3]).hex()}")
+    print(f"RTOAX entry $89A3={bytes(mem[0x89A3:0x89A6]).hex()} (want C3 .. E0)")
+    print(f"RTOAX ld b $89A1={bytes(mem[0x89A1:0x89A3]).hex()} (want 06 90)")
 
     for a in range(0x00, 0x40, 8):
         mem[a] = 0xC9
@@ -61,7 +64,7 @@ def main() -> int:
     cpu.sp = sp
     cpu.set_get_int_vector_callback(lambda: 0xFF)
 
-    hits = {"attract": 0, "irq": 0, "reset": 0, "rom": 0, "hook": 0}
+    hits = {"attract": 0, "irq": 0, "rom": 0, "hook": 0}
     recent: deque[tuple[int, int, int]] = deque(maxlen=24)
     for i in range(insns):
         p = cpu.pc
@@ -76,14 +79,20 @@ def main() -> int:
             for j, rp, rsp in recent:
                 print(f"  {j:6d} PC=${rp:04X} SP=${rsp:04X}")
             return 1
+        if cpu.sp < 0x4000 or cpu.sp > 0xFFFE:
+            print(f"FAIL: SP=${cpu.sp:04X} after {i} insns PC=${p:04X}")
+            return 1
         if HOOK_BASE <= p < HOOK_BASE + 0x800:
             hits["hook"] += 1
+            # frame_blit / deep HAL on IRQ scratch stack → reset
+            if (cpu.sp >> 8) == IRQ_STACK_PAGE and p >= HOOK_BASE + 0x20:
+                # allow thin status veneer only; blit lives deeper in HAL
+                pass  # checked via low-PC failure
 
         cpu.ticks_to_stop = 1
         cpu.run()
 
         if hits["attract"] and i % 512 == 0:
-            # Only inject if we won't force vblank every time — status hook pulses.
             cpu.on_handle_active_int()
 
     print(
