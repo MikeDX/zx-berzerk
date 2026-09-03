@@ -27,13 +27,27 @@ TAP         := $(BUILD)/$(PROJECT).tap
 LST         := $(BUILD)/$(PROJECT).lst
 SYM         := $(BUILD)/$(PROJECT).sym
 
-.PHONY: all assemble arcade run run-arcade tap clean check-tools convert smoke-arcade
+.PHONY: all assemble arcade run run-arcade tap clean check-tools convert smoke-arcade \
+	headless headless-trace
 
 all: assemble
 
 assemble: check-tools $(SNA) $(TAP)
 
 arcade: check-tools convert-reloc $(BUILD)/arcade.sna $(BUILD)/arcade.tap
+
+# Faithful arcade-map run (docs/PORT.md). Prefer this over binary reloc experiments.
+headless:
+	@test -x tools/.venv/bin/python || { \
+	  echo "creating tools/.venv + z80…"; \
+	  python3 -m venv tools/.venv && tools/.venv/bin/pip install -q z80; }
+	tools/.venv/bin/python tools/headless_berzerk.py --insns 200000
+
+headless-trace: 
+	@test -x tools/.venv/bin/python || { \
+	  echo "creating tools/.venv + z80…"; \
+	  python3 -m venv tools/.venv && tools/.venv/bin/pip install -q z80; }
+	tools/.venv/bin/python tools/headless_berzerk.py --insns 1000000 --json $(BUILD)/arcade_access.json
 
 smoke-arcade: convert-reloc
 	@test -x tools/.venv/bin/python || { \
