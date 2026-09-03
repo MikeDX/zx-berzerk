@@ -40,9 +40,11 @@ ZX_HAL = 0xE000  # host hooks / blit / input
 ZX_COLOR = 0xF000  # arcade $8000–$87FF
 ZX_STACK = 0xFFFE
 
-# IM2: arcade uses I=$37 (table at $37xx in PROM). After remap the table
-# lives at ZX_PROM+$3700 = $9700, so I must be $97 — not $37 (Spectrum ROM).
-ZX_IM2_PAGE = (ZX_PROM >> 8) + 0x37  # $97
+# IM2: arcade I=$37 (ACK $FC → $37FC). Spectrum bus is usually $FF, sometimes
+# not — a 2-byte vector in PROM at $97FF misses. Host fills page $EE (HAL tail)
+# with $EE so any bus byte vectors to $EEEE → ARC_IRQ. `ld a,$37` in the IRQ
+# epilogue is rewritten to this page.
+ZX_IM2_PAGE = 0xEE
 
 VIDEO_LINES = 224  # storage (arcade 223 + pad); Spectrum shows top 192
 VIDEO_STRIDE = 32
@@ -58,6 +60,8 @@ HOOK_IN_STATUS = ZX_HAL + 0x0C
 HOOK_NMI = ZX_HAL + 0x0F
 HOOK_PRINT_CHAR = ZX_HAL + 0x12
 HOOK_IN_SYSTEM = ZX_HAL + 0x15
+HOOK_GAME_LOOP = ZX_HAL + 0x18
+HOOK_OUT_MAGIC = ZX_HAL + 0x1B
 
 ENTRY_HOOKS = {
     0x2817: "HOOK_DRAW_SPRITE",
@@ -66,6 +70,9 @@ ENTRY_HOOKS = {
     0x29A3: "HOOK_RTOAX",
     0x1721: "HOOK_NMI",
     0x29DB: "HOOK_PRINT_CHAR",
+    # Room loop: `bit 2,(ix+0); ret z` with MAN_PTR=0 reads Spectrum ROM $0000
+    # and leaves the room (clears vectors). Arcade $0000 is NOP — same trap.
+    0x2157: "HOOK_GAME_LOOP",
 }
 
 # Ports → HAL. Active-low inputs idle as $FF. SYSTEM has coin/start keys.
@@ -215,6 +222,9 @@ RE_HEX_ADDR = re.compile(r"\$([0-9A-Fa-f]{4})\b")
 RE_IN_PORT = re.compile(
     r"^\s*in\s+a\s*,\s*\(\s*\$([0-9A-Fa-f]{2})\s*\)\s*$", re.I
 )
+RE_OUT_PORT = re.compile(
+    r"^\s*out\s+\(\s*\$([0-9A-Fa-f]{2})\s*\)\s*,\s*a\s*$", re.I
+)
 
 
 def map_addr(a: int) -> int:
@@ -246,9 +256,20 @@ def map_addr(a: int) -> int:
 def is_pointer_imm(nn: int) -> bool:
     if nn < 0x0800:
         return False
+    # Packed (X=L, Y=H) for RTOAX — not magic addresses. Remapping $641E
+    # (MAN at X=$1E,Y=$64) to $C41E parked the player at Y=$C4 (off-screen).
+    if nn in NEVER_REMAP_IMMS:
+        return False
     if nn < 0x8800:
         return True
     return False
+
+
+# ld hl,nn packs used as coordinates (H=Y, L=X), not pointers.
+NEVER_REMAP_IMMS = {
+    0x641E,  # $1807 set MAN_X/MAN_Y
+    0x4438,  # $258B maze generator start (X=$38,Y=$44), not video ptr
+}
 
 
 _REGISH = {
@@ -346,11 +367,15 @@ HOOK_IN_STATUS       EQU ${HOOK_IN_STATUS:04X}
 HOOK_NMI             EQU ${HOOK_NMI:04X}
 HOOK_PRINT_CHAR      EQU ${HOOK_PRINT_CHAR:04X}
 HOOK_IN_SYSTEM       EQU ${HOOK_IN_SYSTEM:04X}
+HOOK_GAME_LOOP       EQU ${HOOK_GAME_LOOP:04X}
+HOOK_OUT_MAGIC       EQU ${HOOK_OUT_MAGIC:04X}
 
 ARC_COLD             EQU ${map_addr(0x1602):04X}
 ARC_ATTRACT          EQU ${map_addr(0x164B):04X}
 ARC_START_GAME       EQU ${map_addr(0x17B8):04X}
 ARC_ROOM_START       EQU ${map_addr(0x209D):04X}
+ARC_ROOM_MOVE        EQU ${map_addr(0x2160):04X}
+ARC_ROOM_JOBS        EQU ${map_addr(0x21C9):04X}
 ARC_IRQ              EQU ${map_addr(0x26AB):04X}
 """
     )
@@ -437,7 +462,9 @@ def emit_berzerk_asm(path: Path) -> dict:
         "ZX_MAGIC_SCRATCH", "ZX_MAGIC", "ZX_HAL", "ZX_COLOR", "ZX_STACK",
         "HOOK_DRAW_SPRITE", "HOOK_CLEAR_SCREEN", "HOOK_RTOAX", "HOOK_IN_P1",
         "HOOK_IN_STATUS", "HOOK_NMI", "HOOK_PRINT_CHAR", "HOOK_IN_SYSTEM",
+        "HOOK_GAME_LOOP", "HOOK_OUT_MAGIC",
         "ARC_COLD", "ARC_ATTRACT", "ARC_START_GAME", "ARC_ROOM_START", "ARC_IRQ",
+        "ARC_ROOM_MOVE", "ARC_ROOM_JOBS",
     }
     # Collect code labels so EQUs that share a name don't collide.
     code_labels = {sanitize_label(lab) for i in insns for lab in i.labels}
@@ -628,6 +655,33 @@ def emit_berzerk_asm(path: Path) -> dict:
                     stats["in_hooks"] += 1
                     addr = cont
                     continue
+
+            m_out = RE_OUT_PORT.match(insn.text.strip())
+            if m_out and int(m_out.group(1), 16) == 0x4B:
+                # Magic control latch (pixel shift in bits 0–2). 2-byte OUT.
+                next_pc = insn.addr + 2
+                nlen = insn_len(rom, next_pc)
+                stolen = bytearray(rom[next_pc : next_pc + nlen])
+                stats["rewrites"] += rewrite_insn_immediates(stolen)
+                cont = next_pc + nlen
+                isl = island_pc
+                island_pc += 3 + nlen + 3
+                if island_pc > 0x1000:
+                    raise SystemExit("I/O island space exhausted in $0C00-$0FFF")
+                stolen_asm = ",".join(f"${b:02X}" for b in stolen)
+                islands.append(
+                    f"    ORG ${map_addr(isl):04X}    ; OUT ($4B) island "
+                    f"from ${addr:04X}\n"
+                    f"    call HOOK_OUT_MAGIC\n"
+                    f"    db  {stolen_asm}\n"
+                    f"    jp  ${map_addr(cont):04X}"
+                )
+                a(f"    ORG ${zx:04X}")
+                a(f"    jp  ${map_addr(isl):04X}      ; OUT ($4B) → HOOK_OUT_MAGIC")
+                skip_until = cont
+                stats["in_hooks"] += 1
+                addr = cont
+                continue
 
             rewritten, n = rewrite_text_addrs(clean_mnemonic(insn.text))
             stats["rewrites"] += n

@@ -57,13 +57,21 @@ hook_rtoax:
     ld      bc,ZX_MAGIC
     add     hl,bc
     pop     bc
-    ld      a,$90
+    ld      a,(rtoax_x)
+    and     7
+    ld      (magic_shift),a
+    or      b                       ; arcade: (X&7) | control
     ret
 
 hook_draw_sprite:
     ; Magic plane only — Spectrum bitmap is presented by frame_blit.
-    ; Drawing to both caused XOR flicker on every erase/draw.
+    ; IRQ uses SP=$A040 (~64 bytes); a 16-row sprite overflows that into PROM.
     push    af
+    ld      a,i
+    di
+    push    af
+    ld      (blit_save_sp),sp
+    ld      sp,blit_stack
     push    bc
     push    de
     push    hl
@@ -71,7 +79,8 @@ hook_draw_sprite:
     push    hl
     pop     ix
     call    magic_dest_xy
-    ld      a,b
+    ld      a,(magic_shift)
+    add     a,b                     ; byte column * 8 + (X&7)
     ld      (draw_x),a
     ld      a,c
     ld      (draw_y),a
@@ -86,6 +95,11 @@ hook_draw_sprite:
     pop     hl
     pop     de
     pop     bc
+    ld      sp,(blit_save_sp)
+    pop     af
+    jp      po,.noid
+    ei
+.noid:
     pop     af
     ret
 
@@ -142,57 +156,63 @@ hook_in_p1:
 hook_in_status:
     ; Preserve HL — IRQ samples $4E before saving HL.
     push    hl
-    ; Present shadows even from IRQ (frame_blit has its own stack).
-    ld      a,(blit_div)
-    inc     a
-    ld      (blit_div),a
-    and     3                       ; every 4th status poll
-    call    z,frame_blit
-    ld      hl,ZX_SCRATCH_CMOS + ($0876 - $0800)  ; MAN_PTR
-    ld      a,(hl)
-    inc     hl
-    ld      h,(hl)
-    ld      l,a
+    push    bc
+    ; Present once per IRQ prologue, not after every sprite collision IN
+    ; (that was ~100 full-screen blits/sec and made the game crawl).
+    ld      hl,0
+    add     hl,sp
     ld      a,h
-    cp      ZX_SCRATCH_CMOS >> 8
-    jr      c,.idle
-    cp      ZX_HAL >> 8
-    jr      nc,.idle
+    cp      ZX_SCRATCH_CMOS >> 8    ; IRQ SP page $A0
+    jr      nz,.noblit
+    ld      a,l
+    cp      $30                     ; still near $A040, not BOTTOM's deep frame
+    jr      c,.noblit
+    call    frame_blit
+.noblit:
+    ld      c,0
     ld      a,(magic_collide)
     or      a
-    jr      z,.vblank
+    jr      z,.nocoll
     xor     a
     ld      (magic_collide),a
-    ld      a,%10000001
-    pop     hl
-    ret
-.vblank:
+    ld      c,%10000000
+.nocoll:
     ld      a,(vblank_div)
     inc     a
     ld      (vblank_div),a
+    and     1
+    ld      a,c
+    jr      nz,.out
+    or      %00000001
+.out:
+    pop     bc
+    pop     hl
+    ret
+
+hook_out_magic:
+    push    af
     and     7
-    ld      a,%00000001
-    jr      z,.vblank_out
-    xor     a
-.vblank_out:
-    pop     hl
-    ret
-.idle:
-    ld      a,(magic_collide)
-    or      a
-    jr      z,.zero
-    xor     a
-    ld      (magic_collide),a
-    ld      a,%10000000
-    pop     hl
-    ret
-.zero:
-    xor     a
-    pop     hl
+    ld      (magic_shift),a
+    pop     af
     ret
 
 hook_nmi:
     ret
+
+; Room loop $2157: arcade `bit 2,(MAN_PTR); ret z` with a NULL pointer reads
+; address 0. On the Spectrum that is ROM ($F3, MOVE bit clear) so we RET out
+; of the room, $22F1 wipes vectors, and only the maze walls remain.
+; With no player yet, keep pumping jobs until MAN_INIT sets MAN_PTR.
+hook_game_loop:
+    ld      ix,(ZX_SCRATCH_CMOS + ($0876 - $0800))
+    push    ix
+    pop     hl
+    ld      a,h
+    or      l
+    jp      z,ARC_ROOM_JOBS
+    bit     2,(ix+$00)
+    ret     z
+    jp      ARC_ROOM_MOVE
 
 ; SYSTEM $49 — active-low. Idle $FF.
 ; Keys: 0 or ENTER = COIN1, 1 = START1, 2 = START2.

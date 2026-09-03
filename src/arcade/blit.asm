@@ -207,13 +207,14 @@ magic_xor_sprite:
     ld      a,(spr_row)
     xor     (hl)
     ld      (hl),a
-    ld      a,(spr_row+1)
-    or      a
-    jr      z,.m2
     inc     hl
+    ld      a,(spr_row+1)
     xor     (hl)
     ld      (hl),a
-.m2:
+    inc     hl
+    ld      a,(spr_row+2)
+    xor     (hl)
+    ld      (hl),a
     pop     hl
     pop     bc
     jr      .next
