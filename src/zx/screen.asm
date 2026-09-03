@@ -21,6 +21,54 @@ zx_cls:
     out     ($FE),a                         ; black border
     ret
 
+; Print A (ASCII) at character cell B=column (0-31), C=row (0-23).
+; Uses the 48K ROM font at $3D00.
+zx_print_char:
+    push    bc
+    push    de
+    push    hl
+    ld      h,0
+    ld      l,a
+    add     hl,hl
+    add     hl,hl
+    add     hl,hl
+    ld      de,$3D00 - 256                  ; $3D00 - 32*8
+    add     hl,de
+    ex      de,hl                           ; DE -> glyph
+    ld      a,c
+    and     %00011000
+    or      %01000000
+    ld      h,a
+    ld      a,c
+    and     7
+    rrca
+    rrca
+    rrca
+    or      b
+    ld      l,a
+    ld      b,8
+.row:
+    ld      a,(de)
+    ld      (hl),a
+    inc     de
+    inc     h
+    djnz    .row
+    pop     hl
+    pop     de
+    pop     bc
+    ret
+
+; HL -> NUL-terminated string. B=column, C=row.
+zx_print:
+    ld      a,(hl)
+    or      a
+    ret     z
+    inc     hl
+    call    zx_print_char
+    inc     b
+    jr      zx_print
+
+
 ; HL = pixel address for (B=x 0..255, C=y 0..191)
 ; Standard Spectrum screen address formula.
 zx_pixel_addr:

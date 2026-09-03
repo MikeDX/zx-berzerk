@@ -21,6 +21,11 @@ maze_hwall:
 maze_vwall:
     ld      a,18
 .vloop:
+    ld      d,a
+    ld      a,c
+    cp      192
+    ret     nc
+    ld      a,d
     push    af
     push    bc
     ld      hl,spr_brick

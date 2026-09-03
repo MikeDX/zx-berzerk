@@ -21,6 +21,7 @@ player_fire_cd: db 0
 otto_active:    db 0
 frame_tick:     db 0
 hud_dirty:      db 1
+game_mode:      db 0                        ; 0 = attract, 1 = play
 
 door_bits:      ds 15
 

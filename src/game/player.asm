@@ -112,6 +112,7 @@ player_update:
 
 .tick:
     call    entity_move
+    call    player_touch_robots
     pop     hl                              ; previous D.P
     ld      a,(ix+V_DP_L)
     cp      l
@@ -154,12 +155,70 @@ player_draw:
     ld      ix,player_vec
     bit     1,(ix+V_STATUS)
     ret     z
-    call    entity_erase
-    call    entity_draw
-    res     1,(ix+V_STATUS)
-    set     0,(ix+V_STATUS)
+    call    vec_resolve_sprite
+    call    entity_draw_pos
+    ld      l,(ix+V_SPR_L)
+    ld      h,(ix+V_SPR_H)
+    push    bc
+    call    collide_sprite
+    pop     bc
     ld      a,(draw_collide)
     or      a
-    ret     z
+    jr      z,.paint
+    ; Wall: undo the step, leave the last good sprite on screen (arcade
+    ; electrocutes; we refuse the move until the maze is pixel-exact).
+    ld      a,(ix+V_OLDX)
+    ld      (ix+V_PX),a
+    ld      a,(ix+V_OLDY)
+    ld      (ix+V_PY),a
+    xor     a
+    ld      (ix+V_VX),a
+    ld      (ix+V_VY),a
+    res     1,(ix+V_STATUS)
+    ret
+.paint:
+    call    entity_erase
+    call    entity_draw_pos
+    ld      l,(ix+V_SPR_L)
+    ld      h,(ix+V_SPR_H)
+    call    or_sprite
+    call    entity_stash_old
+    res     1,(ix+V_STATUS)
+    set     0,(ix+V_STATUS)
+    ret
+
+; Touching a live robot kills the player (arcade Magic RAM intercept).
+player_touch_robots:
+    ld      ix,robot_vecs
+    ld      b,MAX_ROBOTS
+.lp:
+    push    bc
+    ld      a,(ix+V_KIND)
+    cp      KIND_ROBOT
+    jr      nz,.nx
+    bit     7,(ix+V_STATUS)
+    jr      nz,.nx
+    ld      a,(player_vec+V_PX)
+    sub     (ix+V_PX)
+    jr      nc,.dx
+    neg
+.dx:
+    cp      8
+    jr      nc,.nx
+    ld      a,(player_vec+V_PY)
+    sub     (ix+V_PY)
+    jr      nc,.dy
+    neg
+.dy:
+    cp      12
+    jr      nc,.nx
+    pop     bc
+    ld      ix,player_vec
     set     7,(ix+V_STATUS)
+    ret
+.nx:
+    ld      de,VEC_SIZE
+    add     ix,de
+    pop     bc
+    djnz    .lp
     ret

@@ -22,8 +22,8 @@ WALL_TOP_Y      EQU 0
 WALL_BOT_Y      EQU 184
 WALL_LEFT_X     EQU 4
 WALL_RIGHT_X    EQU 248
-ROW1_Y          EQU 56                      ; arcade $38
-ROW2_Y          EQU 136                     ; arcade $88
+ROW1_Y          EQU $44                     ; arcade interior row 1 ($4438)
+ROW2_Y          EQU $88                     ; arcade interior row 2 ($8838)
 CELL_PITCH      EQU $30
 
 ; Exit thresholds (tuned for 192-line screen)

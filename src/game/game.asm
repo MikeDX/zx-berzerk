@@ -1,4 +1,48 @@
-; Room / game flow
+; Room / game flow — attract ($164B) then play ($17B8 / $209D)
+
+txt_title:
+    db      "BERZERK",0
+txt_start:
+    db      "PUSH FIRE TO START",0
+txt_credits:
+    db      "FREE PLAY",0
+txt_copy:
+    db      "(C) 1980 STERN",0
+
+attract_init:
+    xor     a
+    ld      (game_mode),a
+    call    zx_cls
+    ld      hl,$5800
+    ld      de,$5801
+    ld      bc,767
+    ld      (hl),%00000110                  ; yellow ink
+    ldir
+    ld      b,12
+    ld      c,6
+    ld      hl,txt_title
+    call    zx_print
+    ld      b,7
+    ld      c,12
+    ld      hl,txt_start
+    call    zx_print
+    ld      b,11
+    ld      c,16
+    ld      hl,txt_credits
+    call    zx_print
+    ld      b,9
+    ld      c,20
+    ld      hl,txt_copy
+    call    zx_print
+    ret
+
+attract_frame:
+    call    input_poll
+    and     FIRE
+    ret     z
+    ld      a,1
+    ld      (game_mode),a
+    jp      game_init
 
 game_init:
     xor     a
@@ -132,17 +176,9 @@ room_check_exit:
     jp      room_next
 
 game_over:
-    ; red border, freeze until fire
-    ld      a,2
-    out     ($FE),a
-.wait:
-    halt
-    call    input_poll
-    and     FIRE
-    jr      z,.wait
     xor     a
     out     ($FE),a
-    jp      game_init
+    jp      attract_init
 
 ; Main per-frame update
 game_frame:

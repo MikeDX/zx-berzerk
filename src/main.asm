@@ -20,11 +20,17 @@ basend:
 start:
     di
     ld      sp,$FF58
-    call    game_init
     ei
+    call    attract_init
 .main:
     halt
+    ld      a,(game_mode)
+    or      a
+    jr      z,.att
     call    game_frame
+    jr      .main
+.att:
+    call    attract_frame
     jr      .main
 
 ; ---------------------------------------------------------------------------
