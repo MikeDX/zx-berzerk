@@ -61,6 +61,12 @@ hook_rtoax:
     and     7
     ld      (magic_shift),a
     or      b                       ; arcade: (X&7) | control
+    ; OUT ($4B) / magicram_control_w raises the intercept flip-flop.
+    ; Maze bricks that share a pixel must not kill the first sprite.
+    push    af
+    xor     a
+    ld      (magic_collide),a
+    pop     af
     ret
 
 hook_draw_sprite:
@@ -164,9 +170,7 @@ hook_in_status:
     ld      a,(magic_collide)
     or      a
     jr      z,.nocoll
-    xor     a
-    ld      (magic_collide),a
-    ld      c,%10000000
+    ld      c,%10000000             ; latch stays until next OUT ($4B)
 .nocoll:
     ld      hl,0
     add     hl,sp
@@ -195,6 +199,8 @@ hook_out_magic:
     push    af
     and     7
     ld      (magic_shift),a
+    xor     a
+    ld      (magic_collide),a
     pop     af
     ret
 
