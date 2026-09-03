@@ -30,10 +30,11 @@ start:
 ; ---------------------------------------------------------------------------
     INCLUDE "src/zx/screen.asm"
     INCLUDE "src/zx/input.asm"
+    INCLUDE "src/game/romdata.asm"
     INCLUDE "src/game/draw.asm"
+    INCLUDE "src/game/pattern.asm"
     INCLUDE "src/game/util.asm"
     INCLUDE "src/game/tables.asm"
-    INCLUDE "src/game/sprites.asm"
     INCLUDE "src/game/entity.asm"
     INCLUDE "src/game/maze.asm"
     INCLUDE "src/game/bolts.asm"

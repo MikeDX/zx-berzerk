@@ -17,7 +17,7 @@ rsaved:         db 0
 score:          db 0,0,0                    ; BCD
 rng_seed:       dw 0
 player_dir:     db DOWN
-player_firing:  db 0
+player_fire_cd: db 0
 otto_active:    db 0
 frame_tick:     db 0
 hud_dirty:      db 1
@@ -35,7 +35,9 @@ bolt_from_robot: db 0
 draw_collide:   db 0
 spr_shift:      db 0
 spr_hleft:      db 0
+spr_w:          db 0
 spr_addr:       dw 0
 spr_mask:       dw 0
+spr_row:        db 0,0,0
 
 game_vars_end:

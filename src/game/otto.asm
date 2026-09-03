@@ -1,4 +1,4 @@
-; Evil Otto
+; Evil Otto — bounce animation $120B, seeks player, ignores walls
 
 otto_clear:
     ld      ix,otto_vec
@@ -8,14 +8,12 @@ otto_update:
     ld      a,(otto_active)
     or      a
     jr      nz,.chase
-    ; countdown
     ld      a,(otto_timer)
     or      a
     ret     z
     dec     a
     ld      (otto_timer),a
     ret     nz
-    ; appear opposite player
     ld      ix,otto_vec
     call    vec_clear
     ld      a,KIND_OTTO
@@ -38,10 +36,10 @@ otto_update:
     ld      (ix+V_PY),c
     ld      a,3
     ld      (ix+V_TPRIME),a
+    ld      a,1
     ld      (ix+V_TIME),a
-    ld      hl,spr_otto
-    ld      (ix+V_SPR_L),l
-    ld      (ix+V_SPR_H),h
+    ld      hl,PAT_OTTO
+    call    vec_set_pattern
     ld      a,1
     ld      (otto_active),a
     ret
@@ -49,7 +47,6 @@ otto_update:
 .chase:
     ld      ix,otto_vec
     call    entity_erase
-    ; seek player (ignores walls — no collision kill)
     ld      a,(player_vec+V_PX)
     sub     (ix+V_PX)
     ld      d,0
@@ -73,7 +70,6 @@ otto_update:
     set     0,(ix+V_STATUS)
     set     1,(ix+V_STATUS)
 
-    ; touch player?
     ld      a,(ix+V_PX)
     ld      b,a
     ld      a,(player_vec+V_PX)
@@ -103,11 +99,4 @@ otto_draw:
     ld      ix,otto_vec
     bit     1,(ix+V_STATUS)
     ret     z
-    ; OR only — Otto walks through walls
-    ld      b,(ix+V_PX)
-    ld      c,(ix+V_PY)
-    ld      (ix+V_OLDX),b
-    ld      (ix+V_OLDY),c
-    ld      l,(ix+V_SPR_L)
-    ld      h,(ix+V_SPR_H)
-    jp      or_sprite
+    jp      entity_draw_noclip

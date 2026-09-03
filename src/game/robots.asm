@@ -1,4 +1,4 @@
-; Robots — seek player, optional shoot, die on HIT
+; Robots — SEEK / SETPAT / BLAM
 
 robots_clear:
     ld      ix,robot_vecs
@@ -25,8 +25,6 @@ robots_spawn:
     call    random
     ld      c,a
     ld      a,(spawn_thresh)
-    ; spawn if random >= (255-thresh) roughly → more thresh = more robots
-    ; simple: spawn if random < thresh (thresh grows each room)
     cp      c
     jr      c,.skip
 
@@ -102,12 +100,14 @@ robot_create:
     ld      (ix+V_PY),c
     ld      (ix+V_OLDX),b
     ld      (ix+V_OLDY),c
+    ld      a,$FF
+    ld      (ix+V_LAST),a
+    xor     a
+    call    robot_setpat
     ld      a,(robot_speed)
     ld      (ix+V_TPRIME),a
+    ld      a,1
     ld      (ix+V_TIME),a
-    ld      hl,spr_robot
-    ld      (ix+V_SPR_L),l
-    ld      (ix+V_SPR_H),h
     ld      hl,rcount
     inc     (hl)
     ret
@@ -127,9 +127,9 @@ robots_update:
     ret
 
 .one:
-    bit     7,(ix+V_STATUS)
-    jp      nz,robot_blam
     call    entity_erase
+    bit     7,(ix+V_STATUS)
+    jp      nz,robot_exploding
 
     ld      a,(player_vec+V_PX)
     sub     (ix+V_PX)
@@ -152,20 +152,12 @@ robots_update:
     or      e
     push    af
     ld      a,d
-    and     e
-    jr      nz,.check_fire
-    ld      a,d
-    or      e
-    jr      z,.noshoot
-    ; aligned on one axis — maybe fire
-.check_fire:
-    ld      a,d
     or      a
-    jr      z,.dofire
+    jr      z,.aligned
     ld      a,e
     or      a
     jr      nz,.noshoot
-.dofire:
+.aligned:
     call    random
     cp      16
     jr      nc,.noshoot
@@ -174,25 +166,58 @@ robots_update:
     call    robot_try_fire
 .noshoot:
     pop     af
-    call    set_velocity
-    ld      hl,spr_robot_move
-    ld      a,(ix+V_VX)
-    or      (ix+V_VY)
-    jr      nz,.spr
-    ld      hl,spr_robot
-.spr:
-    ld      (ix+V_SPR_L),l
-    ld      (ix+V_SPR_H),h
+    call    robot_setpat
     call    entity_move
     set     0,(ix+V_STATUS)
     set     1,(ix+V_STATUS)
     ret
 
-robot_blam:
-    call    entity_erase
+; HIT is set: start or continue the $103B explosion, then remove.
+robot_exploding:
+    ld      a,(ix+V_TAB_L)
+    cp      PAT_EXPLOSION & $FF
+    jr      nz,.start
+    ld      a,(ix+V_TAB_H)
+    cp      PAT_EXPLOSION >> 8
+    jr      z,.run
+.start:
+    xor     a
+    ld      (ix+V_VX),a
+    ld      (ix+V_VY),a
+    ld      a,(ix+V_PX)
+    sub     4
+    ld      (ix+V_PX),a
+    ld      a,(ix+V_PY)
+    sub     6
+    ld      (ix+V_PY),a
+    ld      hl,PAT_EXPLOSION
+    call    vec_set_pattern
+    ld      a,1
+    ld      (ix+V_TIME),a
+    ld      (ix+V_TPRIME),a
     ld      b,1
     ld      c,5
     call    add_score
+    ld      hl,otto_timer
+    inc     (hl)
+    inc     (hl)
+    set     0,(ix+V_STATUS)
+    set     1,(ix+V_STATUS)
+    ret
+.run:
+    call    entity_move
+    ld      a,(ix+V_DP_L)
+    cp      $41
+    jr      nz,.keep
+    ld      a,(ix+V_DP_H)
+    cp      $10
+    jp      z,robot_remove
+.keep:
+    set     0,(ix+V_STATUS)
+    set     1,(ix+V_STATUS)
+    ret
+
+robot_remove:
     xor     a
     ld      (ix+V_KIND),a
     ld      (ix+V_STATUS),a
@@ -201,9 +226,6 @@ robot_blam:
     or      a
     jr      z,.nob
     dec     (hl)
-    ld      a,(otto_timer)
-    add     a,25
-    ld      (otto_timer),a
 .nob:
     ld      a,(rcount)
     or      a
@@ -231,11 +253,16 @@ robots_draw:
     jr      nz,.dn
     bit     1,(ix+V_STATUS)
     jr      z,.dn
+    bit     7,(ix+V_STATUS)
+    jr      nz,.blast
     call    entity_draw
     ld      a,(draw_collide)
     or      a
     jr      z,.dn
     set     7,(ix+V_STATUS)
+    jr      .dn
+.blast:
+    call    entity_draw_noclip
 .dn:
     ld      de,VEC_SIZE
     add     ix,de

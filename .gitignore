@@ -5,3 +5,4 @@
 *.lab
 *.sld
 .DS_Store
+tools/__pycache__

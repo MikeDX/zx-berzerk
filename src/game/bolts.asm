@@ -10,44 +10,13 @@ bolts_clear:
     djnz    .cl
     ret
 
-; A = DURL, IX = shooter vector. Returns B=x, C=y just outside the
-; shooter's hitbox so it can never shoot itself.
-bolt_spawn_pos:
-    ld      d,a
-    ld      a,(ix+V_PX)
-    add     a,3
-    ld      b,a
-    ld      a,(ix+V_PY)
-    add     a,7
-    ld      c,a
-    bit     0,d                             ; LEFT
-    jr      z,.nl
-    ld      a,(ix+V_PX)
-    sub     2
-    ld      b,a
-.nl:
-    bit     1,d                             ; RIGHT
-    jr      z,.nr
-    ld      a,(ix+V_PX)
-    add     a,10
-    ld      b,a
-.nr:
-    bit     2,d                             ; UP
-    jr      z,.nu
-    ld      a,(ix+V_PY)
-    sub     2
-    ld      c,a
-.nu:
-    bit     3,d                             ; DOWN
-    jr      z,.nd
-    ld      a,(ix+V_PY)
-    add     a,16
-    ld      c,a
-.nd:
-    ret
-
+; A = full input (FIRE | DURL). Arcade FIRE ($1F1B) using SR.TAB.
 player_try_fire:
-    ld      a,(player_dir)
+    ld      c,a
+    ld      a,(player_fire_cd)
+    or      a
+    ret     nz
+    ld      a,c
     and     $0F
     ret     z
     ld      iy,player_bolts
@@ -61,24 +30,44 @@ player_try_fire:
     djnz    .find
     ret
 .slot:
-    ld      a,(player_dir)
-    and     $0F
+    ld      a,c
+    ld      hl,sr_tab
+    call    durl_to_6
+    xor     a
+    ld      (ix+V_VX),a
+    ld      (ix+V_VY),a
+    ld      a,(hl)
+    inc     hl
+    ld      (ix+V_DP_L),a
+    ld      (ix+V_TAB_L),a
+    ld      a,(hl)
+    inc     hl
+    ld      (ix+V_DP_H),a
+    ld      (ix+V_TAB_H),a
+    ld      b,(hl)                          ; X offset
+    inc     hl
+    ld      c,(hl)                          ; Y offset
+    inc     hl
+    ld      a,(hl)                          ; bolt DURL
     ld      (iy+B_DIR),a
     ld      (iy+B_LAST),a
     xor     a
     ld      (iy+B_LEN),a
     ld      a,12
     ld      (iy+B_MAX),a
-    ld      ix,player_vec
-    ld      a,(iy+B_DIR)
-    call    bolt_spawn_pos
-    ld      (iy+B_X),b
-    ld      (iy+B_TX),b
-    ld      (iy+B_Y),c
-    ld      (iy+B_TY),c
+    ld      a,(ix+V_PX)
+    add     a,b
+    ld      (iy+B_X),a
+    ld      (iy+B_TX),a
+    ld      a,(ix+V_PY)
+    add     a,c
+    ld      (iy+B_Y),a
+    ld      (iy+B_TY),a
+    ld      a,8
+    ld      (player_fire_cd),a
     ret
 
-; A = DURL, IX = firing robot
+; A = DURL, IX = firing robot. Arcade SHOOT using S.TAB.
 robot_try_fire:
     ld      c,a
     ld      a,(rbolts_max)
@@ -96,19 +85,30 @@ robot_try_fire:
     ret
 .rslot:
     ld      a,c
-    and     $0F
+    ld      hl,shoot_tab
+    call    durl_to_6
+    inc     hl                              ; skip pattern
+    inc     hl
+    ld      b,(hl)
+    inc     hl
+    ld      c,(hl)
+    inc     hl
+    ld      a,(hl)
     ld      (iy+B_DIR),a
     xor     a
     ld      (iy+B_LEN),a
     ld      a,5
     ld      (iy+B_MAX),a
-    ld      a,(iy+B_DIR)
-    call    bolt_spawn_pos
-    ld      (iy+B_X),b
-    ld      (iy+B_TX),b
-    ld      (iy+B_Y),c
-    ld      (iy+B_TY),c
+    ld      a,(ix+V_PX)
+    add     a,b
+    ld      (iy+B_X),a
+    ld      (iy+B_TX),a
+    ld      a,(ix+V_PY)
+    add     a,c
+    ld      (iy+B_Y),a
+    ld      (iy+B_TY),a
     ret
+
 
 bolts_update:
     ; player bolts: only hurt robots

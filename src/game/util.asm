@@ -20,7 +20,7 @@ random:
     ret
 
 ; A = DURL bits → set IX vector VX/VY from m_tab
-; Also returns DE = d_tab offset (for callers that need it)
+; Returns DE = D.TAB offset (arcade SET_VELOCITY $2B3D)
 set_velocity:
     and     $0F
     ld      c,a
@@ -36,6 +36,50 @@ set_velocity:
     inc     hl
     ld      a,(hl)
     ld      (ix+V_VY),a
+    ret
+
+; CDIR ($1F94): A = DURL. Sets velocity and player walk/still/death table.
+cdir:
+    call    set_velocity                    ; DE = D.TAB offset
+    ld      hl,p_tab
+    add     hl,de
+    ld      a,(hl)
+    inc     hl
+    ld      h,(hl)
+    ld      l,a                             ; arcade address of pattern table
+    jp      vec_set_pattern
+
+; SETPAT ($2436): A = DURL. Sets velocity and robot animation table.
+; Skips if A equals the last direction this vector used.
+robot_setpat:
+    and     $0F
+    cp      (ix+V_LAST)
+    ret     z
+    ld      (ix+V_LAST),a
+    call    set_velocity
+    ld      hl,robot_anim_tab
+    add     hl,de
+    ld      a,(hl)
+    inc     hl
+    ld      h,(hl)
+    ld      l,a
+    jp      vec_set_pattern
+
+; A = DURL, HL = 6-byte-record table (SR.TAB / S.TAB)
+; Returns HL = table + D.TAB[A]*3
+durl_to_6:
+    and     $0F
+    ld      c,a
+    ld      b,0
+    push    hl
+    ld      hl,d_tab
+    add     hl,bc
+    ld      e,(hl)
+    ld      d,0
+    pop     hl
+    add     hl,de
+    add     hl,de
+    add     hl,de
     ret
 
 ; Clear a VECTOR to empty
