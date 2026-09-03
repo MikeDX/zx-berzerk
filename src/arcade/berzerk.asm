@@ -3203,9 +3203,7 @@ MOVE_AND_DRAW_BOLT:
     ORG $7575
     call $89A1 ; call RTOAX to get Magic RAM address and set XOR pixel mode
     ORG $7578
-    ld   (hl),$80 ; write a single pixel for the bolt
-    ORG $757A
-    jp  $6C7E      ; IN ($4E) → HOOK_IN_STATUS
+    jp  HOOK_BOLT_PIXEL              ; arcade $1578 hooked
     ORG $757D
     ret
 CHECK_IF_BOLT_OFFSCREEN:
@@ -3421,7 +3419,7 @@ COLLISION_DETECTION:
     ORG $7640
     djnz $7630
     ORG $7642
-    jp  $6C85      ; IN ($49) → HOOK_IN_SYSTEM
+    jp  $6C7E      ; IN ($49) → HOOK_IN_SYSTEM
     ORG $7645
     ld   hl,$A09F
     ORG $7648
@@ -3923,7 +3921,7 @@ V.LOOP:
     ORG $7811
     jr   z,$781E
     ORG $7813
-    jp  $6C8C      ; IN ($4A) → HOOK_IN_P1
+    jp  $6C85      ; IN ($4A) → HOOK_IN_P1
     ORG $7817
     jr   z,$781E
     ORG $7819
@@ -4375,7 +4373,7 @@ DECREMENT_CREDITS:
     ORG $79A5
     ld   l,$03
     ORG $79A7
-    jp  $6C94      ; IN ($49) → HOOK_IN_SYSTEM
+    jp  $6C8D      ; IN ($49) → HOOK_IN_SYSTEM
     ORG $79AA
     and  l
     ORG $79AB
@@ -4585,7 +4583,7 @@ CLEAR_SCREEN:
     ORG $7A7F
     ei
     ORG $7A80
-    jp  $6C9B      ; IN ($4A) → HOOK_IN_P1
+    jp  $6C94      ; IN ($4A) → HOOK_IN_P1
     ORG $7A84
     jr   nz,$7A93
     ORG $7A86
@@ -5682,9 +5680,9 @@ MOVE_PLAYER:
     ORG $7EE5
     jr   z,$7EEB ; yes, goto $1EEB
     ORG $7EE7
-    jp  $6CA3      ; IN ($4A) → HOOK_IN_P1
+    jp  $6C9C      ; IN ($4A) → HOOK_IN_P1
     ORG $7EEB
-    jp  $6CAB      ; IN ($48) → HOOK_IN_P1
+    jp  $6CA4      ; IN ($48) → HOOK_IN_P1
     ORG $7EEF
     bit  4,a ; test fire button
     ORG $7EF1
@@ -7623,7 +7621,7 @@ RANDOM:
     ORG $86B3
     push af
     ORG $86B4
-    jp  $6CB3      ; IN ($4E) → HOOK_IN_STATUS
+    jp  $6CAC      ; IN ($4E) → HOOK_IN_STATUS
     ORG $86B7
     jr   c,$86D9
     ORG $86B9
@@ -7643,7 +7641,7 @@ RANDOM:
     ORG $86C2
     ld   c,a
     ORG $86C3
-    jp  $6CBA      ; IN ($49) → HOOK_IN_SYSTEM
+    jp  $6CB3      ; IN ($49) → HOOK_IN_SYSTEM
     ORG $86C6
     ld   (hl),a
     ORG $86C7
@@ -7783,7 +7781,7 @@ ERASE_PATTERN:
     ORG $873B
     ld   a,(hl) ; read VECTOR.Magic
     ORG $873C
-    jp  $6CC1      ; OUT ($4B) → HOOK_OUT_MAGIC
+    jp  $6CBA      ; OUT ($4B) → HOOK_OUT_MAGIC
     ORG $873F
     ld   e,(hl) ; read VECTOR.O.A.L
     ORG $8740
@@ -7900,7 +7898,7 @@ WRITE_PATTERN:
     ORG $879A
     ld   hl,($A070) ; get pointer to next VECTOR to process from V.PTR
     ORG $879D
-    jp  $6CC8      ; IN ($4E) → HOOK_IN_STATUS
+    jp  $6CC1      ; IN ($4E) → HOOK_IN_STATUS
     ORG $87A1
     ret  z
     ORG $87A2
@@ -8552,7 +8550,7 @@ CALCULATE_MAGIC_IMAGE_RAM_ADDRESS:
     ORG $89AC
     or   b ; combine with magic image RAM control bits
     ORG $89AD
-    jp  $6CD0      ; OUT ($4B) → HOOK_OUT_MAGIC
+    jp  $6CC9      ; OUT ($4B) → HOOK_OUT_MAGIC
     ORG $89B1
     rr   l
     ORG $89B3
@@ -8576,7 +8574,7 @@ CALCULATE_MAGIC_IMAGE_RAM_ADDRESS:
     ORG $89C2
     set  3,a ; set horizontal flip bit
     ORG $89C4
-    jp  $6CD8      ; OUT ($4B) → HOOK_OUT_MAGIC
+    jp  $6CD1      ; OUT ($4B) → HOOK_OUT_MAGIC
     ORG $89C8
     rr   l
     ORG $89CA
@@ -8655,7 +8653,7 @@ PRINT_CHAR:
     ORG $8A04
     di ; prevent interrupts while writing to magic RAM
     ORG $8A05
-    jp  $6CE0      ; OUT ($4B) → HOOK_OUT_MAGIC
+    jp  $6CD9      ; OUT ($4B) → HOOK_OUT_MAGIC
     ORG $8A08
     and  $7F
     ORG $8A0A
@@ -8705,7 +8703,7 @@ PRINT_CHAR:
     ORG $8A2A
     di
     ORG $8A2B
-    jp  $6CE7      ; OUT ($4B) → HOOK_OUT_MAGIC
+    jp  $6CE0      ; OUT ($4B) → HOOK_OUT_MAGIC
     ORG $8A2E
     and  $7F
     ORG $8A30
@@ -9794,9 +9792,9 @@ INCREMENT_BY_1:
     ORG $8DD1
     or   a
     ORG $8DD2
-    jp  $6CEE      ; IN ($48) → HOOK_IN_P1
+    jp  $6CE7      ; IN ($48) → HOOK_IN_P1
     ORG $8DD5
-    jp  $6CF5      ; IN ($4A) → HOOK_IN_P1
+    jp  $6CEE      ; IN ($4A) → HOOK_IN_P1
     ORG $8DD8
     call $897B ; call PRINT_STRING_297B
     ORG $8DDB            ; arcade $2DDB data
@@ -16503,71 +16501,67 @@ COLOUR_MAN:
     call HOOK_IN_P1
     db  $CB,$67
     jp  $6790
-    ORG $6C7E    ; IN ($4E) island from $157A
-    call HOOK_IN_STATUS
-    db  $07
-    jp  $757D
-    ORG $6C85    ; IN ($49) island from $1642
+    ORG $6C7E    ; IN ($49) island from $1642
     call HOOK_IN_SYSTEM
     db  $2F
     jp  $7645
-    ORG $6C8C    ; IN ($4A) island from $1813
+    ORG $6C85    ; IN ($4A) island from $1813
     call HOOK_IN_P1
     db  $CB,$7F
     jp  $7817
-    ORG $6C94    ; IN ($49) island from $19A7
+    ORG $6C8D    ; IN ($49) island from $19A7
     call HOOK_IN_SYSTEM
     db  $2F
     jp  $79AA
-    ORG $6C9B    ; IN ($4A) island from $1A80
+    ORG $6C94    ; IN ($4A) island from $1A80
     call HOOK_IN_P1
     db  $CB,$7F
     jp  $7A84
-    ORG $6CA3    ; IN ($4A) island from $1EE7
+    ORG $6C9C    ; IN ($4A) island from $1EE7
     call HOOK_IN_P1
     db  $18,$02
     jp  $7EEB
-    ORG $6CAB    ; IN ($48) island from $1EEB
+    ORG $6CA4    ; IN ($48) island from $1EEB
     call HOOK_IN_P1
     db  $EE,$1F
     jp  $7EEF
-    ORG $6CB3    ; IN ($4E) island from $26B4
+    ORG $6CAC    ; IN ($4E) island from $26B4
     call HOOK_IN_STATUS
     db  $1F
     jp  $86B7
-    ORG $6CBA    ; IN ($49) island from $26C3
+    ORG $6CB3    ; IN ($49) island from $26C3
     call HOOK_IN_SYSTEM
     db  $2F
     jp  $86C6
-    ORG $6CC1    ; OUT ($4B) island from $273C
+    ORG $6CBA    ; OUT ($4B) island from $273C
     call HOOK_OUT_MAGIC
     db  $23
     jp  $873F
-    ORG $6CC8    ; IN ($4E) island from $279D
+    ORG $6CC1    ; IN ($4E) island from $279D
     call HOOK_IN_STATUS
     db  $CB,$7F
     jp  $87A1
-    ORG $6CD0    ; OUT ($4B) island from $29AD
+    ORG $6CC9    ; OUT ($4B) island from $29AD
     call HOOK_OUT_MAGIC
     db  $CB,$3C
     jp  $89B1
-    ORG $6CD8    ; OUT ($4B) island from $29C4
+    ORG $6CD1    ; OUT ($4B) island from $29C4
     call HOOK_OUT_MAGIC
     db  $CB,$3C
     jp  $89C8
-    ORG $6CE0    ; OUT ($4B) island from $2A05
+    ORG $6CD9    ; OUT ($4B) island from $2A05
     call HOOK_OUT_MAGIC
     db  $1A
     jp  $8A08
-    ORG $6CE7    ; OUT ($4B) island from $2A2B
+    ORG $6CE0    ; OUT ($4B) island from $2A2B
     call HOOK_OUT_MAGIC
     db  $1A
     jp  $8A2E
-    ORG $6CEE    ; IN ($48) island from $2DD2
+    ORG $6CE7    ; IN ($48) island from $2DD2
     call HOOK_IN_P1
     db  $C8
     jp  $8DD5
-    ORG $6CF5    ; IN ($4A) island from $2DD5
+    ORG $6CEE    ; IN ($4A) island from $2DD5
     call HOOK_IN_P1
     db  $C9
     jp  $8DD8

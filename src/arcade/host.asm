@@ -37,6 +37,8 @@ basend:
     jp      hook_game_loop
     ASSERT $ == HOOK_OUT_MAGIC
     jp      hook_out_magic
+    ASSERT $ == HOOK_BOLT_PIXEL
+    jp      hook_bolt_pixel
 
 host_start:
     di

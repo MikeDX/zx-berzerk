@@ -318,3 +318,15 @@ hook_print_char:
     pop     af
     xor     a
     ret
+
+; Arcade $1578: ld (hl),$80 after RTOAX, then IN $4E / rlca.
+; Return carry set if that pixel hit existing Magic ink.
+hook_bolt_pixel:
+    push    bc
+    push    de
+    call    magic_xor_pixel80
+    pop     de
+    pop     bc
+    ld      a,(magic_collide)
+    rrca
+    ret

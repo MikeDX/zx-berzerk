@@ -62,6 +62,7 @@ HOOK_PRINT_CHAR = ZX_HAL + 0x12
 HOOK_IN_SYSTEM = ZX_HAL + 0x15
 HOOK_GAME_LOOP = ZX_HAL + 0x18
 HOOK_OUT_MAGIC = ZX_HAL + 0x1B
+HOOK_BOLT_PIXEL = ZX_HAL + 0x1E
 
 ENTRY_HOOKS = {
     0x2817: "HOOK_DRAW_SPRITE",
@@ -73,6 +74,9 @@ ENTRY_HOOKS = {
     # Room loop: `bit 2,(ix+0); ret z` with MAN_PTR=0 reads Spectrum ROM $0000
     # and leaves the room (clears vectors). Arcade $0000 is NOP — same trap.
     0x2157: "HOOK_GAME_LOOP",
+    # `ld (hl),$80` after RTOAX: one shifted XOR pixel, not a raw byte store.
+    # Skip ld + IN $4E + rlca (5) so the hook can return carry to the caller.
+    0x1578: ("HOOK_BOLT_PIXEL", 5),
 }
 
 # Ports → HAL. Active-low inputs idle as $FF. SYSTEM has coin/start keys.
@@ -369,6 +373,7 @@ HOOK_PRINT_CHAR      EQU ${HOOK_PRINT_CHAR:04X}
 HOOK_IN_SYSTEM       EQU ${HOOK_IN_SYSTEM:04X}
 HOOK_GAME_LOOP       EQU ${HOOK_GAME_LOOP:04X}
 HOOK_OUT_MAGIC       EQU ${HOOK_OUT_MAGIC:04X}
+HOOK_BOLT_PIXEL      EQU ${HOOK_BOLT_PIXEL:04X}
 
 ARC_COLD             EQU ${map_addr(0x1602):04X}
 ARC_ATTRACT          EQU ${map_addr(0x164B):04X}
@@ -462,7 +467,7 @@ def emit_berzerk_asm(path: Path) -> dict:
         "ZX_MAGIC_SCRATCH", "ZX_MAGIC", "ZX_HAL", "ZX_COLOR", "ZX_STACK",
         "HOOK_DRAW_SPRITE", "HOOK_CLEAR_SCREEN", "HOOK_RTOAX", "HOOK_IN_P1",
         "HOOK_IN_STATUS", "HOOK_NMI", "HOOK_PRINT_CHAR", "HOOK_IN_SYSTEM",
-        "HOOK_GAME_LOOP", "HOOK_OUT_MAGIC",
+        "HOOK_GAME_LOOP", "HOOK_OUT_MAGIC", "HOOK_BOLT_PIXEL",
         "ARC_COLD", "ARC_ATTRACT", "ARC_START_GAME", "ARC_ROOM_START", "ARC_IRQ",
         "ARC_ROOM_MOVE", "ARC_ROOM_JOBS",
     }
@@ -595,11 +600,16 @@ def emit_berzerk_asm(path: Path) -> dict:
         # Entry hooks: JP veneer (3 bytes). Must not let the next listing
         # record overwrite the JP operand (common when the first opcode is 1 byte).
         if addr in ENTRY_HOOKS:
-            name = ENTRY_HOOKS[addr]
+            spec = ENTRY_HOOKS[addr]
+            if isinstance(spec, tuple):
+                name, skip = spec
+            else:
+                name = spec
+                skip = max(len(insn.data), 3)
             a(f"    ORG ${zx:04X}")
             a(f"    jp  {name}              ; arcade ${addr:04X} hooked")
             stats["hooks"] += 1
-            skip_until = insn.addr + max(len(insn.data), 3)
+            skip_until = insn.addr + skip
             addr = skip_until
             continue
 

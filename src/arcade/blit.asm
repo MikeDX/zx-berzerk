@@ -291,3 +291,41 @@ magic_print_char:
     pop     bc
     pop     af
     ret
+
+; XOR $80 through the Magic shifter into one byte + Spectrum pixel.
+; A = shifted mask on return in B path; sets magic_collide on overlap.
+magic_xor_pixel80:
+    ld      a,(magic_shift)
+    ld      b,a
+    ld      a,$80
+    inc     b
+    dec     b
+    jr      z,.got
+.sh:
+    srl     a
+    djnz    .sh
+.got:
+    ld      b,a
+    and     (hl)
+    jr      z,.w
+    ld      a,1
+    ld      (magic_collide),a
+.w:
+    ld      a,b
+    xor     (hl)
+    ld      (hl),a
+    ld      a,(rtoax_y)
+    cp      192
+    ret     nc
+    push    hl
+    push    bc
+    ld      c,a
+    ld      a,(rtoax_x)
+    ld      b,a
+    call    zx_pixel_addr
+    pop     bc
+    ld      a,b
+    xor     (hl)
+    ld      (hl),a
+    pop     hl
+    ret
