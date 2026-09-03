@@ -10,6 +10,7 @@ ZX_MAGIC             EQU $C400
 ZX_HAL               EQU $DC00
 ZX_COLOR             EQU $F000
 ZX_STACK             EQU $FFFE
+ZX_IM2_PAGE          EQU $0097
 
 HOOK_DRAW_SPRITE     EQU $DC00
 HOOK_CLEAR_SCREEN    EQU $DC03

@@ -53,7 +53,7 @@ start:
 
 code_end:
 
-    EMPTYTAP "build/berzerk.tap"
-    SAVETAP  "build/berzerk.tap", BASIC, "berzerk", basic, basend - basic, 10
-    SAVETAP  "build/berzerk.tap", CODE,  "berzerk", start, code_end - start
-    SAVESNA  "build/berzerk.sna", start
+    EMPTYTAP "build/shell.tap"
+    SAVETAP  "build/shell.tap", BASIC, "shell", basic, basend - basic, 10
+    SAVETAP  "build/shell.tap", CODE,  "shell", start, code_end - start
+    SAVESNA  "build/shell.sna", start

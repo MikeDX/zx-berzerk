@@ -27,10 +27,11 @@ The durable artefact is a **recompilable, remapped** assembly image plus a
 generated address map.
 
 ```bash
-make spectrum-asm      # ref/berzerk.asm → src/arcade/berzerk.asm + mem_map.inc
-make headless          # arcade-map trace (validation)
-make headless-trace    # longer run + build/arcade_access.json
-make run               # Phase-1 hand-ported shell
+make                 # emit Spectrum asm + build build/berzerk.sna/.tap
+make run             # boot SNA in ZEsarUX
+make spectrum-asm    # ref/berzerk.asm → src/arcade/berzerk.asm only
+make headless        # arcade-map trace (validation)
+make shell           # Phase-1 hand-ported shell → build/shell.sna
 ```
 
 ## Arcade memory map (from MAME / listing)
@@ -133,10 +134,11 @@ src/arcade/host + HAL     → build/arcade.sna
 
 **Phase 2:** PROM image + symbols + I/O map (`convert_ref`).
 
-**Phase 3 (now):** `make spectrum-asm` emits remapped `src/arcade/berzerk.asm`;
-headless traces validate behaviour; wire HAL and assemble the host.
+**Phase 3 (now):** `make` / `make run` build and boot the remapped host
+(`src/arcade/host.asm` + `berzerk.asm` + HAL at `$DC00`).
 
-**Phase 4:** playable host; delete `src/game/*` hand port.
+**Phase 4:** harden HAL (frame blit of video shadow, job timing); delete
+`src/game/*` hand port when playable.
 
 ## Hook points (must stay 1:1 with listing)
 

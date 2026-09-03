@@ -39,6 +39,10 @@ ZX_HAL = 0xDC00  # host hooks / blit / input
 ZX_COLOR = 0xF000  # arcade $8000–$87FF
 ZX_STACK = 0xFFFE
 
+# IM2: arcade uses I=$37 (table at $37xx in PROM). After remap the table
+# lives at ZX_PROM+$3700 = $9700, so I must be $97 — not $37 (Spectrum ROM).
+ZX_IM2_PAGE = (ZX_PROM >> 8) + 0x37  # $97
+
 VIDEO_LINES = 192
 VIDEO_STRIDE = 32
 VIDEO_SIZE = VIDEO_LINES * VIDEO_STRIDE  # $1800
@@ -71,6 +75,26 @@ IN_HOOKS = {
     0x61: "SAFE",
     0x65: "SAFE",
 }
+
+# Force-emit ranges as remapped data words (listing mis-disassembles these).
+DATA_WORD_RANGES = [
+    (0x1D31, 0x1D51),  # bytecode opcode → handler jump table
+]
+
+# LTABLE ($1AED) pops its return address as a 4-language pointer table.
+LTABLE_ADDR = 0x1AED
+LTABLE_TABLE_BYTES = 8
+
+
+def discover_ltable_ranges(rom: bytes) -> list[tuple[int, int]]:
+    """Every `call LTABLE` is followed by 8 bytes of code pointers."""
+    out: list[tuple[int, int]] = []
+    lo, hi = LTABLE_ADDR & 0xFF, (LTABLE_ADDR >> 8) & 0xFF
+    for a in range(len(rom) - 3):
+        if rom[a] == 0xCD and rom[a + 1] == lo and rom[a + 2] == hi:
+            t = a + 3
+            out.append((t, t + LTABLE_TABLE_BYTES))
+    return out
 
 RE_HEX_ADDR = re.compile(r"\$([0-9A-Fa-f]{4})\b")
 RE_IN_PORT = re.compile(
@@ -196,6 +220,7 @@ ZX_MAGIC             EQU ${ZX_MAGIC:04X}
 ZX_HAL               EQU ${ZX_HAL:04X}
 ZX_COLOR             EQU ${ZX_COLOR:04X}
 ZX_STACK             EQU ${ZX_STACK:04X}
+ZX_IM2_PAGE          EQU ${ZX_IM2_PAGE:04X}
 
 HOOK_DRAW_SPRITE     EQU ${HOOK_DRAW_SPRITE:04X}
 HOOK_CLEAR_SCREEN    EQU ${HOOK_CLEAR_SCREEN:04X}
@@ -248,17 +273,25 @@ def rewrite_insn_immediates(buf: bytearray) -> int:
     return n
 
 
-def remap_data_words(data: bytearray) -> int:
-    """Remap aligned pointer words in data tables (even offsets only)."""
+def remap_data_words(data: bytearray, *, code_ptrs: bool = False) -> int:
+    """Remap aligned pointer words in data tables (even offsets only).
+
+    code_ptrs=True: treat any non-zero word below $8800 as a code/data
+    pointer (needed for LTABLE / jump tables that target PROM $0000–$07FF).
+    """
     n = 0
     for i in range(0, len(data) - 1, 2):
         w = data[i] | (data[i + 1] << 8)
-        if is_pointer_imm(w):
-            nw = map_addr(w)
-            if nw != w:
-                data[i] = nw & 0xFF
-                data[i + 1] = (nw >> 8) & 0xFF
-                n += 1
+        if code_ptrs:
+            if w == 0 or w >= 0x8800:
+                continue
+        elif not is_pointer_imm(w):
+            continue
+        nw = map_addr(w)
+        if nw != w:
+            data[i] = nw & 0xFF
+            data[i + 1] = (nw >> 8) & 0xFF
+            n += 1
     return n
 
 
@@ -314,6 +347,10 @@ def emit_berzerk_asm(path: Path) -> dict:
     islands: list[str] = []
     seen_labels: dict[str, int] = {}
 
+    ltable_ranges = discover_ltable_ranges(rom)
+    word_ranges = list(DATA_WORD_RANGES) + ltable_ranges
+    word_ranges.sort()
+
     stats = {
         "insns": 0,
         "data_records": 0,
@@ -321,6 +358,7 @@ def emit_berzerk_asm(path: Path) -> dict:
         "in_hooks": 0,
         "rewrites": 0,
         "clashes": len(clashes),
+        "ltable_tables": len(ltable_ranges),
     }
 
     a("; --- Program image @ ZX_PROM (layout-preserving) ---")
@@ -346,6 +384,27 @@ def emit_berzerk_asm(path: Path) -> dict:
         zx = map_addr(addr)
         insn = by_addr.get(addr)
 
+        # Force word tables the listing mis-disassembled as code.
+        forced = None
+        for lo, hi in word_ranges:
+            if lo <= addr < hi:
+                forced = (lo, hi)
+                break
+        if forced is not None:
+            lo, hi = forced
+            if addr == lo:
+                a(f"    ORG ${map_addr(lo):04X}            ; data words arcade ${lo:04X}-${hi-1:04X}")
+                data = bytearray(rom[lo:hi])
+                # Jump / LTABLE words may target PROM $0000–$07FF.
+                stats["rewrites"] += remap_data_words(data, code_ptrs=True)
+                for base in range(0, len(data), 16):
+                    row = ",".join(f"${b:02X}" for b in data[base:base+16])
+                    a(f"    db  {row}")
+                stats["data_records"] += 1
+            addr = hi
+            skip_until = hi
+            continue
+
         if insn is None:
             # Unlisted PROM byte
             a(f"    ORG ${zx:04X}")
@@ -361,13 +420,14 @@ def emit_berzerk_asm(path: Path) -> dict:
             seen_labels[base] = addr
             a(f"{base}:")
 
-        # Entry hooks: JP veneer (3 bytes); remainder of original routine skipped.
+        # Entry hooks: JP veneer (3 bytes). Must not let the next listing
+        # record overwrite the JP operand (common when the first opcode is 1 byte).
         if addr in ENTRY_HOOKS:
             name = ENTRY_HOOKS[addr]
             a(f"    ORG ${zx:04X}")
             a(f"    jp  {name}              ; arcade ${addr:04X} hooked")
             stats["hooks"] += 1
-            skip_until = insn.addr + len(insn.data)
+            skip_until = insn.addr + max(len(insn.data), 3)
             addr = skip_until
             continue
 
@@ -414,6 +474,10 @@ def emit_berzerk_asm(path: Path) -> dict:
 
             rewritten, n = rewrite_text_addrs(clean_mnemonic(insn.text))
             stats["rewrites"] += n
+            # Arcade IM2 page $37 → Spectrum page holding remapped table.
+            if re.match(r"ld\s+a\s*,\s*\$37\s*$", rewritten, re.I):
+                rewritten = f"ld   a,${ZX_IM2_PAGE:02X}"
+                stats["rewrites"] += 1
             cmt = insn.comment.strip().lstrip(";").strip()
             raw = insn.text.split(";", 1)[0]
             glue = re.match(r"^.*?\S\s{2,}([A-Za-z].*)$", raw)
@@ -432,7 +496,9 @@ def emit_berzerk_asm(path: Path) -> dict:
 
         # Data
         data = bytearray(insn.data)
-        stats["rewrites"] += remap_data_words(data)
+        # Do NOT remap arbitrary data records as pointer words — ASCII strings
+        # like "Hi" ($6948) look like magic-RAM addresses and get corrupted.
+        # Jump tables are handled via DATA_WORD_RANGES / LTABLE discovery above.
         a(f"    ORG ${zx:04X}            ; arcade ${addr:04X} data")
         for base in range(0, len(data), 16):
             row = ",".join(f"${b:02X}" for b in data[base : base + 16])
@@ -488,7 +554,8 @@ def main() -> int:
     print(
         f"insns={stats['insns']} data={stats['data_records']} "
         f"entry_hooks={stats['hooks']} in_hooks={stats['in_hooks']} "
-        f"rewrites={stats['rewrites']} clashes={stats['clashes']}"
+        f"rewrites={stats['rewrites']} clashes={stats['clashes']} "
+        f"ltables={stats['ltable_tables']}"
     )
     print(f"ARC_COLD=${map_addr(0x1602):04X}  ARC_IRQ=${map_addr(0x26AB):04X}")
     return 0

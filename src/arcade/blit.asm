@@ -147,7 +147,7 @@ magic_xor_sprite:
     ld      e,a
     ld      d,0
     add     hl,de
-    ld      de,ARC_MAGIC
+    ld      de,ZX_MAGIC
     add     hl,de
     ld      (spr_addr),hl
     pop     hl

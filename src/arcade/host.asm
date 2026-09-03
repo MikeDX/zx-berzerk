@@ -1,57 +1,69 @@
-; Berzerk arcade host — relocated PROM + Spectrum I/O hooks.
-; docs/PORT.md Phase 3.
+; Berzerk Spectrum host — remapped game + HAL veneers.
+; docs/PORT.md. Built by `make` → build/berzerk.sna / .tap
 
     INCLUDE "tools/sjasm/BasicLib.asm"
-    INCLUDE "src/arcade/host_mem.inc"
+    INCLUDE "src/arcade/mem_map.inc"
 
     DEVICE ZXSPECTRUM48
 
     ORG 23755
 basic:
-    LINE : db clear,val,'"24575"'           : LEND
-    LINE : db load,'"arcade"',code          : LEND
-    LINE : db rand,usr : NUM host_start     : LEND
+    LINE : db clear,val,'"24575"'            : LEND
+    LINE : db load,'"bzprom"',code           : LEND
+    LINE : db load,'"bzhal"',code            : LEND
+    LINE : db rand,usr : NUM host_start      : LEND
 basend:
 
 ; --------------------------------------------------------------------
-    ORG HOST_HOOK_BASE
-; Veneers — addresses fixed for reloc_rom.py ($6000–$6017)
-    jp      hook_draw_sprite          ; $6000
-    jp      hook_clear_screen         ; $6003
-    jp      hook_rtoax                ; $6006
-    jp      hook_in_p1                ; $6009
-    jp      hook_in_status            ; $600C
-    jp      hook_nmi                  ; $600F
-    jp      hook_print_char           ; $6012
-    jp      hook_in_safe              ; $6015
+; HAL veneers — addresses fixed by mem_map.inc / emit_spectrum_asm.py
+    ORG ZX_HAL
+    ASSERT $ == HOOK_DRAW_SPRITE
+    jp      hook_draw_sprite          ; $DC00
+    ASSERT $ == HOOK_CLEAR_SCREEN
+    jp      hook_clear_screen         ; $DC03
+    ASSERT $ == HOOK_RTOAX
+    jp      hook_rtoax                ; $DC06
+    ASSERT $ == HOOK_IN_P1
+    jp      hook_in_p1                ; $DC09
+    ASSERT $ == HOOK_IN_STATUS
+    jp      hook_in_status            ; $DC0C
+    ASSERT $ == HOOK_NMI
+    jp      hook_nmi                  ; $DC0F
+    ASSERT $ == HOOK_PRINT_CHAR
+    jp      hook_print_char           ; $DC12
+    ASSERT $ == HOOK_IN_SAFE
+    jp      hook_in_safe              ; $DC15
 
 host_start:
     di
-    ld      sp,HOST_STACK
-    ld      hl,ARC_SCRATCH_4000
-    ld      de,ARC_SCRATCH_4000+1
-    ld      bc,$4000-1
+    ld      sp,ZX_STACK
+
+    ; Clear guest RAM (scratch / video / magic / colour)
+    ld      hl,ZX_SCRATCH_CMOS
+    ld      de,ZX_SCRATCH_CMOS+1
+    ld      bc,ZX_HAL - ZX_SCRATCH_CMOS - 1
     ld      (hl),0
     ldir
+
     call    zx_cls
     ld      hl,$5800
     ld      de,$5801
     ld      bc,767
-    ld      (hl),%00000100
+    ld      (hl),%00000100              ; green ink on black
     ldir
-    ; Berzerk uses IM2 with I=$37; Spectrum bus vector is $FF.
-    ; reloc_rom plants $A6AB at $37FF/$3800 so EI does not reset.
-    ld      a,$37
+
+    ; IM2: vector table is in remapped PROM at $97xx (not $37xx — that's ROM).
+    ld      a,ZX_IM2_PAGE
     ld      i,a
     im      2
-    ; EI is left to the arcade PROM once its vector page is ready.
+
     jp      ARC_COLD
 
     INCLUDE "src/zx/screen.asm"
     INCLUDE "src/zx/input.asm"
 
-; draw/hook working vars (must be before blit/hooks use them)
 magic_collide:  db 0
+vblank_div:     db 0
 rtoax_x:        db 0
 rtoax_y:        db 0
 draw_x:         db 0
@@ -68,14 +80,15 @@ spr_row:        db 0,0,0
     INCLUDE "src/arcade/hooks.asm"
 
 host_end:
-    ASSERT host_end <= ARCADE_BASE
+    ASSERT host_end <= ZX_COLOR
 
 ; --------------------------------------------------------------------
-    INCLUDE "src/arcade/rom_reloc.asm"
+; Remapped Berzerk (ORG'd into $6000–$9FFF by the emitter)
+    DEFINE _BERZERK_MEM_MAP_INC
+    INCLUDE "src/arcade/berzerk.asm"
 
-code_end:
-
-    EMPTYTAP "build/arcade.tap"
-    SAVETAP  "build/arcade.tap", BASIC, "arcade", basic, basend - basic, 10
-    SAVETAP  "build/arcade.tap", CODE,  "arcade", HOST_HOOK_BASE, code_end - HOST_HOOK_BASE
-    SAVESNA  "build/arcade.sna", host_start
+    EMPTYTAP "build/berzerk.tap"
+    SAVETAP  "build/berzerk.tap", BASIC, "berzerk", basic, basend - basic, 10
+    SAVETAP  "build/berzerk.tap", CODE,  "bzprom", ZX_PROM, $4000
+    SAVETAP  "build/berzerk.tap", CODE,  "bzhal",  ZX_HAL, host_end - ZX_HAL
+    SAVESNA  "build/berzerk.sna", host_start

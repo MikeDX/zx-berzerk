@@ -154,11 +154,11 @@ TODOs:
     ORG $601E            ; arcade $001E data
     db  $90
     ORG $601F            ; arcade $001F data
-    db  $20,$A0
+    db  $20,$08
     ORG $6021            ; arcade $0021 data
-    db  $43,$CF,$6E,$C7,$72,$C1,$74,$D5,$6C,$C1,$74,$C9,$6F,$CE,$73,$80
+    db  $43,$6F,$6E,$67,$72,$61,$74,$75,$6C,$61,$74,$69,$6F,$6E,$73,$20
     ORG $6031            ; arcade $0031 data
-    db  $50,$CC,$61,$D9,$65,$D2,$20,$00
+    db  $50,$6C,$61,$79,$65,$72,$20,$00
     ORG $6039
     ret
     ORG $603A
@@ -166,11 +166,11 @@ TODOs:
     ORG $603D            ; arcade $003D data
     db  $90
     ORG $603E            ; arcade $003E data
-    db  $10,$A0
+    db  $10,$08
     ORG $6040            ; arcade $0040 data
-    db  $46,$C5,$6C,$C9,$63,$C9,$74,$C1,$74,$C9,$6F,$CE,$73,$80,$61,$D5
+    db  $46,$65,$6C,$69,$63,$69,$74,$61,$74,$69,$6F,$6E,$73,$20,$61,$75
     ORG $6050            ; arcade $0050 data
-    db  $20,$CA,$6F,$D5,$65,$D5,$72,$80,$00
+    db  $20,$6A,$6F,$75,$65,$75,$72,$20,$00
     ORG $6059
     ret
     ORG $605A
@@ -214,7 +214,7 @@ TODOs:
     ORG $6074
     dec  b
     ORG $6075            ; arcade $0075 data
-    db  $00,$A0
+    db  $00,$08
     ORG $6077            ; arcade $0077 data
     db  $A3,$00
     ORG $6079            ; arcade $0079 data
@@ -230,7 +230,7 @@ TODOs:
     ORG $6083
     ld   a,$01
     ORG $6085            ; arcade $0085 data
-    db  $01,$A5,$01
+    db  $01,$41,$01
     ORG $6088
     ld   de,$F247
     ORG $608B
@@ -582,7 +582,7 @@ TODOs:
     ORG $6180
     jr   nz,$6199
     ORG $6182            ; arcade $0182 data
-    db  $DD,$81,$00,$00
+    db  $DD,$21,$00,$00
     ORG $6186
     ld   e,$80
     ORG $6188
@@ -827,9 +827,9 @@ COLOUR_TEST_MODE:
     ORG $6262
     djnz $6256
     ORG $6264            ; arcade $0264 data
-    db  $21,$71,$11
+    db  $21,$11,$11
     ORG $6267            ; arcade $0267 data
-    db  $11,$71,$11
+    db  $11,$11,$11
     ORG $626A
     ld   sp,$8800
     ORG $626D
@@ -1473,7 +1473,7 @@ COLOUR_TEST_MODE:
     ORG $64D0
     cpl
     ORG $64D1            ; arcade $04D1 data
-    db  $18,$78
+    db  $18,$18
     ORG $64D3
     xor  a
     ORG $64D4
@@ -1489,7 +1489,7 @@ COLOUR_TEST_MODE:
     ORG $64DC
     xor  b
     ORG $64DD            ; arcade $04DD data
-    db  $18,$78
+    db  $18,$18
     ORG $64DF
     cpl
     ORG $64E0
@@ -1697,17 +1697,17 @@ PRINT_SET_BITS:
     ORG $65B8
     ret
     ORG $65B9            ; arcade $05B9 data
-    db  $5A,$B4,$55,$80,$44,$AD,$50,$80,$53,$BB,$49,$B8,$43,$AC,$45,$B7
+    db  $5A,$50,$55,$20,$44,$49,$50,$20,$53,$57,$49,$54,$43,$48,$45,$53
     ORG $65C9            ; arcade $05C9 data
     db  $00
     ORG $65CA            ; arcade $05CA data
-    db  $56,$AA,$42,$80,$53,$BB,$49,$B8,$43,$AC,$45,$B7,$00
+    db  $56,$46,$42,$20,$53,$57,$49,$54,$43,$48,$45,$53,$00
     ORG $65D7            ; arcade $05D7 data
-    db  $31,$80,$20,$80,$32,$80,$20,$80,$33,$80,$20,$80,$34,$80,$20,$80
+    db  $31,$20,$20,$20,$32,$20,$20,$20,$33,$20,$20,$20,$34,$20,$20,$20
     ORG $65E7            ; arcade $05E7 data
-    db  $35,$80,$20,$80,$36,$80,$20,$80,$37,$80,$20,$80,$38,$00
+    db  $35,$20,$20,$20,$36,$20,$20,$20,$37,$20,$20,$20,$38,$00
     ORG $65F5            ; arcade $05F5 data
-    db  $30,$9D,$4F,$AA,$46,$80,$E0,$DB,$3D,$B3,$4E,$00
+    db  $30,$3D,$4F,$46,$46,$20,$20,$7F,$3D,$4F,$4E,$00
     ORG $6601            ; arcade $0601 data
     db  $7F,$00
     ORG $6603            ; arcade $0603 data
@@ -1972,53 +1972,53 @@ PRINT_STRING_06B8:
     ORG $66CB
     ret
     ORG $66CC            ; arcade $06CC data
-    db  $43,$D2,$65,$C4,$69,$D4,$73,$00
+    db  $43,$72,$65,$64,$69,$74,$73,$00
     ORG $66D4            ; arcade $06D4 data
-    db  $A4,$A0
+    db  $A4,$08
     ORG $66D6            ; arcade $06D6 data
     db  $02
     ORG $66D7            ; arcade $06D7 data
-    db  $43,$C8,$75,$D4,$65,$80,$31,$00
+    db  $43,$68,$75,$74,$65,$20,$31,$00
     ORG $66DF            ; arcade $06DF data
-    db  $A6,$A0
+    db  $A6,$08
     ORG $66E1            ; arcade $06E1 data
     db  $08
     ORG $66E2            ; arcade $06E2 data
-    db  $43,$C8,$75,$D4,$65,$80,$32,$00
+    db  $43,$68,$75,$74,$65,$20,$32,$00
     ORG $66EA            ; arcade $06EA data
-    db  $AE,$A0
+    db  $AE,$08
     ORG $66EC            ; arcade $06EC data
     db  $08
     ORG $66ED            ; arcade $06ED data
-    db  $43,$C8,$75,$D4,$65,$80,$33,$00
+    db  $43,$68,$75,$74,$65,$20,$33,$00
     ORG $66F5            ; arcade $06F5 data
-    db  $B6,$A0
+    db  $B6,$08
     ORG $66F7            ; arcade $06F7 data
     db  $08
     ORG $66F8            ; arcade $06F8 data
-    db  $50,$CC,$61,$D9,$73,$00
+    db  $50,$6C,$61,$79,$73,$00
     ORG $66FE            ; arcade $06FE data
-    db  $BE,$A0
+    db  $BE,$08
     ORG $6700            ; arcade $0700 data
     db  $06
     ORG $6701            ; arcade $0701 data
-    db  $54,$CF,$74,$C1,$6C,$80,$53,$C3,$6F,$D2,$65,$00
+    db  $54,$6F,$74,$61,$6C,$20,$53,$63,$6F,$72,$65,$00
     ORG $670D            ; arcade $070D data
-    db  $C4,$A0
+    db  $C4,$08
     ORG $670F            ; arcade $070F data
     db  $0C
     ORG $6710            ; arcade $0710 data
-    db  $54,$CF,$74,$C1,$6C,$80,$53,$C5,$63,$CF,$6E,$C4,$73
+    db  $54,$6F,$74,$61,$6C,$20,$53,$65,$63,$6F,$6E,$64,$73
     ORG $671D            ; arcade $071D data
-    db  $20,$CF,$66,$80,$50,$CC,$61,$D9,$00
+    db  $20,$6F,$66,$20,$50,$6C,$61,$79,$00
     ORG $6726            ; arcade $0726 data
-    db  $D0,$A0
+    db  $D0,$08
     ORG $6728            ; arcade $0728 data
     db  $0C
     ORG $6729            ; arcade $0729 data
-    db  $48,$C9,$67,$C8,$20,$B7,$63,$CF,$72,$C5,$73,$00
+    db  $48,$69,$67,$68,$20,$53,$63,$6F,$72,$65,$73,$00
     ORG $6735            ; arcade $0735 data
-    db  $DC,$A0
+    db  $DC,$08
     ORG $6737            ; arcade $0737 data
     db  $06
     ORG $6738            ; arcade $0738 data
@@ -2114,31 +2114,31 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $6796            ; arcade $0796 data
     db  $90
     ORG $6797            ; arcade $0797 data
-    db  $08,$80
+    db  $08,$20
     ORG $6799            ; arcade $0799 data
-    db  $59,$CF,$75,$80,$68,$C1,$76,$C5,$20,$CA,$6F,$C9,$6E,$C5,$64,$80
+    db  $59,$6F,$75,$20,$68,$61,$76,$65,$20,$6A,$6F,$69,$6E,$65,$64,$20
     ORG $67A9            ; arcade $07A9 data
-    db  $74,$C8,$65,$80,$69,$CD,$6D,$CF,$72,$D4,$61,$CC,$73,$00
+    db  $74,$68,$65,$20,$69,$6D,$6D,$6F,$72,$74,$61,$6C,$73,$00
     ORG $67B7
     call $897B ; call PRINT_STRING_297B
     ORG $67BA            ; arcade $07BA data
     db  $90
     ORG $67BB            ; arcade $07BB data
-    db  $0C,$90
+    db  $0C,$30
     ORG $67BD            ; arcade $07BD data
-    db  $69,$CE,$20,$D4,$68,$C5,$20,$A6,$45,$B6,$5A,$A9,$52,$AF,$20,$C8
+    db  $69,$6E,$20,$74,$68,$65,$20,$42,$45,$52,$5A,$45,$52,$4B,$20,$68
     ORG $67CD            ; arcade $07CD data
-    db  $61,$CC,$6C,$80,$6F,$C6,$20,$C6,$61,$CD,$65,$00
+    db  $61,$6C,$6C,$20,$6F,$66,$20,$66,$61,$6D,$65,$00
     ORG $67D9
     call $897B ; call PRINT_STRING_297B
     ORG $67DC            ; arcade $07DC data
     db  $90
     ORG $67DD            ; arcade $07DD data
-    db  $18,$B4
+    db  $18,$50
     ORG $67DF            ; arcade $07DF data
-    db  $45,$CE,$74,$C5,$72,$80,$79,$CF,$75,$D2,$20,$C9,$6E,$C9,$74,$C9
+    db  $45,$6E,$74,$65,$72,$20,$79,$6F,$75,$72,$20,$69,$6E,$69,$74,$69
     ORG $67EF            ; arcade $07EF data
-    db  $61,$CC,$73,$9A,$00
+    db  $61,$6C,$73,$3A,$00
     ORG $67F4
     ret
     ORG $67F5
@@ -2178,55 +2178,55 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $700C            ; arcade $100C data
     db  $11,$05
     ORG $700E            ; arcade $100E data
-    db  $11,$72
+    db  $11,$12
     ORG $7010            ; arcade $1010 data
     db  $00
     ORG $7011            ; arcade $1011 data
-    db  $00,$70
+    db  $00,$10
     ORG $7013            ; arcade $1013 data
-    db  $11,$8C
+    db  $11,$2C
     ORG $7015            ; arcade $1015 data
-    db  $11,$7F
+    db  $11,$1F
     ORG $7017            ; arcade $1017 data
-    db  $11,$7F
+    db  $11,$1F
     ORG $7019            ; arcade $1019 data
     db  $00
     ORG $701A            ; arcade $101A data
-    db  $13,$70
+    db  $13,$10
     ORG $701C            ; arcade $101C data
     db  $10,$D1
     ORG $701E            ; arcade $101E data
-    db  $11,$99
+    db  $11,$39
     ORG $7020            ; arcade $1020 data
     db  $10,$D1
     ORG $7022            ; arcade $1022 data
-    db  $11,$AB
+    db  $11,$47
     ORG $7024            ; arcade $1024 data
     db  $00
     ORG $7025            ; arcade $1025 data
-    db  $1C,$70
+    db  $1C,$10
     ORG $7027            ; arcade $1027 data
-    db  $11,$B9
+    db  $11,$55
     ORG $7029            ; arcade $1029 data
-    db  $11,$C2
+    db  $11,$62
     ORG $702B            ; arcade $102B data
-    db  $11,$C2
+    db  $11,$62
     ORG $702D            ; arcade $102D data
     db  $00
     ORG $702E            ; arcade $102E data
-    db  $27,$70
+    db  $27,$10
     ORG $7030            ; arcade $1030 data
-    db  $11,$CF
+    db  $11,$6F
     ORG $7032            ; arcade $1032 data
-    db  $F1,$DB
+    db  $11,$7C
     ORG $7034            ; arcade $1034 data
-    db  $11,$CF
+    db  $11,$6F
     ORG $7036            ; arcade $1036 data
     db  $11,$8A
     ORG $7038            ; arcade $1038 data
     db  $00
     ORG $7039            ; arcade $1039 data
-    db  $30,$70
+    db  $30,$10
     ORG $703B            ; arcade $103B data
     db  $11,$98
     ORG $703D            ; arcade $103D data
@@ -2234,17 +2234,17 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $703F            ; arcade $103F data
     db  $11,$E0
     ORG $7041            ; arcade $1041 data
-    db  $12,$A0
+    db  $12,$08
     ORG $7043            ; arcade $1043 data
     db  $00
     ORG $7044            ; arcade $1044 data
-    db  $41,$70
+    db  $41,$10
     ORG $7046            ; arcade $1046 data
     db  $10,$BF
     ORG $7048            ; arcade $1048 data
     db  $00
     ORG $7049            ; arcade $1049 data
-    db  $46,$70
+    db  $46,$10
     ORG $704B            ; arcade $104B data
     db  $10,$AD
     ORG $704D            ; arcade $104D data
@@ -2256,7 +2256,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $7053            ; arcade $1053 data
     db  $00
     ORG $7054            ; arcade $1054 data
-    db  $4B,$70
+    db  $4B,$10
     ORG $7056            ; arcade $1056 data
     db  $13,$B5
     ORG $7058            ; arcade $1058 data
@@ -2268,169 +2268,169 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $705E            ; arcade $105E data
     db  $00
     ORG $705F            ; arcade $105F data
-    db  $56,$70
+    db  $56,$10
     ORG $7061            ; arcade $1061 data
-    db  $13,$A1
+    db  $13,$09
     ORG $7063            ; arcade $1063 data
     db  $00
     ORG $7064            ; arcade $1064 data
-    db  $61,$70
+    db  $61,$10
     ORG $7066            ; arcade $1066 data
-    db  $13,$7A
+    db  $13,$1A
     ORG $7068            ; arcade $1068 data
     db  $00
     ORG $7069            ; arcade $1069 data
-    db  $66,$70
+    db  $66,$10
     ORG $706B            ; arcade $106B data
-    db  $13,$8B
+    db  $13,$2B
     ORG $706D            ; arcade $106D data
     db  $00
     ORG $706E            ; arcade $106E data
-    db  $6B,$70
+    db  $6B,$10
     ORG $7070            ; arcade $1070 data
-    db  $13,$9C
+    db  $13,$3C
     ORG $7072            ; arcade $1072 data
     db  $00
     ORG $7073            ; arcade $1073 data
-    db  $70,$70
+    db  $70,$10
     ORG $7075            ; arcade $1075 data
-    db  $13,$B1
+    db  $13,$4D
     ORG $7077            ; arcade $1077 data
     db  $00
     ORG $7078            ; arcade $1078 data
-    db  $75,$70
+    db  $75,$10
     ORG $707A            ; arcade $107A data
-    db  $F3,$BF
+    db  $13,$5E
     ORG $707C            ; arcade $107C data
     db  $00
     ORG $707D            ; arcade $107D data
-    db  $7A,$70
+    db  $7A,$10
     ORG $707F            ; arcade $107F data
-    db  $13,$CF
+    db  $13,$6F
     ORG $7081            ; arcade $1081 data
     db  $00
     ORG $7082            ; arcade $1082 data
-    db  $7F,$70
+    db  $7F,$10
     ORG $7084            ; arcade $1084 data
-    db  $13,$F0
+    db  $13,$80
     ORG $7086            ; arcade $1086 data
     db  $00
     ORG $7087            ; arcade $1087 data
-    db  $84,$70
+    db  $84,$10
     ORG $7089            ; arcade $1089 data
     db  $01
     ORG $708A            ; arcade $108A data
     db  $10
     ORG $708B            ; arcade $108B data
-    db  $18,$78,$00,$9C,$5A,$99,$58,$78,$18,$84,$22,$A5,$41,$F1,$81,$00
+    db  $18,$18,$00,$3C,$5A,$99,$58,$18,$18,$24,$22,$41,$41,$81,$81,$00
     ORG $709B            ; arcade $109B data
     db  $01
     ORG $709C            ; arcade $109C data
     db  $10
     ORG $709D            ; arcade $109D data
-    db  $00,$78,$18,$00,$FC,$BF,$5C,$9E,$18,$78,$14,$72,$F2,$F2,$02,$03
+    db  $00,$18,$18,$00,$3C,$5C,$5C,$3E,$18,$18,$14,$12,$F2,$82,$02,$03
     ORG $70AD            ; arcade $10AD data
     db  $01
     ORG $70AE            ; arcade $10AE data
     db  $10
     ORG $70AF            ; arcade $10AF data
-    db  $18,$78,$00,$9C,$FC,$BF,$5A,$78,$18,$78,$18,$78,$18,$78,$1C,$70
+    db  $18,$18,$00,$3C,$5C,$5C,$5A,$18,$18,$18,$18,$18,$18,$18,$1C,$10
     ORG $70BF            ; arcade $10BF data
     db  $01
     ORG $70C0            ; arcade $10C0 data
     db  $10
     ORG $70C1            ; arcade $10C1 data
-    db  $18,$78,$00,$9C,$5A,$BE,$5A,$78,$18,$78,$18,$78,$18,$78,$1C,$70
+    db  $18,$18,$00,$3C,$5A,$5A,$5A,$18,$18,$18,$18,$18,$18,$18,$1C,$10
     ORG $70D1            ; arcade $10D1 data
     db  $01
     ORG $70D2            ; arcade $10D2 data
     db  $0B
     ORG $70D3            ; arcade $10D3 data
-    db  $3C,$C6,$FF,$BD,$BD,$BD,$3C,$84,$24,$84,$66
+    db  $3C,$66,$FF,$BD,$BD,$BD,$3C,$24,$24,$24,$66
     ORG $70DE            ; arcade $10DE data
     db  $01
     ORG $70DF            ; arcade $10DF data
     db  $0B
     ORG $70E0            ; arcade $10E0 data
-    db  $3C,$B2,$FF,$BD,$BD,$BD,$3C,$84,$24,$84,$66
+    db  $3C,$4E,$FF,$BD,$BD,$BD,$3C,$24,$24,$24,$66
     ORG $70EB            ; arcade $10EB data
     db  $01
     ORG $70EC            ; arcade $10EC data
     db  $0B
     ORG $70ED            ; arcade $10ED data
-    db  $3C,$7E,$FF,$BD,$BD,$BD,$3C,$84,$24,$84,$66
+    db  $3C,$1E,$FF,$BD,$BD,$BD,$3C,$24,$24,$24,$66
     ORG $70F8            ; arcade $10F8 data
     db  $01
     ORG $70F9            ; arcade $10F9 data
     db  $0B
     ORG $70FA            ; arcade $10FA data
-    db  $FC,$DB,$FF,$BD,$BD,$BD,$3C,$84,$24,$84,$66
+    db  $3C,$7E,$FF,$BD,$BD,$BD,$3C,$24,$24,$24,$66
     ORG $7105            ; arcade $1105 data
     db  $01
     ORG $7106            ; arcade $1106 data
     db  $0B
     ORG $7107            ; arcade $1107 data
-    db  $3C,$D8,$FF,$BD,$BD,$BD,$3C,$84,$24,$84,$66
+    db  $3C,$78,$FF,$BD,$BD,$BD,$3C,$24,$24,$24,$66
     ORG $7112            ; arcade $1112 data
     db  $01
     ORG $7113            ; arcade $1113 data
     db  $0B
     ORG $7114            ; arcade $1114 data
-    db  $3C,$D1,$FF,$BD,$BD,$BD,$3C,$84,$24,$84,$66
+    db  $3C,$71,$FF,$BD,$BD,$BD,$3C,$24,$24,$24,$66
     ORG $711F            ; arcade $111F data
     db  $01
     ORG $7120            ; arcade $1120 data
     db  $0B
     ORG $7121            ; arcade $1121 data
-    db  $3C,$D8,$FF,$BD,$BD,$BD,$3C,$78,$18,$78,$1C
+    db  $3C,$78,$FF,$BD,$BD,$BD,$3C,$18,$18,$18,$1C
     ORG $712C            ; arcade $112C data
     db  $01
     ORG $712D            ; arcade $112D data
     db  $0B
     ORG $712E            ; arcade $112E data
-    db  $3C,$D8,$FF,$BD,$BD,$BD,$3C,$84,$24,$84,$36
+    db  $3C,$78,$FF,$BD,$BD,$BD,$3C,$24,$24,$24,$36
     ORG $7139            ; arcade $1139 data
     db  $01
     ORG $713A            ; arcade $113A data
     db  $0C
     ORG $713B            ; arcade $113B data
-    db  $3C,$C6,$FF,$BD,$BD,$BD,$3C,$84,$24,$86,$20,$C0
+    db  $3C,$66,$FF,$BD,$BD,$BD,$3C,$24,$24,$26,$20,$60
     ORG $7147            ; arcade $1147 data
     db  $01
     ORG $7148            ; arcade $1148 data
     db  $0C
     ORG $7149            ; arcade $1149 data
-    db  $3C,$C6,$FF,$BD,$BD,$BD,$3C,$84,$24,$C4,$04,$06
+    db  $3C,$66,$FF,$BD,$BD,$BD,$3C,$24,$24,$64,$04,$06
     ORG $7155            ; arcade $1155 data
     db  $01
     ORG $7156            ; arcade $1156 data
     db  $0B
     ORG $7157            ; arcade $1157 data
-    db  $3C,$7E,$FF,$BD,$BD,$BD,$3C,$84,$24,$84,$6C
+    db  $3C,$1E,$FF,$BD,$BD,$BD,$3C,$24,$24,$24,$6C
     ORG $7162            ; arcade $1162 data
     db  $01
     ORG $7163            ; arcade $1163 data
     db  $0B
     ORG $7164            ; arcade $1164 data
-    db  $3C,$7E,$FF,$BD,$BD,$BD,$3C,$78,$18,$78,$38
+    db  $3C,$1E,$FF,$BD,$BD,$BD,$3C,$18,$18,$18,$38
     ORG $716F            ; arcade $116F data
     db  $01
     ORG $7170            ; arcade $1170 data
     db  $0B
     ORG $7171            ; arcade $1171 data
-    db  $FC,$DB,$FF,$BD,$BD,$BD,$3C,$84,$24,$84,$66
+    db  $3C,$7E,$FF,$BD,$BD,$BD,$3C,$24,$24,$24,$66
     ORG $717C            ; arcade $117C data
     db  $01
     ORG $717D            ; arcade $117D data
     db  $0C
     ORG $717E            ; arcade $117E data
-    db  $FC,$DB,$FF,$BD,$BD,$BD,$3C,$84,$24,$86,$20,$C0
+    db  $3C,$7E,$FF,$BD,$BD,$BD,$3C,$24,$24,$26,$20,$60
     ORG $718A            ; arcade $118A data
     db  $01
     ORG $718B            ; arcade $118B data
     db  $0C
     ORG $718C            ; arcade $118C data
-    db  $FC,$DB,$FF,$BD,$BD,$BD,$3C,$84,$24,$C4,$04,$06
+    db  $3C,$7E,$FF,$BD,$BD,$BD,$3C,$24,$24,$64,$04,$06
     ORG $7198            ; arcade $1198 data
     db  $02
     ORG $7199            ; arcade $1199 data
@@ -2524,11 +2524,11 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $71CC
     ex   af,af'
     ORG $71CD            ; arcade $11CD data
-    db  $10,$70
+    db  $10,$10
     ORG $71CF
     ex   af,af'
     ORG $71D0            ; arcade $11D0 data
-    db  $22,$A8,$44
+    db  $22,$44,$44
     ORG $71D3
     ld   b,d
     ORG $71D4
@@ -2876,90 +2876,90 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $72B3
     ld   (de),a
     ORG $72B4            ; arcade $12B4 data
-    db  $D0,$72
+    db  $D0,$12
     ORG $72B6            ; arcade $12B6 data
-    db  $BE,$72
+    db  $BE,$12
     ORG $72B8            ; arcade $12B8 data
-    db  $E3,$72
+    db  $E3,$12
     ORG $72BA
     or   $00
     ORG $72BC            ; arcade $12BC data
-    db  $B3,$72
+    db  $B3,$12
     ORG $72BE            ; arcade $12BE data
     db  $01
     ORG $72BF            ; arcade $12BF data
     db  $10
     ORG $72C0            ; arcade $12C0 data
-    db  $00,$78,$18,$00,$3C,$BE,$5A,$BE,$18,$78,$18,$78,$18,$78,$18,$9C
+    db  $00,$18,$18,$00,$3C,$5A,$5A,$5A,$18,$18,$18,$18,$18,$18,$18,$3C
     ORG $72D0            ; arcade $12D0 data
     db  $01
     ORG $72D1            ; arcade $12D1 data
     db  $11
     ORG $72D2            ; arcade $12D2 data
-    db  $18,$84,$24,$A6,$81,$F1,$81,$F1,$81,$A6,$24,$84,$24,$84,$24,$A6
+    db  $18,$24,$24,$42,$81,$81,$81,$81,$81,$42,$24,$24,$24,$24,$24,$42
     db  $3C
     ORG $72E3            ; arcade $12E3 data
     db  $01
     ORG $72E4            ; arcade $12E4 data
     db  $11
     ORG $72E5            ; arcade $12E5 data
-    db  $3C,$84,$E4,$DB,$C3,$A5,$A5,$A5,$E7,$C6,$24,$84,$24,$84,$66,$A6
+    db  $3C,$24,$24,$7E,$C3,$A5,$A5,$A5,$E7,$66,$24,$24,$24,$24,$66,$42
     db  $7E
     ORG $72F6            ; arcade $12F6 data
     db  $01
     ORG $72F7            ; arcade $12F7 data
     db  $11
     ORG $72F8            ; arcade $12F8 data
-    db  $3C,$9C,$FC,$DB,$FF,$FF,$FF,$FF,$FF,$DB,$3C,$9C,$3C,$9C,$FE,$DB
+    db  $3C,$3C,$3C,$7E,$FF,$FF,$FF,$FF,$FF,$7E,$3C,$3C,$3C,$3C,$7E,$7E
     db  $7E
     ORG $7309            ; arcade $1309 data
     db  $01
     ORG $730A            ; arcade $130A data
     db  $0F
     ORG $730B            ; arcade $130B data
-    db  $18,$79,$04,$7C,$18,$78,$18,$78,$18,$78,$18,$78,$18,$78,$1C
+    db  $18,$19,$04,$1C,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$1C
     ORG $731A            ; arcade $131A data
     db  $01
     ORG $731B            ; arcade $131B data
     db  $0F
     ORG $731C            ; arcade $131C data
-    db  $18,$78,$00,$7F,$18,$78,$18,$78,$18,$78,$18,$78,$18,$78,$1C
+    db  $18,$18,$00,$1F,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$1C
     ORG $732B            ; arcade $132B data
     db  $01
     ORG $732C            ; arcade $132C data
     db  $0F
     ORG $732D            ; arcade $132D data
-    db  $18,$78,$00,$78,$18,$7C,$1A,$78,$18,$78,$18,$78,$18,$78,$1C
+    db  $18,$18,$00,$18,$18,$1C,$1A,$18,$18,$18,$18,$18,$18,$18,$1C
     ORG $733C            ; arcade $133C data
     db  $01
     ORG $733D            ; arcade $133D data
     db  $0F
     ORG $733E            ; arcade $133E data
-    db  $18,$78,$00,$9C,$3C,$9A,$3A,$9A,$18,$78,$18,$78,$18,$78,$1C
+    db  $18,$18,$00,$3C,$3C,$3A,$3A,$3A,$18,$18,$18,$18,$18,$18,$1C
     ORG $734D            ; arcade $134D data
     db  $01
     ORG $734E            ; arcade $134E data
     db  $0F
     ORG $734F            ; arcade $134F data
-    db  $18,$78,$00,$9C,$FC,$BF,$9C,$7C,$18,$78,$18,$78,$18,$78,$38
+    db  $18,$18,$00,$3C,$3C,$5C,$9C,$1C,$18,$18,$18,$18,$18,$18,$38
     ORG $735E            ; arcade $135E data
     db  $01
     ORG $735F            ; arcade $135F data
     db  $0F
     ORG $7360            ; arcade $1360 data
-    db  $18,$78,$00,$F8,$18,$78,$18,$78,$18,$78,$18,$78,$18,$78,$38
+    db  $18,$18,$00,$F8,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$38
     ORG $736F            ; arcade $136F data
     db  $01
     ORG $7370            ; arcade $1370 data
     db  $0F
     ORG $7371            ; arcade $1371 data
-    db  $98,$BC,$20,$78,$18,$78,$18,$78,$18,$78,$18,$78,$18,$78,$38
+    db  $98,$58,$20,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$38
     ORG $7380            ; arcade $1380 data
     db  $01
     ORG $7381            ; arcade $1381 data
     db  $0F
     ORG $7382            ; arcade $1382 data
-    db  $18,$78,$00,$7D,$1B,$79,$18,$78,$18,$78,$18,$78,$18,$78,$38
+    db  $18,$18,$00,$1D,$1B,$19,$18,$18,$18,$18,$18,$18,$18,$18,$38
     ORG $7391
     db  $01
     ORG $7392
@@ -2975,7 +2975,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $7399
     sbc  a,d
     ORG $739A            ; arcade $139A data
-    db  $18,$78
+    db  $18,$18
     ORG $739C
     inc  h
     ORG $739D
@@ -2993,7 +2993,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $73A3
     ld   bc,$0010
     ORG $73A6            ; arcade $13A6 data
-    db  $18,$78
+    db  $18,$18
     ORG $73A8
     nop
     ORG $73A9
@@ -3001,7 +3001,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $73AA
     ld   a,($DBFA)
     ORG $73AD            ; arcade $13AD data
-    db  $18,$78
+    db  $18,$18
     ORG $73AF
     jr   z,$73F9
     ORG $73B1
@@ -3021,13 +3021,13 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $73BB
     ld   a,($DA3A)
     ORG $73BE            ; arcade $13BE data
-    db  $18,$78
+    db  $18,$18
     ORG $73C0            ; arcade $13C0 data
-    db  $18,$78
+    db  $18,$18
     ORG $73C2            ; arcade $13C2 data
-    db  $18,$78
+    db  $18,$18
     ORG $73C4            ; arcade $13C4 data
-    db  $18,$78
+    db  $18,$18
     ORG $73C6
     jr   c,$743A
     ORG $73C8
@@ -3071,9 +3071,9 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $73E2            ; arcade $13E2 data
     db  $20,$BE
     ORG $73E4            ; arcade $13E4 data
-    db  $53,$D4,$61,$D2,$74,$CB,$6E,$CF,$65,$D0,$66,$C5,$20,$C4,$72,$D5
+    db  $53,$74,$61,$72,$74,$6B,$6E,$6F,$65,$70,$66,$65,$20,$64,$72,$75
     ORG $73F4            ; arcade $13F4 data
-    db  $65,$C3,$6B,$C5,$6E,$00
+    db  $65,$63,$6B,$65,$6E,$00
     ORG $73FA
     ret
     ORG $73FB
@@ -3083,7 +3083,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $73FF            ; arcade $13FF data
     db  $44,$BE
     ORG $7401            ; arcade $1401 data
-    db  $50,$D5,$6C,$D3,$61,$D2,$20,$B7,$74,$C1,$72,$D4,$00
+    db  $50,$75,$6C,$73,$61,$72,$20,$53,$74,$61,$72,$74,$00
     ORG $740E
     ret
     ORG $740F
@@ -3093,7 +3093,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $7413            ; arcade $1413 data
     db  $58,$BE
     ORG $7415            ; arcade $1415 data
-    db  $49,$CE,$73,$C5,$72,$D4,$20,$A7,$6F,$C9,$6E,$00
+    db  $49,$6E,$73,$65,$72,$74,$20,$43,$6F,$69,$6E,$00
     ORG $7421
     ret
     ORG $7422
@@ -3103,9 +3103,9 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $7426            ; arcade $1426 data
     db  $30,$BE
     ORG $7428            ; arcade $1428 data
-    db  $49,$CE,$74,$D2,$6F,$C4,$75,$C9,$72,$C5,$20,$CC,$61,$80,$6D,$CF
+    db  $49,$6E,$74,$72,$6F,$64,$75,$69,$72,$65,$20,$6C,$61,$20,$6D,$6F
     ORG $7438            ; arcade $1438 data
-    db  $6E,$CE,$61,$C9,$65,$00
+    db  $6E,$6E,$61,$69,$65,$00
     ORG $743E
     ret
     ORG $743F
@@ -3115,7 +3115,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $7443            ; arcade $1443 data
     db  $48,$BE
     ORG $7445            ; arcade $1445 data
-    db  $4D,$D5,$6E,$DA,$65,$80,$65,$C9,$6E,$D7,$65,$D2,$66,$C5,$6E,$00
+    db  $4D,$75,$6E,$7A,$65,$20,$65,$69,$6E,$77,$65,$72,$66,$65,$6E,$00
     ORG $7455
     ret
     ORG $7456
@@ -3125,7 +3125,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $745A            ; arcade $145A data
     db  $48,$BE
     ORG $745C            ; arcade $145C data
-    db  $50,$CF,$6E,$C7,$61,$80,$6C,$C1,$20,$CD,$6F,$CE,$65,$C4,$61,$00
+    db  $50,$6F,$6E,$67,$61,$20,$6C,$61,$20,$6D,$6F,$6E,$65,$64,$61,$00
     ORG $746C
     ret
     ORG $746D
@@ -3390,11 +3390,11 @@ HANDLE_PLAYER_BOLTS:
     ORG $7547
     call $757E ; call CHECK_IF_BOLT_OFFSCREEN
     ORG $754A            ; arcade $154A data
-    db  $FD,$95,$FD
+    db  $FD,$35,$FD
     ORG $754D
     ret  nz
     ORG $754E            ; arcade $154E data
-    db  $FD,$96,$00,$00
+    db  $FD,$36,$00,$00
     ORG $7552
     ret
 MOVE_AND_DRAW_BOLT:
@@ -3468,7 +3468,7 @@ CHECK_IF_ZERO_OR_E:
     ret ; and we're out
 HANDLE_BOLT_COLLISION:
     ORG $75A0            ; arcade $15A0 data
-    db  $FD,$96,$00,$00
+    db  $FD,$36,$00,$00
     ORG $75A4
     ld   ix,($A076) ; load IX with contents of MAN_PTR
     ORG $75A8
@@ -4517,7 +4517,7 @@ DECREMENT_CREDITS:
     ORG $795B
     ld   de,$8211
     ORG $795E            ; arcade $195E data
-    db  $22,$93,$33
+    db  $22,$33,$33
     ORG $7961
     ld   b,h
     ORG $7962
@@ -4555,7 +4555,7 @@ DECREMENT_CREDITS:
     ORG $7975
     nop
     ORG $7976            ; arcade $1976 data
-    db  $21,$71,$21
+    db  $21,$11,$21
     ORG $7979
     ld   de,$C532
     ORG $797C
@@ -4621,31 +4621,17 @@ DECREMENT_CREDITS:
     ORG $79B6            ; arcade $19B6 data
     db  $0C,$BE
     ORG $79B8            ; arcade $19B8 data
-    db  $1F,$91,$39,$98,$30,$80,$53,$B8,$45,$B6,$4E,$80,$45,$CC,$65,$C3
+    db  $1F,$31,$39,$38,$30,$20,$53,$54,$45,$52,$4E,$20,$45,$6C,$65,$63
     ORG $79C8            ; arcade $19C8 data
-    db  $74,$D2,$6F,$CE,$69,$C3,$73,$8C,$20,$AD,$6E,$C3,$2E,$00
+    db  $74,$72,$6F,$6E,$69,$63,$73,$2C,$20,$49,$6E,$63,$2E,$00
     ORG $79D6
     call $78CD
     ORG $79D9
     call $8314 ; call SHOW_SCORE
     ORG $79DC
     call $7AED ; call LTABLE
-    ORG $79DF
-    inc  b
-    ORG $79E0
-    dec  de
-    ORG $79E1
-    dec  l
-    ORG $79E2
-    dec  de
-    ORG $79E3
-    rla
-    ORG $79E4
-    dec  de
-    ORG $79E5
-    ld   b,l
-    ORG $79E6
-    dec  de
+    ORG $79DF            ; data words arcade $19DF-$19E6
+    db  $04,$7B,$2D,$7B,$17,$7B,$45,$7B
     ORG $79E7
     ld   hl,$A702
     ORG $79EA
@@ -4864,42 +4850,24 @@ CLEAR_SCREEN:
     call $9613
     ORG $7AA6
     call $7AED ; call LTABLE
-    ORG $7AA9            ; arcade $1AA9 data
-    db  $94,$7B
-    ORG $7AAB            ; arcade $1AAB data
-    db  $DE,$7B
-    ORG $7AAD            ; arcade $1AAD data
-    db  $BB,$7B
-    ORG $7AAF            ; arcade $1AAF data
-    db  $FB,$7B
+    ORG $7AA9            ; data words arcade $1AA9-$1AB0
+    db  $94,$7B,$DE,$7B,$BB,$7B,$FB,$7B
     ORG $7AB1
     ret
     ORG $7AB2
     call $960A
     ORG $7AB5
     call $7AED ; call LTABLE
-    ORG $7AB8            ; arcade $1AB8 data
-    db  $54,$7B
-    ORG $7ABA            ; arcade $1ABA data
-    db  $DE,$7B
-    ORG $7ABC            ; arcade $1ABC data
-    db  $76,$7B
-    ORG $7ABE            ; arcade $1ABE data
-    db  $FB,$7B
+    ORG $7AB8            ; data words arcade $1AB8-$1ABF
+    db  $54,$7B,$DE,$7B,$76,$7B,$FB,$7B
     ORG $7AC0
     ret
     ORG $7AC1
     call $9601
     ORG $7AC4
     call $7AED ; call LTABLE
-    ORG $7AC7            ; arcade $1AC7 data
-    db  $0F,$7C
-    ORG $7AC9            ; arcade $1AC9 data
-    db  $3F,$7C
-    ORG $7ACB            ; arcade $1ACB data
-    db  $22,$7C
-    ORG $7ACD            ; arcade $1ACD data
-    db  $56,$7C
+    ORG $7AC7            ; data words arcade $1AC7-$1ACE
+    db  $0F,$7C,$3F,$7C,$22,$7C,$56,$7C
     ORG $7ACF
     ld   hl,$7AD6 ; load HL with address of COINS_DETECTED_IN_POCKET speech
     ORG $7AD2
@@ -4986,7 +4954,7 @@ LTABLE:
     ORG $7B08            ; arcade $1B08 data
     db  $58,$00
     ORG $7B0A            ; arcade $1B0A data
-    db  $48,$C9,$67,$C8,$20,$B7,$63,$CF,$72,$C5,$73,$00
+    db  $48,$69,$67,$68,$20,$53,$63,$6F,$72,$65,$73,$00
     ORG $7B16
     ret
     ORG $7B17
@@ -4996,7 +4964,7 @@ LTABLE:
     ORG $7B1B            ; arcade $1B1B data
     db  $48,$00
     ORG $7B1D            ; arcade $1B1D data
-    db  $4D,$C5,$69,$CC,$6C,$C5,$75,$D2,$20,$B7,$63,$CF,$72,$C5,$00
+    db  $4D,$65,$69,$6C,$6C,$65,$75,$72,$20,$53,$63,$6F,$72,$65,$00
     ORG $7B2C
     ret
     ORG $7B2D
@@ -5006,7 +4974,7 @@ LTABLE:
     ORG $7B31            ; arcade $1B31 data
     db  $40,$00
     ORG $7B33            ; arcade $1B33 data
-    db  $48,$CF,$65,$C3,$68,$D3,$74,$C5,$72,$80,$47,$C5,$62,$CE,$69,$D3
+    db  $48,$6F,$65,$63,$68,$73,$74,$65,$72,$20,$47,$65,$62,$6E,$69,$73
     ORG $7B43            ; arcade $1B43 data
     db  $00
     ORG $7B44
@@ -5018,7 +4986,7 @@ LTABLE:
     ORG $7B49            ; arcade $1B49 data
     db  $5C,$00
     ORG $7B4B            ; arcade $1B4B data
-    db  $52,$C5,$63,$CF,$72,$C4,$73,$00
+    db  $52,$65,$63,$6F,$72,$64,$73,$00
     ORG $7B53
     ret
     ORG $7B54
@@ -5028,9 +4996,9 @@ LTABLE:
     ORG $7B58            ; arcade $1B58 data
     db  $14,$BE
     ORG $7B5A            ; arcade $1B5A data
-    db  $50,$D5,$73,$C8,$20,$91,$20,$B4,$6C,$C1,$79,$C5,$72,$80,$53,$D4
+    db  $50,$75,$73,$68,$20,$31,$20,$50,$6C,$61,$79,$65,$72,$20,$53,$74
     ORG $7B6A            ; arcade $1B6A data
-    db  $61,$D2,$74,$80,$42,$D5,$74,$D4,$6F,$CE,$00
+    db  $61,$72,$74,$20,$42,$75,$74,$74,$6F,$6E,$00
     ORG $7B75
     ret
     ORG $7B76
@@ -5040,9 +5008,9 @@ LTABLE:
     ORG $7B7A            ; arcade $1B7A data
     db  $24,$BE
     ORG $7B7C            ; arcade $1B7C data
-    db  $50,$CF,$75,$D3,$73,$C5,$72,$80,$62,$CF,$75,$D4,$6F,$CE,$20,$D3
+    db  $50,$6F,$75,$73,$73,$65,$72,$20,$62,$6F,$75,$74,$6F,$6E,$20,$73
     ORG $7B8C            ; arcade $1B8C data
-    db  $74,$C1,$72,$D4,$20,$91,$00
+    db  $74,$61,$72,$74,$20,$31,$00
     ORG $7B93
     ret
     ORG $7B94
@@ -5052,9 +5020,9 @@ LTABLE:
     ORG $7B98            ; arcade $1B98 data
     db  $04,$BE
     ORG $7B9A            ; arcade $1B9A data
-    db  $50,$D5,$73,$C8,$20,$91,$20,$CF,$72,$80,$32,$80,$50,$CC,$61,$D9
+    db  $50,$75,$73,$68,$20,$31,$20,$6F,$72,$20,$32,$20,$50,$6C,$61,$79
     ORG $7BAA            ; arcade $1BAA data
-    db  $65,$D2,$20,$B7,$74,$C1,$72,$D4,$20,$A6,$75,$D4,$74,$CF,$6E,$00
+    db  $65,$72,$20,$53,$74,$61,$72,$74,$20,$42,$75,$74,$74,$6F,$6E,$00
     ORG $7BBA
     ret
     ORG $7BBB
@@ -5064,9 +5032,9 @@ LTABLE:
     ORG $7BBF            ; arcade $1BBF data
     db  $10,$BE
     ORG $7BC1            ; arcade $1BC1 data
-    db  $50,$CF,$75,$D3,$73,$C5,$72,$80,$62,$CF,$75,$D4,$6F,$CE,$20,$D3
+    db  $50,$6F,$75,$73,$73,$65,$72,$20,$62,$6F,$75,$74,$6F,$6E,$20,$73
     ORG $7BD1            ; arcade $1BD1 data
-    db  $74,$C1,$72,$D4,$20,$91,$20,$CF,$75,$80,$32,$00
+    db  $74,$61,$72,$74,$20,$31,$20,$6F,$75,$20,$32,$00
     ORG $7BDD
     ret
     ORG $7BDE
@@ -5076,9 +5044,9 @@ LTABLE:
     ORG $7BE2            ; arcade $1BE2 data
     db  $20,$BE
     ORG $7BE4            ; arcade $1BE4 data
-    db  $53,$D4,$61,$D2,$74,$CB,$6E,$CF,$65,$D0,$66,$C5,$20,$C4,$72,$D5
+    db  $53,$74,$61,$72,$74,$6B,$6E,$6F,$65,$70,$66,$65,$20,$64,$72,$75
     ORG $7BF4            ; arcade $1BF4 data
-    db  $65,$C3,$6B,$C5,$6E,$00,$C9,$CD,$7B,$89,$90,$A8,$BE,$B4,$75,$CC
+    db  $65,$63,$6B,$65,$6E,$00,$C9,$CD,$7B,$29,$90,$44,$BE,$50,$75,$6C
     ORG $7C04
     db  $73
     ORG $7C05
@@ -5108,7 +5076,7 @@ LTABLE:
     ORG $7C13            ; arcade $1C13 data
     db  $58,$BE
     ORG $7C15            ; arcade $1C15 data
-    db  $49,$CE,$73,$C5,$72,$D4,$20,$A7,$6F,$C9,$6E,$00
+    db  $49,$6E,$73,$65,$72,$74,$20,$43,$6F,$69,$6E,$00
     ORG $7C21
     ret
     ORG $7C22
@@ -5118,9 +5086,9 @@ LTABLE:
     ORG $7C26            ; arcade $1C26 data
     db  $30,$BE
     ORG $7C28            ; arcade $1C28 data
-    db  $49,$CE,$74,$D2,$6F,$C4,$75,$C9,$72,$C5,$20,$CC,$61,$80,$6D,$CF
+    db  $49,$6E,$74,$72,$6F,$64,$75,$69,$72,$65,$20,$6C,$61,$20,$6D,$6F
     ORG $7C38            ; arcade $1C38 data
-    db  $6E,$CE,$61,$C9,$65,$00
+    db  $6E,$6E,$61,$69,$65,$00
     ORG $7C3E
     ret
     ORG $7C3F
@@ -5130,7 +5098,7 @@ LTABLE:
     ORG $7C43            ; arcade $1C43 data
     db  $48,$BE
     ORG $7C45            ; arcade $1C45 data
-    db  $4D,$D5,$6E,$DA,$65,$80,$65,$C9,$6E,$D7,$65,$D2,$66,$C5,$6E,$00
+    db  $4D,$75,$6E,$7A,$65,$20,$65,$69,$6E,$77,$65,$72,$66,$65,$6E,$00
     ORG $7C55
     ret
     ORG $7C56
@@ -5140,7 +5108,7 @@ LTABLE:
     ORG $7C5A            ; arcade $1C5A data
     db  $48,$BE
     ORG $7C5C            ; arcade $1C5C data
-    db  $50,$CF,$6E,$C7,$61,$80,$6C,$C1,$20,$CD,$6F,$CE,$65,$C4,$61,$00
+    db  $50,$6F,$6E,$67,$61,$20,$6C,$61,$20,$6D,$6F,$6E,$65,$64,$61,$00
     ORG $7C6C
     ret
     ORG $7C6D
@@ -5403,62 +5371,11 @@ LTABLE:
     ld   l,a
     ORG $7D30
     jp   (hl)
-    ORG $7D31
-    ld   d,c
-    ORG $7D32
-    dec  e
-    ORG $7D33
-    ld   e,h
-    ORG $7D34
-    dec  e
-    ORG $7D35
-    ld   e,l
-    ORG $7D36
-    dec  e
-    ORG $7D37
-    ld   l,b
-    ORG $7D38
-    dec  e
-    ORG $7D39
-    ld   (hl),h
-    ORG $7D3A
-    dec  e
-    ORG $7D3B
-    ld   a,(hl)
-    ORG $7D3C
-    dec  e
-    ORG $7D3D
-    adc  a,d
-    ORG $7D3E
-    dec  e
-    ORG $7D3F
-    sub  (hl)
-    ORG $7D40
-    dec  e
-    ORG $7D41
-    and  a
-    ORG $7D42
-    dec  e
-    ORG $7D43
-    or   c
-    ORG $7D44
-    dec  e
-    ORG $7D45
-    cp   l
-    ORG $7D46
-    dec  e
-    ORG $7D47
-    rr   l
-    ORG $7D49
-    call po,$F41D
-    ORG $7D4C
-    dec  e
-    ORG $7D4D
-    add  hl,bc
-    ORG $7D4E
-    ld   e,$1C
-    ORG $7D50
-    ld   e,$0B
+    ORG $7D31            ; data words arcade $1D31-$1D50
+    db  $51,$7D,$5C,$7D,$5D,$7D,$68,$7D,$74,$7D,$7E,$7D,$8A,$7D,$96,$7D
+    db  $A7,$7D,$B1,$7D,$BD,$7D,$CB,$7D,$E4,$7D,$F4,$7D,$09,$7E,$1C,$7E
+    ORG $7D51
+    db  $0B
     ORG $7D52            ; arcade $1D52 data
     db  $21,$00,$00
     ORG $7D55
@@ -6227,7 +6144,7 @@ MAN_INIT:
     ORG $7FDC
     djnz $7FDB
     ORG $7FDE            ; arcade $1FDE data
-    db  $DD,$81,$00,$00
+    db  $DD,$21,$00,$00
     ORG $7FE2
     add  ix,sp ; IX = SP
     ORG $7FE4
@@ -6353,28 +6270,28 @@ D.TAB:
     db  $12
 P.TAB:
     ORG $8053            ; arcade $2053 data
-    db  $46,$70
+    db  $46,$10
     ORG $8055            ; arcade $2055 data
-    db  $4B,$70
+    db  $4B,$10
     ORG $8057            ; arcade $2057 data
-    db  $4B,$70
+    db  $4B,$10
     ORG $8059            ; arcade $2059 data
-    db  $4B,$70
+    db  $4B,$10
     ORG $805B            ; arcade $205B data
-    db  $4B,$70
+    db  $4B,$10
     ORG $805D            ; arcade $205D data
-    db  $56,$70
+    db  $56,$10
     ORG $805F            ; arcade $205F data
-    db  $56,$70
+    db  $56,$10
     ORG $8061            ; arcade $2061 data
-    db  $56,$70
+    db  $56,$10
     ORG $8063            ; arcade $2063 data
-    db  $4B,$70
+    db  $4B,$10
     ORG $8065            ; arcade $2065 data
-    db  $B3,$72
+    db  $B3,$12
 SR.TAB:
     ORG $8067            ; arcade $2067 data
-    db  $46,$70
+    db  $46,$10
     ORG $8069            ; arcade $2069 data
     db  $00
     ORG $806A            ; arcade $206A data
@@ -6384,7 +6301,7 @@ SR.TAB:
     ORG $806C            ; arcade $206C data
     db  $00
     ORG $806D            ; arcade $206D data
-    db  $61,$70
+    db  $61,$10
     ORG $806F            ; arcade $206F data
     db  $07
     ORG $8070            ; arcade $2070 data
@@ -6394,7 +6311,7 @@ SR.TAB:
     ORG $8072            ; arcade $2072 data
     db  $00
     ORG $8073            ; arcade $2073 data
-    db  $66,$70
+    db  $66,$10
     ORG $8075            ; arcade $2075 data
     db  $07
     ORG $8076            ; arcade $2076 data
@@ -6404,7 +6321,7 @@ SR.TAB:
     ORG $8078            ; arcade $2078 data
     db  $00
     ORG $8079            ; arcade $2079 data
-    db  $6B,$70
+    db  $6B,$10
     ORG $807B            ; arcade $207B data
     db  $06
     ORG $807C            ; arcade $207C data
@@ -6414,7 +6331,7 @@ SR.TAB:
     ORG $807E            ; arcade $207E data
     db  $00
     ORG $807F            ; arcade $207F data
-    db  $70,$70
+    db  $70,$10
     ORG $8081            ; arcade $2081 data
     db  $06
     ORG $8082            ; arcade $2082 data
@@ -6424,7 +6341,7 @@ SR.TAB:
     ORG $8084            ; arcade $2084 data
     db  $00
     ORG $8085            ; arcade $2085 data
-    db  $75,$70
+    db  $75,$10
     ORG $8087            ; arcade $2087 data
     db  $00
     ORG $8088            ; arcade $2088 data
@@ -6434,7 +6351,7 @@ SR.TAB:
     ORG $808A            ; arcade $208A data
     db  $00
     ORG $808B            ; arcade $208B data
-    db  $7A,$70
+    db  $7A,$10
     ORG $808D            ; arcade $208D data
     db  $00
     ORG $808E            ; arcade $208E data
@@ -6444,7 +6361,7 @@ SR.TAB:
     ORG $8090            ; arcade $2090 data
     db  $00
     ORG $8091            ; arcade $2091 data
-    db  $7F,$70
+    db  $7F,$10
     ORG $8093            ; arcade $2093 data
     db  $00
     ORG $8094            ; arcade $2094 data
@@ -6454,7 +6371,7 @@ SR.TAB:
     ORG $8096            ; arcade $2096 data
     db  $00
     ORG $8097            ; arcade $2097 data
-    db  $84,$70
+    db  $84,$10
     ORG $8099            ; arcade $2099 data
     db  $07
     ORG $809A            ; arcade $209A data
@@ -6556,7 +6473,7 @@ SR.TAB:
     ORG $8100
     ld   ($A74D),a ; set RWAIT
     ORG $8103            ; arcade $2103 data
-    db  $FD,$81,$17,$81
+    db  $FD,$21,$17,$21
     ORG $8107
     ld   hl,$FFF0
     ORG $810A
@@ -6618,7 +6535,7 @@ SR.TAB:
     ORG $813D
     ld   c,a
     ORG $813E            ; arcade $213E data
-    db  $FD,$81,$45,$81
+    db  $FD,$21,$45,$21
     ORG $8142
     jp   $83B8 ; jump to ROBOT
     ORG $8145
@@ -7499,7 +7416,7 @@ BLAM:
     ORG $84A3            ; arcade $24A3 data
     db  $60,$D5
     ORG $84A5            ; arcade $24A5 data
-    db  $42,$B3,$4E,$B9,$53,$00
+    db  $42,$4F,$4E,$55,$53,$00
     ORG $84AB
     push af
     ORG $84AC
@@ -7651,23 +7568,23 @@ M.TAB:
     db  $00,$00
 ROBOT_ANIMATION_TABLES:
     ORG $852D            ; arcade $252D data
-    db  $00,$70
+    db  $00,$10
     ORG $852F            ; arcade $252F data
-    db  $13,$70
+    db  $13,$10
     ORG $8531            ; arcade $2531 data
-    db  $13,$70
+    db  $13,$10
     ORG $8533            ; arcade $2533 data
-    db  $13,$70
+    db  $13,$10
     ORG $8535            ; arcade $2535 data
-    db  $1C,$70
+    db  $1C,$10
     ORG $8537            ; arcade $2537 data
-    db  $27,$70
+    db  $27,$10
     ORG $8539            ; arcade $2539 data
-    db  $27,$70
+    db  $27,$10
     ORG $853B            ; arcade $253B data
-    db  $27,$70
+    db  $27,$10
     ORG $853D            ; arcade $253D data
-    db  $30,$70
+    db  $30,$10
     ORG $853F
     ld   b,c
     ORG $8540
@@ -8187,7 +8104,7 @@ BOTTOM_OF_SCREEN_INTERRUPT:
     ORG $871E
     out  ($4F),a ; turn on interrupts
     ORG $8720
-    ld   a,$37
+    ld   a,$97
     ORG $8722
     ld   i,a ; set interrupt flags
     ORG $8724
@@ -8506,8 +8423,6 @@ MOVE_ANIMATE_VECTOR:
 DRAW_SPRITE:
     ORG $8817
     jp  HOOK_DRAW_SPRITE              ; arcade $2817 hooked
-    ORG $8819
-    ld   a,(hl) ; read width of sprite
     ORG $881A
     inc  hl ; bump HL to point to height
     ORG $881B
@@ -8914,7 +8829,7 @@ SHOOT:
     jp   (hl)
 S.TAB:
     ORG $8944            ; arcade $2944 data
-    db  $00,$70
+    db  $00,$10
     ORG $8946            ; arcade $2946 data
     db  $00
     ORG $8947            ; arcade $2947 data
@@ -8924,7 +8839,7 @@ S.TAB:
     ORG $8949            ; arcade $2949 data
     db  $00
     ORG $894A            ; arcade $294A data
-    db  $00,$70
+    db  $00,$10
     ORG $894C            ; arcade $294C data
     db  $07
     ORG $894D            ; arcade $294D data
@@ -8934,7 +8849,7 @@ S.TAB:
     ORG $894F            ; arcade $294F data
     db  $00
     ORG $8950            ; arcade $2950 data
-    db  $00,$70
+    db  $00,$10
     ORG $8952            ; arcade $2952 data
     db  $07
     ORG $8953            ; arcade $2953 data
@@ -8944,7 +8859,7 @@ S.TAB:
     ORG $8955            ; arcade $2955 data
     db  $00
     ORG $8956            ; arcade $2956 data
-    db  $00,$70
+    db  $00,$10
     ORG $8958            ; arcade $2958 data
     db  $07
     ORG $8959            ; arcade $2959 data
@@ -8954,7 +8869,7 @@ S.TAB:
     ORG $895B            ; arcade $295B data
     db  $00
     ORG $895C            ; arcade $295C data
-    db  $00,$70
+    db  $00,$10
     ORG $895E            ; arcade $295E data
     db  $07
     ORG $895F            ; arcade $295F data
@@ -8964,7 +8879,7 @@ S.TAB:
     ORG $8961            ; arcade $2961 data
     db  $00
     ORG $8962            ; arcade $2962 data
-    db  $00,$70
+    db  $00,$10
     ORG $8964            ; arcade $2964 data
     db  $00
     ORG $8965            ; arcade $2965 data
@@ -8974,7 +8889,7 @@ S.TAB:
     ORG $8967            ; arcade $2967 data
     db  $00
     ORG $8968            ; arcade $2968 data
-    db  $00,$70
+    db  $00,$10
     ORG $896A            ; arcade $296A data
     db  $00
     ORG $896B            ; arcade $296B data
@@ -8984,7 +8899,7 @@ S.TAB:
     ORG $896D            ; arcade $296D data
     db  $00
     ORG $896E            ; arcade $296E data
-    db  $00,$70
+    db  $00,$10
     ORG $8970            ; arcade $2970 data
     db  $00
     ORG $8971            ; arcade $2971 data
@@ -8994,7 +8909,7 @@ S.TAB:
     ORG $8973            ; arcade $2973 data
     db  $00
     ORG $8974            ; arcade $2974 data
-    db  $00,$70
+    db  $00,$10
     ORG $8976            ; arcade $2976 data
     db  $07
     ORG $8977            ; arcade $2977 data
@@ -9063,9 +8978,10 @@ PRINT_STRING_297B:
 RTOAX:
     ORG $89A1
     jp  HOOK_RTOAX              ; arcade $29A1 hooked
-CALCULATE_MAGIC_IMAGE_RAM_ADDRESS:
-    ORG $89A3
-    jp  HOOK_RTOAX              ; arcade $29A3 hooked
+    ORG $89A4
+    db  $79
+    ORG $89A5
+    db  $43
     ORG $89A6
     or   a ; set zero flag if playing on upright cabinet
     ORG $89A7
@@ -9131,8 +9047,8 @@ CALCULATE_MAGIC_IMAGE_RAM_ADDRESS:
 PRINT_CHAR:
     ORG $89DB
     jp  HOOK_PRINT_CHAR              ; arcade $29DB hooked
-    ORG $89DC            ; arcade $29DC data
-    db  $21,$00,$00
+    ORG $89DE
+    db  $00
     ORG $89DF
     ld   b,$00
     ORG $89E1
@@ -9683,7 +9599,7 @@ GENERATE_ROBOT_SPEECH:
     ORG $8BB8
     ex   de,hl
     ORG $8BB9            ; arcade $2BB9 data
-    db  $21,$8C,$2C
+    db  $21,$2C,$2C
     ORG $8BBC            ; arcade $2BBC data
     db  $06,$06
     ORG $8BBE
@@ -10041,18 +9957,8 @@ INTRUDER_ALERT_INTRUDER_ALERT:
     call $961C
     ORG $8CC8
     call $7AED ; call LTABLE
-    ORG $8CCB
-    dec  de
-    ORG $8CCC
-    nop
-    ORG $8CCD
-    ret  c
-    ORG $8CCE
-    dec  l
-    ORG $8CCF
-    ld   a,($F400)
-    ORG $8CD2
-    dec  l
+    ORG $8CCB            ; data words arcade $2CCB-$2CD2
+    db  $1B,$60,$D8,$8D,$3A,$60,$F4,$8D
     ORG $8CD3
     ex   af,af'
     ORG $8CD4
@@ -10063,18 +9969,10 @@ INTRUDER_ALERT_INTRUDER_ALERT:
     call $8A4A
     ORG $8CDC
     call $7AED ; call LTABLE
-    ORG $8CDF
-    sub  e
-    ORG $8CE0
-    rlca
-    ORG $8CE1
-    ld   (hl),c
-    ORG $8CE2
-    ld   l,$13
-    ORG $8CE4
-    ld   l,$CB
-    ORG $8CE6
-    ld   l,$CD
+    ORG $8CDF            ; data words arcade $2CDF-$2CE6
+    db  $93,$67,$71,$8E,$13,$8E,$CB,$8E
+    ORG $8CE7
+    db  $CD
     ORG $8CE8
     ld   a,e
     ORG $8CE9
@@ -10095,22 +9993,8 @@ INTRUDER_ALERT_INTRUDER_ALERT:
     nop
     ORG $8CF1
     call $7AED ; call LTABLE
-    ORG $8CF4
-    dec  de
-    ORG $8CF5
-    cpl
-    ORG $8CF6
-    dec  de
-    ORG $8CF7
-    cpl
-    ORG $8CF8
-    ld   h,c
-    ORG $8CF9
-    cpl
-    ORG $8CFA
-    cp   h
-    ORG $8CFB
-    cpl
+    ORG $8CF4            ; data words arcade $2CF4-$2CFB
+    db  $1B,$8F,$1B,$8F,$61,$8F,$BC,$8F
     ORG $8CFC
     ld   b,$00
     ORG $8CFE
@@ -10367,83 +10251,83 @@ INCREMENT_BY_1:
     ORG $8DDB            ; arcade $2DDB data
     db  $90
     ORG $8DDC            ; arcade $2DDC data
-    db  $20,$A0
+    db  $20,$08
     ORG $8DDE            ; arcade $2DDE data
-    db  $47,$D2,$61,$D4,$75,$CC,$69,$C5,$72,$C5,$2C,$80,$53,$D0,$69,$C5
+    db  $47,$72,$61,$74,$75,$6C,$69,$65,$72,$65,$2C,$20,$53,$70,$69,$65
     ORG $8DEE            ; arcade $2DEE data
-    db  $6C,$C5,$72,$80,$00,$C9,$CD,$DB,$29,$90,$20,$A0,$46,$C5,$6C,$C9
+    db  $6C,$65,$72,$20,$00,$C9,$CD,$7B,$29,$90,$20,$08,$46,$65,$6C,$69
     ORG $8DFE            ; arcade $2DFE data
-    db  $63,$C9,$74,$C1,$63,$C9,$6F,$CE,$65,$D3,$20,$CA,$75,$C7,$61,$C4
+    db  $63,$69,$74,$61,$63,$69,$6F,$6E,$65,$73,$20,$6A,$75,$67,$61,$64
     ORG $8E0E            ; arcade $2E0E data
-    db  $6F,$D2,$20,$00,$C9,$CD,$7B,$89,$90,$A0,$20,$BA,$6F,$D5,$73,$80
+    db  $6F,$72,$20,$00,$C9,$CD,$7B,$29,$90,$08,$20,$56,$6F,$75,$73,$20
     ORG $8E1E            ; arcade $2E1E data
-    db  $61,$D6,$65,$DA,$20,$CA,$6F,$C9,$6E,$D4,$20,$CC,$65,$D3,$20,$C9
+    db  $61,$76,$65,$7A,$20,$6A,$6F,$69,$6E,$74,$20,$6C,$65,$73,$20,$69
     ORG $8E2E            ; arcade $2E2E data
-    db  $6D,$CD,$6F,$D2,$74,$C5,$6C,$D3,$00,$CD,$7B,$89,$90,$A0,$30,$C4
+    db  $6D,$6D,$6F,$72,$74,$65,$6C,$73,$00,$CD,$7B,$29,$90,$08,$30,$64
     ORG $8E3E            ; arcade $2E3E data
-    db  $75,$80,$70,$C1,$6E,$D4,$68,$C5,$6F,$CE,$20,$A6,$45,$B6,$5A,$A9
+    db  $75,$20,$70,$61,$6E,$74,$68,$65,$6F,$6E,$20,$42,$45,$52,$5A,$45
     ORG $8E4E            ; arcade $2E4E data
-    db  $52,$AF,$2E,$00,$CD,$DB,$29,$90,$08,$B4,$49,$CE,$73,$C3,$72,$C9
+    db  $52,$4B,$2E,$00,$CD,$7B,$29,$90,$08,$50,$49,$6E,$73,$63,$72,$69
     ORG $8E5E            ; arcade $2E5E data
-    db  $72,$C5,$20,$D6,$6F,$D3,$20,$C9,$6E,$C9,$74,$C9,$61,$CC,$65,$D3
+    db  $72,$65,$20,$76,$6F,$73,$20,$69,$6E,$69,$74,$69,$61,$6C,$65,$73
     ORG $8E6E            ; arcade $2E6E data
-    db  $3A,$00,$C9,$CD,$7B,$89,$90,$A0,$20,$A8,$61,$D3,$20,$BB,$61,$D2
+    db  $3A,$00,$C9,$CD,$7B,$29,$90,$08,$20,$44,$61,$73,$20,$57,$61,$72
     ORG $8E7E            ; arcade $2E7E data
-    db  $20,$C5,$69,$CE,$20,$B6,$75,$C8,$6D,$D6,$6F,$CC,$6C,$C5,$72,$80
+    db  $20,$65,$69,$6E,$20,$52,$75,$68,$6D,$76,$6F,$6C,$6C,$65,$72,$20
     ORG $8E8E            ; arcade $2E8E data
-    db  $53,$C9,$65,$C7,$21,$00,$CD,$DB,$29,$90,$08,$A4,$54,$D2,$61,$C7
+    db  $53,$69,$65,$67,$21,$00,$CD,$7B,$29,$90,$08,$40,$54,$72,$61,$67
     ORG $8E9E            ; arcade $2E9E data
-    db  $20,$A8,$65,$C9,$6E,$C5,$6E,$80,$4E,$C1,$6D,$C5,$6E,$80,$69,$CE
+    db  $20,$44,$65,$69,$6E,$65,$6E,$20,$4E,$61,$6D,$65,$6E,$20,$69,$6E
     ORG $8EAE            ; arcade $2EAE data
-    db  $20,$C4,$69,$C5,$00,$CD,$7B,$89,$90,$A0,$50,$AC,$65,$CC,$64,$C5
+    db  $20,$64,$69,$65,$00,$CD,$7B,$29,$90,$08,$50,$48,$65,$6C,$64,$65
     ORG $8EBE            ; arcade $2EBE data
-    db  $6E,$CC,$69,$D3,$74,$C5,$20,$C5,$69,$CE,$21,$00,$C9,$CD,$7B,$89
+    db  $6E,$6C,$69,$73,$74,$65,$20,$65,$69,$6E,$21,$00,$C9,$CD,$7B,$29
     ORG $8ECE            ; arcade $2ECE data
-    db  $90,$04,$20,$B7,$65,$80,$70,$D5,$6E,$D4,$61,$CA,$65,$80,$65,$D3
+    db  $90,$04,$20,$53,$65,$20,$70,$75,$6E,$74,$61,$6A,$65,$20,$65,$73
     ORG $8EDE            ; arcade $2EDE data
-    db  $74,$C1,$20,$C5,$6E,$D4,$72,$C5,$20,$CC,$6F,$D3,$20,$C4,$69,$C5
+    db  $74,$61,$20,$65,$6E,$74,$72,$65,$20,$6C,$6F,$73,$20,$64,$69,$65
     ORG $8EEE            ; arcade $2EEE data
-    db  $7A,$00,$CD,$DB,$29,$90,$08,$90,$6D,$C5,$6A,$CF,$72,$C5,$73,$8E
+    db  $7A,$00,$CD,$7B,$29,$90,$08,$30,$6D,$65,$6A,$6F,$72,$65,$73,$2E
     ORG $8EFE            ; arcade $2EFE data
-    db  $00,$CD,$7B,$89,$90,$78,$50,$A9,$6E,$D4,$72,$C5,$20,$D3,$75,$D3
+    db  $00,$CD,$7B,$29,$90,$18,$50,$45,$6E,$74,$72,$65,$20,$73,$75,$73
     ORG $8F0E            ; arcade $2F0E data
-    db  $20,$C9,$6E,$C9,$63,$C9,$61,$CC,$65,$D3,$3A,$00,$C9,$CD,$7B,$89
+    db  $20,$69,$6E,$69,$63,$69,$61,$6C,$65,$73,$3A,$00,$C9,$CD,$7B,$29
     ORG $8F1E            ; arcade $2F1E data
-    db  $90,$A0,$80,$B1,$6F,$D6,$65,$80,$73,$D4,$69,$C3,$6B,$80,$74,$CF
+    db  $90,$08,$80,$4D,$6F,$76,$65,$20,$73,$74,$69,$63,$6B,$20,$74,$6F
     ORG $8F2E            ; arcade $2F2E data
-    db  $20,$C3,$68,$C1,$6E,$C7,$65,$80,$6C,$C5,$74,$D4,$65,$D2,$00,$CD
+    db  $20,$63,$68,$61,$6E,$67,$65,$20,$6C,$65,$74,$74,$65,$72,$00,$CD
     ORG $8F3E            ; arcade $2F3E data
-    db  $7B,$89,$90,$A0,$90,$D4,$68,$C5,$6E,$80,$70,$D2,$65,$D3,$73,$80
+    db  $7B,$29,$90,$08,$90,$74,$68,$65,$6E,$20,$70,$72,$65,$73,$73,$20
     ORG $8F4E            ; arcade $2F4E data
-    db  $46,$AD,$52,$A9,$20,$D4,$6F,$80,$73,$D4,$6F,$D2,$65,$80,$69,$D4
+    db  $46,$49,$52,$45,$20,$74,$6F,$20,$73,$74,$6F,$72,$65,$20,$69,$74
     ORG $8F5E            ; arcade $2F5E data
-    db  $2E,$00,$C9,$CD,$7B,$89,$90,$04,$80,$B4,$6F,$D5,$73,$D3,$65,$DA
+    db  $2E,$00,$C9,$CD,$7B,$29,$90,$04,$80,$50,$6F,$75,$73,$73,$65,$7A
     ORG $8F6E            ; arcade $2F6E data
-    db  $20,$C2,$61,$D4,$6F,$CE,$6E,$C5,$74,$80,$70,$CF,$75,$D2,$20,$D6
+    db  $20,$62,$61,$74,$6F,$6E,$6E,$65,$74,$20,$70,$6F,$75,$72,$20,$76
     ORG $8F7E            ; arcade $2F7E data
-    db  $6F,$D3,$00,$CD,$7B,$89,$90,$04,$90,$C9,$6E,$C9,$74,$C9,$61,$CC
+    db  $6F,$73,$00,$CD,$7B,$29,$90,$04,$90,$69,$6E,$69,$74,$69,$61,$6C
     ORG $8F8E            ; arcade $2F8E data
-    db  $65,$D3,$2E,$80,$50,$CF,$75,$D3,$73,$C5,$7A,$80,$46,$AD,$52,$A9
+    db  $65,$73,$2E,$20,$50,$6F,$75,$73,$73,$65,$7A,$20,$46,$49,$52,$45
     ORG $8F9E            ; arcade $2F9E data
-    db  $20,$D1,$75,$C1,$6E,$C4,$00,$CD,$7B,$89,$90,$04,$A0,$CC,$65,$D4
+    db  $20,$71,$75,$61,$6E,$64,$00,$CD,$7B,$29,$90,$04,$A0,$6C,$65,$74
     ORG $8FAE            ; arcade $2FAE data
-    db  $74,$D2,$65,$80,$63,$CF,$72,$D2,$65,$C3,$74,$C5,$00,$C9,$CD,$DB
+    db  $74,$72,$65,$20,$63,$6F,$72,$72,$65,$63,$74,$65,$00,$C9,$CD,$7B
     ORG $8FBE            ; arcade $2FBE data
-    db  $29,$90,$04,$F0,$4D,$CF,$76,$C9,$65,$CE,$64,$CF,$20,$CC,$61,$80
+    db  $29,$90,$04,$80,$4D,$6F,$76,$69,$65,$6E,$64,$6F,$20,$6C,$61,$20
     ORG $8FCE            ; arcade $2FCE data
-    db  $70,$C1,$6C,$C1,$6E,$C3,$61,$80,$70,$C1,$72,$C1,$00,$CD,$7B,$89
+    db  $70,$61,$6C,$61,$6E,$63,$61,$20,$70,$61,$72,$61,$00,$CD,$7B,$29
     ORG $8FDE            ; arcade $2FDE data
-    db  $90,$04,$90,$C3,$61,$CD,$62,$C9,$61,$D2,$20,$CC,$61,$D3,$20,$CC
+    db  $90,$04,$90,$63,$61,$6D,$62,$69,$61,$72,$20,$6C,$61,$73,$20,$6C
     ORG $8FEE            ; arcade $2FEE data
-    db  $65,$D4,$72,$C1,$73,$8C,$20,$CC,$75,$C5,$67,$CF,$00,$CD,$7B,$89
+    db  $65,$74,$72,$61,$73,$2C,$20,$6C,$75,$65,$67,$6F,$00,$CD,$7B,$29
     ORG $8FFE            ; arcade $2FFE data
-    db  $90,$04,$A0,$C1,$70,$CC,$61,$D3,$74,$C5,$20,$C5,$6C,$80,$62,$CF
+    db  $90,$04,$A0,$61,$70,$6C,$61,$73,$74,$65,$20,$65,$6C,$20,$62,$6F
     ORG $900E            ; arcade $300E data
-    db  $74,$CF,$6E,$80,$64,$C5,$20,$C4,$69,$D3,$70,$C1,$72,$CF,$00,$CD
+    db  $74,$6F,$6E,$20,$64,$65,$20,$64,$69,$73,$70,$61,$72,$6F,$00,$CD
     ORG $901E            ; arcade $301E data
-    db  $7B,$89,$90,$04,$B0,$D0,$61,$D2,$61,$80,$72,$C5,$74,$C5,$6E,$C5
+    db  $7B,$29,$90,$04,$B0,$70,$61,$72,$61,$20,$72,$65,$74,$65,$6E,$65
     ORG $902E            ; arcade $302E data
-    db  $72,$CC,$61,$D3,$2E,$00,$C9,$00,$3E,$A5,$5D,$B5,$5D,$A5,$3E,$00
+    db  $72,$6C,$61,$73,$2E,$00,$C9,$00,$3E,$41,$5D,$51,$5D,$41,$3E,$00
     ORG $903E
     nop
     ORG $903F
@@ -10463,11 +10347,11 @@ INCREMENT_BY_1:
     ORG $9046
     nop
     ORG $9047            ; arcade $3047 data
-    db  $10,$70
+    db  $10,$10
     ORG $9049            ; arcade $3049 data
-    db  $10,$70
+    db  $10,$10
     ORG $904B            ; arcade $304B data
-    db  $10,$70
+    db  $10,$10
     ORG $904D
     djnz $904F
     ORG $904F
@@ -10571,9 +10455,9 @@ INCREMENT_BY_1:
     ORG $9087
     ex   af,af'
     ORG $9088            ; arcade $3088 data
-    db  $10,$70
+    db  $10,$10
     ORG $908A            ; arcade $308A data
-    db  $10,$70
+    db  $10,$10
     ORG $908C
     djnz $9096
     ORG $908E
@@ -10599,7 +10483,7 @@ INCREMENT_BY_1:
     ORG $909A
     ex   af,af'
     ORG $909B            ; arcade $309B data
-    db  $2A,$7C,$1C
+    db  $2A,$1C,$1C
     ORG $909E
     ld   hl,($0008)
     ORG $90A1
@@ -10627,7 +10511,7 @@ INCREMENT_BY_1:
     ORG $90AD
     nop
     ORG $90AE            ; arcade $30AE data
-    db  $18,$78
+    db  $18,$18
     ORG $90B0
     ex   af,af'
     ORG $90B1
@@ -10663,7 +10547,7 @@ INCREMENT_BY_1:
     ORG $90C2
     nop
     ORG $90C3            ; arcade $30C3 data
-    db  $18,$78
+    db  $18,$18
     ORG $90C5
     nop
     ORG $90C6
@@ -10677,39 +10561,39 @@ INCREMENT_BY_1:
     ORG $90CD
     ld   b,b
     ORG $90CE            ; arcade $30CE data
-    db  $1C,$82,$41,$A5,$41,$A5,$41,$82,$1C
+    db  $1C,$22,$41,$41,$41,$41,$41,$22,$1C
     ORG $90D7            ; arcade $30D7 data
-    db  $08,$78,$08,$A0,$08,$A0,$08,$A0,$1C
+    db  $08,$18,$08,$08,$08,$08,$08,$08,$1C
     ORG $90E0            ; arcade $30E0 data
-    db  $3E,$A5,$01,$01,$3E,$A4,$40,$A4,$7F
+    db  $3E,$41,$01,$01,$3E,$40,$40,$40,$7F
     ORG $90E9            ; arcade $30E9 data
-    db  $3E,$A5,$01,$01,$1E,$01,$01,$A5,$3E
+    db  $3E,$41,$01,$01,$1E,$01,$01,$41,$3E
     ORG $90F2            ; arcade $30F2 data
-    db  $02,$06,$0A,$72,$E2,$DB,$02,$02,$02
+    db  $02,$06,$0A,$12,$22,$7F,$02,$02,$02
     ORG $90FB            ; arcade $30FB data
-    db  $7F,$A4,$40,$A4,$7E,$01,$01,$A5,$3E
+    db  $7F,$40,$40,$40,$7E,$01,$01,$41,$3E
     ORG $9104            ; arcade $3104 data
-    db  $3E,$A5,$40,$A4,$7E,$A5,$41,$A5,$3E
+    db  $3E,$41,$40,$40,$7E,$41,$41,$41,$3E
     ORG $910D            ; arcade $310D data
-    db  $7F,$01,$02,$02,$04,$04,$08,$A0,$08
+    db  $7F,$01,$02,$02,$04,$04,$08,$08,$08
     ORG $9116            ; arcade $3116 data
-    db  $3E,$A5,$41,$A5,$3E,$A5,$41,$A5,$3E
+    db  $3E,$41,$41,$41,$3E,$41,$41,$41,$3E
     ORG $911F            ; arcade $311F data
-    db  $3E,$A5,$41,$A5,$3F,$01,$01,$A5,$3E
+    db  $3E,$41,$41,$41,$3F,$01,$01,$41,$3E
     ORG $9128            ; arcade $3128 data
-    db  $00,$00,$00,$78,$18,$00,$00,$78,$18
+    db  $00,$00,$00,$18,$18,$00,$00,$18,$18
     ORG $9131            ; arcade $3131 data
-    db  $98,$78,$00,$00,$18,$78,$08,$70,$00
+    db  $98,$18,$00,$00,$18,$18,$08,$10,$00
     ORG $913A            ; arcade $313A data
-    db  $02,$04,$08,$70,$20,$70,$08,$04,$02
+    db  $02,$04,$08,$10,$20,$10,$08,$04,$02
     ORG $9143            ; arcade $3143 data
-    db  $00,$00,$00,$9E,$00,$9E,$00,$00,$00
+    db  $00,$00,$00,$3E,$00,$3E,$00,$00,$00
     ORG $914C            ; arcade $314C data
-    db  $20,$70,$08,$04,$02,$04,$08,$70,$20
+    db  $20,$10,$08,$04,$02,$04,$08,$10,$20
     ORG $9155            ; arcade $3155 data
-    db  $1C,$82,$02,$02,$04,$A0,$08,$00,$08
+    db  $1C,$22,$02,$02,$04,$08,$08,$00,$08
     ORG $915E            ; arcade $315E data
-    db  $3E,$A5
+    db  $3E,$41
     ORG $9160            ; arcade $3160 data
     db  $4F
     ORG $9161            ; arcade $3161 data
@@ -10725,7 +10609,7 @@ INCREMENT_BY_1:
     ORG $9166            ; arcade $3166 data
     db  $3F
     ORG $9167            ; arcade $3167 data
-    db  $3E,$A5
+    db  $3E,$41
     ORG $9169            ; arcade $3169 data
     db  $41
     ORG $916A            ; arcade $316A data
@@ -10759,7 +10643,7 @@ INCREMENT_BY_1:
     ORG $9178            ; arcade $3178 data
     db  $7E
     ORG $9179            ; arcade $3179 data
-    db  $3E,$A5
+    db  $3E,$41
     ORG $917B            ; arcade $317B data
     db  $40
     ORG $917C            ; arcade $317C data
@@ -10773,7 +10657,7 @@ INCREMENT_BY_1:
     ORG $9180            ; arcade $3180 data
     db  $41
     ORG $9181            ; arcade $3181 data
-    db  $FE,$DB
+    db  $3E,$7E
     ORG $9183            ; arcade $3183 data
     db  $41
     ORG $9184            ; arcade $3184 data
@@ -10827,7 +10711,7 @@ INCREMENT_BY_1:
     ORG $919C            ; arcade $319C data
     db  $40
     ORG $919D            ; arcade $319D data
-    db  $3E,$A5
+    db  $3E,$41
     ORG $919F            ; arcade $319F data
     db  $40
     ORG $91A0            ; arcade $31A0 data
@@ -10883,7 +10767,7 @@ INCREMENT_BY_1:
     ORG $91BB            ; arcade $31BB data
     db  $01,$01,$01
     ORG $91BE            ; arcade $31BE data
-    db  $01,$A5,$3E
+    db  $01,$41,$3E
     ORG $91C1            ; arcade $31C1 data
     db  $41
     ORG $91C2            ; arcade $31C2 data
@@ -10957,7 +10841,7 @@ INCREMENT_BY_1:
     ORG $91E4            ; arcade $31E4 data
     db  $41
     ORG $91E5            ; arcade $31E5 data
-    db  $3E,$A5
+    db  $3E,$41
     ORG $91E7            ; arcade $31E7 data
     db  $41
     ORG $91E8            ; arcade $31E8 data
@@ -10971,7 +10855,7 @@ INCREMENT_BY_1:
     ORG $91EC            ; arcade $31EC data
     db  $41
     ORG $91ED            ; arcade $31ED data
-    db  $FE,$DB
+    db  $3E,$7E
     ORG $91EF            ; arcade $31EF data
     db  $41
     ORG $91F0            ; arcade $31F0 data
@@ -10989,7 +10873,7 @@ INCREMENT_BY_1:
     ORG $91F6            ; arcade $31F6 data
     db  $40
     ORG $91F7            ; arcade $31F7 data
-    db  $3E,$A5
+    db  $3E,$41
     ORG $91F9            ; arcade $31F9 data
     db  $41
     ORG $91FA            ; arcade $31FA data
@@ -11023,7 +10907,7 @@ INCREMENT_BY_1:
     ORG $9208            ; arcade $3208 data
     db  $41
     ORG $9209            ; arcade $3209 data
-    db  $3E,$A5
+    db  $3E,$41
     ORG $920B            ; arcade $320B data
     db  $40
     ORG $920C            ; arcade $320C data
@@ -11031,7 +10915,7 @@ INCREMENT_BY_1:
     ORG $920D            ; arcade $320D data
     db  $3E,$01
     ORG $920F            ; arcade $320F data
-    db  $01,$A5,$3E
+    db  $01,$41,$3E
     ORG $9212            ; arcade $3212 data
     db  $7F
     ORG $9213            ; arcade $3213 data
@@ -11067,13 +10951,13 @@ INCREMENT_BY_1:
     ORG $9222            ; arcade $3222 data
     db  $41
     ORG $9223            ; arcade $3223 data
-    db  $3E,$A5
+    db  $3E,$41
     ORG $9225            ; arcade $3225 data
     db  $41
     ORG $9226            ; arcade $3226 data
     db  $41
     ORG $9227            ; arcade $3227 data
-    db  $22,$82,$14
+    db  $22,$22,$14
     ORG $922A            ; arcade $322A data
     db  $14
     ORG $922B            ; arcade $322B data
@@ -11103,17 +10987,17 @@ INCREMENT_BY_1:
     ORG $9237            ; arcade $3237 data
     db  $41
     ORG $9238            ; arcade $3238 data
-    db  $22,$74,$08
+    db  $22,$14,$08
     ORG $923B            ; arcade $323B data
     db  $14
     ORG $923C            ; arcade $323C data
-    db  $22,$A5,$41
+    db  $22,$41,$41
     ORG $923F            ; arcade $323F data
     db  $41
     ORG $9240            ; arcade $3240 data
     db  $41
     ORG $9241            ; arcade $3241 data
-    db  $22,$74,$08
+    db  $22,$14,$08
     ORG $9244            ; arcade $3244 data
     db  $08
     ORG $9245            ; arcade $3245 data
@@ -11129,7 +11013,7 @@ INCREMENT_BY_1:
     ORG $924C            ; arcade $324C data
     db  $08
     ORG $924D            ; arcade $324D data
-    db  $10,$80
+    db  $10,$20
     ORG $924F            ; arcade $324F data
     db  $40
     ORG $9250            ; arcade $3250 data
@@ -11137,13 +11021,13 @@ INCREMENT_BY_1:
     ORG $9251            ; arcade $3251 data
     db  $3C
     ORG $9252            ; arcade $3252 data
-    db  $20,$80
+    db  $20,$20
     ORG $9254            ; arcade $3254 data
-    db  $20,$80
+    db  $20,$20
     ORG $9256            ; arcade $3256 data
-    db  $20,$80
+    db  $20,$20
     ORG $9258            ; arcade $3258 data
-    db  $20,$9C
+    db  $20,$3C
     ORG $925A            ; arcade $325A data
     db  $00
     ORG $925B            ; arcade $325B data
@@ -11151,7 +11035,7 @@ INCREMENT_BY_1:
     ORG $925C            ; arcade $325C data
     db  $40
     ORG $925D            ; arcade $325D data
-    db  $20,$70
+    db  $20,$10
     ORG $925F            ; arcade $325F data
     db  $08
     ORG $9260            ; arcade $3260 data
@@ -11159,7 +11043,7 @@ INCREMENT_BY_1:
     ORG $9261            ; arcade $3261 data
     db  $02
     ORG $9262            ; arcade $3262 data
-    db  $01,$9C,$04
+    db  $01,$3C,$04
     ORG $9265            ; arcade $3265 data
     db  $04
     ORG $9266            ; arcade $3266 data
@@ -11179,7 +11063,7 @@ INCREMENT_BY_1:
     ORG $926D            ; arcade $326D data
     db  $14
     ORG $926E            ; arcade $326E data
-    db  $22,$A5,$00
+    db  $22,$41,$00
     ORG $9271            ; arcade $3271 data
     db  $00
     ORG $9272            ; arcade $3272 data
@@ -11207,9 +11091,9 @@ INCREMENT_BY_1:
     ORG $927D            ; arcade $327D data
     db  $00
     ORG $927E            ; arcade $327E data
-    db  $18,$78
+    db  $18,$18
     ORG $9280            ; arcade $3280 data
-    db  $10,$A0
+    db  $10,$08
     ORG $9282            ; arcade $3282 data
     db  $00
     ORG $9283            ; arcade $3283 data
@@ -11221,73 +11105,73 @@ INCREMENT_BY_1:
     ORG $9286            ; arcade $3286 data
     db  $00
     ORG $9287            ; arcade $3287 data
-    db  $00,$00,$00,$9A,$46,$A6,$42,$AA,$3A
+    db  $00,$00,$00,$3A,$46,$42,$42,$46,$3A
     ORG $9290            ; arcade $3290 data
-    db  $40,$A4,$E0,$BF,$62,$A6,$42,$C2,$5C
+    db  $40,$40,$40,$5C,$62,$42,$42,$62,$5C
     ORG $9299            ; arcade $3299 data
-    db  $00,$00,$00,$9C,$42,$A4,$40,$A6,$3C
+    db  $00,$00,$00,$3C,$42,$40,$40,$42,$3C
     ORG $92A2            ; arcade $32A2 data
-    db  $02,$02,$02,$9A,$46,$A6,$42,$AA,$3A
+    db  $02,$02,$02,$3A,$46,$42,$42,$46,$3A
     ORG $92AB            ; arcade $32AB data
-    db  $00,$00,$00,$9C,$E2,$DB,$40,$A4,$3C
+    db  $00,$00,$00,$3C,$42,$7E,$40,$40,$3C
     ORG $92B4            ; arcade $32B4 data
-    db  $0C,$72,$10,$70,$38,$70,$10,$70,$10
+    db  $0C,$12,$10,$10,$38,$10,$10,$10,$10
     ORG $92BD            ; arcade $32BD data
-    db  $BA,$AA,$42,$A6,$46,$9A,$02,$A6,$3C
+    db  $BA,$46,$42,$42,$46,$3A,$02,$42,$3C
     ORG $92C6            ; arcade $32C6 data
-    db  $40,$A4,$E0,$DB,$42,$A6,$42,$A6,$42
+    db  $40,$40,$40,$7C,$42,$42,$42,$42,$42
     ORG $92CF            ; arcade $32CF data
-    db  $00,$A0,$00,$A0,$08,$A0,$08,$A0,$08
+    db  $00,$08,$00,$08,$08,$08,$08,$08,$08
     ORG $92D8            ; arcade $32D8 data
-    db  $84,$04,$04,$04,$04,$04,$04,$A8,$38
+    db  $84,$04,$04,$04,$04,$04,$04,$44,$38
     ORG $92E1            ; arcade $32E1 data
-    db  $40,$A4,$40,$A8,$48,$B4,$70,$AC,$44
+    db  $40,$40,$40,$44,$48,$50,$70,$48,$44
     ORG $92EA            ; arcade $32EA data
-    db  $10,$70,$10,$70,$10,$70,$10,$70,$10
+    db  $10,$10,$10,$10,$10,$10,$10,$10,$10
     ORG $92F3            ; arcade $32F3 data
-    db  $00,$00,$00,$D6,$49,$AD,$49,$AD,$49
+    db  $00,$00,$00,$76,$49,$49,$49,$49,$49
     ORG $92FC            ; arcade $32FC data
-    db  $00,$00,$E0,$DB,$42,$A6,$42,$A6,$42
+    db  $00,$00,$00,$7C,$42,$42,$42,$42,$42
     ORG $9305            ; arcade $3305 data
-    db  $00,$00,$00,$9C,$42,$A6,$42,$A6,$3C
+    db  $00,$00,$00,$3C,$42,$42,$42,$42,$3C
     ORG $930E            ; arcade $330E data
-    db  $DC,$C2,$42,$A6,$E2,$BF,$40,$A4,$40
+    db  $DC,$62,$42,$42,$62,$5C,$40,$40,$40
     ORG $9317            ; arcade $3317 data
-    db  $BA,$AA,$42,$A6,$46,$9A,$02,$02,$02
+    db  $BA,$46,$42,$42,$46,$3A,$02,$02,$02
     ORG $9320            ; arcade $3320 data
-    db  $00,$00,$E0,$BF,$62,$A4,$40,$A4,$40
+    db  $00,$00,$00,$5C,$62,$40,$40,$40,$40
     ORG $9329            ; arcade $3329 data
-    db  $00,$00,$00,$9C,$42,$90,$0C,$A6,$3C
+    db  $00,$00,$00,$3C,$42,$30,$0C,$42,$3C
     ORG $9332            ; arcade $3332 data
-    db  $00,$70,$F0,$DB,$10,$70,$10,$70,$10
+    db  $00,$10,$10,$7C,$10,$10,$10,$10,$10
     ORG $933B            ; arcade $333B data
-    db  $00,$00,$00,$A6,$42,$A6,$42,$A6,$3C
+    db  $00,$00,$00,$42,$42,$42,$42,$42,$3C
     ORG $9344            ; arcade $3344 data
-    db  $00,$00,$00,$A8,$44,$A8,$44,$88,$10
+    db  $00,$00,$00,$44,$44,$44,$44,$28,$10
     ORG $934D            ; arcade $334D data
-    db  $00,$00,$00,$A5,$41,$A5,$49,$AD,$36
+    db  $00,$00,$00,$41,$41,$41,$49,$49,$36
     ORG $9356            ; arcade $3356 data
-    db  $00,$00,$00,$A6,$24,$78,$18,$84,$42
+    db  $00,$00,$00,$42,$24,$18,$18,$24,$42
     ORG $935F            ; arcade $335F data
-    db  $C2,$A6,$42,$A6,$46,$9A,$02,$A6,$3C
+    db  $C2,$42,$42,$42,$46,$3A,$02,$42,$3C
     ORG $9368            ; arcade $3368 data
-    db  $00,$00,$E0,$DB,$04,$A0,$10,$80,$7E
+    db  $00,$00,$00,$7E,$04,$08,$10,$20,$7E
     ORG $9371            ; arcade $3371 data
-    db  $0C,$70,$10,$70,$20,$70,$10,$70,$0C
+    db  $0C,$10,$10,$10,$20,$10,$10,$10,$0C
     ORG $937A            ; arcade $337A data
-    db  $08,$A0,$08,$00,$00,$A0,$08,$A0,$00
+    db  $08,$08,$08,$00,$00,$08,$08,$08,$00
     ORG $9383            ; arcade $3383 data
     db  $18,$04,$04,$04,$02,$04,$04,$04,$18
     ORG $938C            ; arcade $338C data
-    db  $30,$AD,$06,$00,$00,$00,$00,$00,$00
+    db  $30,$49,$06,$00,$00,$00,$00,$00,$00
     ORG $9395
     ld   d,l
     ORG $9396            ; arcade $3396 data
-    db  $2A,$B9,$2A
+    db  $2A,$55,$2A
     ORG $9399
     ld   d,l
     ORG $939A            ; arcade $339A data
-    db  $2A,$B9,$2A
+    db  $2A,$55,$2A
     ORG $939D
     ld   d,l
     ORG $939E
@@ -11297,7 +11181,7 @@ INCREMENT_BY_1:
     ORG $93A0
     inc  e
     ORG $93A1            ; arcade $33A1 data
-    db  $2A,$A0,$08
+    db  $2A,$08,$08
     ORG $93A4
     inc  d
     ORG $93A5

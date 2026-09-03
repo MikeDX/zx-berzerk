@@ -1,5 +1,5 @@
 ; Arcade ↔ Spectrum I/O hook implementations.
-; Veneer JP table lives in host.asm at HOST_HOOK_BASE.
+; Veneer JP table lives in host.asm at ZX_HAL.
 
 hook_clear_screen:
     push    af
@@ -7,13 +7,13 @@ hook_clear_screen:
     push    de
     push    hl
     call    zx_cls
-    ld      hl,ARC_VIDEO
-    ld      de,ARC_VIDEO+1
+    ld      hl,ZX_VIDEO
+    ld      de,ZX_VIDEO+1
     ld      bc,$1800-1
     ld      (hl),0
     ldir
-    ld      hl,ARC_MAGIC
-    ld      de,ARC_MAGIC+1
+    ld      hl,ZX_MAGIC
+    ld      de,ZX_MAGIC+1
     ld      bc,$1800-1
     ld      (hl),0
     ldir
@@ -50,7 +50,7 @@ hook_rtoax:
     ld      c,a
     ld      b,0
     add     hl,bc
-    ld      bc,ARC_MAGIC
+    ld      bc,ZX_MAGIC
     add     hl,bc
     pop     bc
     ld      a,$90
@@ -94,10 +94,17 @@ magic_dest_xy:
     push    de
     pop     hl
     ld      a,h
-    cp      ARC_MAGIC >> 8
-    ld      bc,ARC_MAGIC
-    jr      nc,.sub
-    ld      bc,ARC_VIDEO
+    cp      ZX_MAGIC >> 8
+    jr      nc,.magic
+    cp      ZX_MAGIC_SCRATCH >> 8
+    jr      c,.video
+    ld      bc,ZX_MAGIC_SCRATCH
+    jr      .sub
+.magic:
+    ld      bc,ZX_MAGIC
+    jr      .sub
+.video:
+    ld      bc,ZX_VIDEO
 .sub:
     or      a
     sbc     hl,bc
@@ -132,22 +139,58 @@ hook_in_p1:
     ret
 
 hook_in_status:
+    ; Bottom-of-screen (bit0) only when MAN_PTR looks like a guest RAM pointer.
+    ; Junk values (e.g. $1100) must not enable ERASE_PATTERN or we reset.
+    ; Must preserve HL — IRQ samples this port before pushing HL.
+    push    hl
+    ld      hl,ZX_SCRATCH_CMOS + ($0876 - $0800)  ; MAN_PTR @ arcade $0876
+    ld      a,(hl)
+    inc     hl
+    ld      h,(hl)
+    ld      l,a
+    ld      a,h
+    cp      ZX_SCRATCH_CMOS >> 8
+    jr      c,.idle
+    ld      a,h
+    cp      ZX_HAL >> 8
+    jr      nc,.idle
     ld      a,(magic_collide)
     or      a
-    jr      z,.nc
+    jr      z,.vblank
     xor     a
     ld      (magic_collide),a
     ld      a,%10000001
+    pop     hl
     ret
-.nc:
+.vblank:
+    ld      a,(vblank_div)
+    inc     a
+    ld      (vblank_div),a
+    and     7
     ld      a,%00000001
+    jr      z,.vblank_out
+    xor     a
+.vblank_out:
+    pop     hl
+    ret
+.idle:
+    ld      a,(magic_collide)
+    or      a
+    jr      z,.zero
+    xor     a
+    ld      (magic_collide),a
+    ld      a,%10000000
+    pop     hl
+    ret
+.zero:
+    xor     a
+    pop     hl
     ret
 
-; Cold start CALLs $1721 as a subroutine; RETN would corrupt IFF.
+; Cold start CALLs NMI as a subroutine; use RET not RETN.
 hook_nmi:
     ret
 
-; Safe stub for arcade ports that must not float into test/DIP modes.
 hook_in_safe:
     xor     a
     ret
