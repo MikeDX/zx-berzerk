@@ -75,9 +75,6 @@ player_update:
     or      a
     ret     z
 
-    call    entity_erase
-    res     0,(ix+V_STATUS)
-
     bit     7,(ix+V_STATUS)
     jp      nz,player_die
 
@@ -87,6 +84,15 @@ player_update:
     dec     a
     ld      (player_fire_cd),a
 .cdok:
+    ld      e,0                             ; E != 0 means need a blit
+    ld      a,(ix+V_PX)
+    ld      h,(ix+V_PY)
+    ld      l,a
+    push    hl
+    ld      a,(ix+V_DP_L)
+    ld      h,(ix+V_DP_H)
+    ld      l,a
+    push    hl
     call    input_poll
     ld      d,a
     and     FIRE
@@ -106,8 +112,25 @@ player_update:
 
 .tick:
     call    entity_move
+    pop     hl                              ; previous D.P
+    ld      a,(ix+V_DP_L)
+    cp      l
+    jr      nz,.changed
+    ld      a,(ix+V_DP_H)
+    cp      h
+    jr      nz,.changed
+    pop     hl                              ; previous P.X/P.Y
+    ld      a,(ix+V_PX)
+    cp      l
+    jr      nz,.blit
+    ld      a,(ix+V_PY)
+    cp      h
+    ret     z
+    jr      .blit
+.changed:
+    pop     hl
+.blit:
     set     1,(ix+V_STATUS)
-    set     0,(ix+V_STATUS)
     ret
 
 player_die:
@@ -131,7 +154,10 @@ player_draw:
     ld      ix,player_vec
     bit     1,(ix+V_STATUS)
     ret     z
+    call    entity_erase
     call    entity_draw
+    res     1,(ix+V_STATUS)
+    set     0,(ix+V_STATUS)
     ld      a,(draw_collide)
     or      a
     ret     z

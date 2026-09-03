@@ -62,8 +62,10 @@ robot_setpat:
     ld      a,(hl)
     inc     hl
     ld      h,(hl)
-    ld      l,a
-    jp      vec_set_pattern
+    ld      l,a                             ; arcade address of pattern table
+    call    vec_set_pattern
+    or      1
+    ret
 
 ; A = DURL, HL = 6-byte-record table (SR.TAB / S.TAB)
 ; Returns HL = table + D.TAB[A]*3

@@ -15,10 +15,10 @@ player_try_fire:
     ld      c,a
     ld      a,(player_fire_cd)
     or      a
-    ret     nz
+    jr      nz,.no
     ld      a,c
     and     $0F
-    ret     z
+    jr      z,.no
     ld      iy,player_bolts
     ld      b,MAX_PBOLTS
 .find:
@@ -28,6 +28,8 @@ player_try_fire:
     ld      de,BOLT_SIZE
     add     iy,de
     djnz    .find
+.no:
+    xor     a
     ret
 .slot:
     ld      a,c
@@ -65,6 +67,7 @@ player_try_fire:
     ld      (iy+B_TY),a
     ld      a,8
     ld      (player_fire_cd),a
+    or      1
     ret
 
 ; A = DURL, IX = firing robot. Arcade SHOOT using S.TAB.
@@ -138,19 +141,8 @@ bolts_update:
     djnz    .group
     ret
 
-bolt_step:
-    ld      a,(iy+B_LEN)
-    or      a
-    jr      z,.grow
-    ld      c,a
-    ld      a,(iy+B_MAX)
-    cp      c
-    jp      z,.shrink
-
-.grow:
-    ld      a,(iy+B_DIR)
-    ld      b,(iy+B_X)
-    ld      c,(iy+B_Y)
+; A = DURL, BC = x,y. Step one pixel. Preserves A.
+bolt_advance:
     bit     0,a
     jr      z,.nl
     dec     b
@@ -164,63 +156,86 @@ bolt_step:
     dec     c
 .nu:
     bit     3,a
-    jr      z,.moved
+    ret     z
     inc     c
-.moved:
+    ret
+
+; Restore every plotted pixel from the tail up to the head.
+bolt_erase_trail:
+    ld      a,(iy+B_LEN)
+    or      a
+    ret     z
+    ld      b,(iy+B_TX)
+    ld      c,(iy+B_TY)
+.lp:
+    push    af
+    call    restore_pixel
+    ld      a,(iy+B_DIR)
+    and     $0F
+    call    bolt_advance
+    pop     af
+    dec     a
+    jr      nz,.lp
+    ret
+
+bolt_step:
+    ld      a,(iy+B_DIR)
+    and     $0F
+    ld      b,(iy+B_X)
+    ld      c,(iy+B_Y)
+    call    bolt_advance
+
     ld      a,b
     or      a
-    jp      z,.kill
+    jp      z,bolt_kill
     inc     a
-    jp      z,.kill
+    jp      z,bolt_kill
     ld      a,c
     or      a
-    jp      z,.kill
+    jp      z,bolt_kill
     cp      192
-    jp      nc,.kill
-
+    jp      nc,bolt_kill
     call    pixel_hits_wall
-    jp      c,.kill
+    jp      c,bolt_kill
 
     ld      (iy+B_X),b
     ld      (iy+B_Y),c
     call    plot_pixel
-    ld      a,(iy+B_LEN)
-    inc     a
-    ld      (iy+B_LEN),a
-    call    bolt_hit_check
-    ret
 
-.kill:
-    ld      b,(iy+B_X)
-    ld      c,(iy+B_Y)
     ld      a,(iy+B_LEN)
     or      a
-    call    nz,restore_pixel
+    jr      nz,.grown
+    ld      (iy+B_TX),b
+    ld      (iy+B_TY),c
+.grown:
+    inc     a
+    ld      (iy+B_LEN),a
+    ld      c,a
+    ld      a,(iy+B_MAX)
+    cp      c
+    jr      nc,.hits                        ; length <= max
+
     ld      b,(iy+B_TX)
     ld      c,(iy+B_TY)
-    ld      a,b
-    cp      (iy+B_X)
-    jr      nz,.rest_tail
-    ld      a,c
-    cp      (iy+B_Y)
-    jr      z,.cleared
-.rest_tail:
     call    restore_pixel
-.cleared:
+    ld      a,(iy+B_DIR)
+    and     $0F
+    call    bolt_advance
+    ld      (iy+B_TX),b
+    ld      (iy+B_TY),c
+    ld      a,(iy+B_LEN)
+    dec     a
+    ld      (iy+B_LEN),a
+
+.hits:
+    jp      bolt_hit_check
+
+bolt_kill:
+    call    bolt_erase_trail
     xor     a
     ld      (iy+B_DIR),a
     ld      (iy+B_LEN),a
     ret
-
-.shrink:
-    ld      b,(iy+B_TX)
-    ld      c,(iy+B_TY)
-    call    restore_pixel
-    ld      a,(iy+B_X)
-    ld      (iy+B_TX),a
-    ld      a,(iy+B_Y)
-    ld      (iy+B_TY),a
-    jp      .grow
 
 bolt_hit_check:
     ld      a,(bolt_from_robot)
@@ -256,9 +271,8 @@ bolt_hit_check:
     cp      16
     ret     nc
     set     7,(ix+V_STATUS)
-    ld      b,(iy+B_X)
-    ld      c,(iy+B_Y)
-    call    restore_pixel
+    call    bolt_erase_trail
     xor     a
     ld      (iy+B_DIR),a
+    ld      (iy+B_LEN),a
     ret

@@ -1,11 +1,12 @@
 ; Shared entity move / draw / erase
 ; MOVE_ANIMATE_VECTOR ($27A9) + WRITE_PATTERN ($274D), minus Magic RAM.
 
+; Returns NZ if TIME expired (position and/or animation frame advanced).
 entity_move:
     ld      a,(ix+V_TIME)
     dec     a
     ld      (ix+V_TIME),a
-    ret     nz
+    jr      nz,.none
     ld      a,(ix+V_TPRIME)
     ld      (ix+V_TIME),a
     ld      a,(ix+V_PX)
@@ -14,7 +15,12 @@ entity_move:
     ld      a,(ix+V_PY)
     add     a,(ix+V_VY)
     ld      (ix+V_PY),a
-    jp      vec_next_frame
+    call    vec_next_frame
+    or      1
+    ret
+.none:
+    xor     a
+    ret
 
 ; Restore the sprite that was actually drawn last frame.
 entity_erase:
@@ -58,11 +64,11 @@ entity_stash_old:
     ld      (ix+V_OSPR_H),a
     ret
 
-; Collide against the wall mask; OR onto the screen only if clear.
+; Collide against the wall mask only (never the framebuffer). A hit while
+; still standing on the last drawn cell is ignored so a redraw cannot kill.
 entity_draw:
     call    vec_resolve_sprite
     call    entity_draw_pos
-    call    entity_stash_old
     ld      l,(ix+V_SPR_L)
     ld      h,(ix+V_SPR_H)
     push    hl
@@ -72,8 +78,20 @@ entity_draw:
     pop     hl
     ld      a,(draw_collide)
     or      a
-    ret     nz
-    jp      or_sprite
+    jr      z,.ok
+    ld      a,(ix+V_VX)
+    or      (ix+V_VY)
+    jr      nz,.hit                         ; only die if we actually moved
+    xor     a
+    ld      (draw_collide),a
+    jr      .ok
+.hit:
+    ld      a,1
+    ld      (draw_collide),a
+    ret
+.ok:
+    call    or_sprite
+    jp      entity_stash_old
 
 ; Draw with no wall test (Otto, explosions).
 entity_draw_noclip:

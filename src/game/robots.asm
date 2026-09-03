@@ -127,7 +127,6 @@ robots_update:
     ret
 
 .one:
-    call    entity_erase
     bit     7,(ix+V_STATUS)
     jp      nz,robot_exploding
 
@@ -167,8 +166,11 @@ robots_update:
 .noshoot:
     pop     af
     call    robot_setpat
+    jr      z,.moved
+    set     1,(ix+V_STATUS)
+.moved:
     call    entity_move
-    set     0,(ix+V_STATUS)
+    ret     z
     set     1,(ix+V_STATUS)
     ret
 
@@ -218,6 +220,7 @@ robot_exploding:
     ret
 
 robot_remove:
+    call    entity_erase
     xor     a
     ld      (ix+V_KIND),a
     ld      (ix+V_STATUS),a
@@ -253,9 +256,12 @@ robots_draw:
     jr      nz,.dn
     bit     1,(ix+V_STATUS)
     jr      z,.dn
+    call    entity_erase
     bit     7,(ix+V_STATUS)
     jr      nz,.blast
     call    entity_draw
+    res     1,(ix+V_STATUS)
+    set     0,(ix+V_STATUS)
     ld      a,(draw_collide)
     or      a
     jr      z,.dn
@@ -263,6 +269,8 @@ robots_draw:
     jr      .dn
 .blast:
     call    entity_draw_noclip
+    res     1,(ix+V_STATUS)
+    set     0,(ix+V_STATUS)
 .dn:
     ld      de,VEC_SIZE
     add     ix,de

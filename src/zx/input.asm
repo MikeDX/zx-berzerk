@@ -39,15 +39,25 @@ input_poll:
 
     ld      e,0                             ; E = result
 
-    ; Kempston bit order: 0=RIGHT 1=LEFT 2=DOWN 3=UP 4=FIRE
-    ; $FF usually means no interface on the bus — ignore it.
+    ; Kempston: 0=RIGHT 1=LEFT 2=DOWN 3=UP 4=FIRE.
+    ; Ignore $FF (no interface), $00, high-bit junk, and $1F (all bits floating).
     in      a,(KEMPSTON_PORT)
     inc     a
     jr      z,.kb
     dec     a
+    or      a
+    jr      z,.kb
+    ld      b,a
+    and     $E0
+    jr      nz,.kb
+    ld      a,b
+    and     $1F
+    cp      $1F
+    jr      z,.kb
+    ld      a,b
     bit     1,a
     jr      z,.kr
-    set     0,e                             ; LEFT
+    set     0,e
 .kr:
     bit     0,a
     jr      z,.ku

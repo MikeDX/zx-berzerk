@@ -46,7 +46,6 @@ otto_update:
 
 .chase:
     ld      ix,otto_vec
-    call    entity_erase
     ld      a,(player_vec+V_PX)
     sub     (ix+V_PX)
     ld      d,0
@@ -67,9 +66,10 @@ otto_update:
     or      e
     call    set_velocity
     call    entity_move
-    set     0,(ix+V_STATUS)
+    jr      z,.touch
     set     1,(ix+V_STATUS)
 
+.touch:
     ld      a,(ix+V_PX)
     ld      b,a
     ld      a,(player_vec+V_PX)
@@ -99,4 +99,8 @@ otto_draw:
     ld      ix,otto_vec
     bit     1,(ix+V_STATUS)
     ret     z
-    jp      entity_draw_noclip
+    call    entity_erase
+    call    entity_draw_noclip
+    res     1,(ix+V_STATUS)
+    set     0,(ix+V_STATUS)
+    ret
