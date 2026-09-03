@@ -7,10 +7,7 @@ player_init:
     ld      (ix+V_KIND),a
     ld      a,ST_MOVE|ST_WRITE
     ld      (ix+V_STATUS),a
-    ld      a,(man_x)
-    ld      (ix+V_PX),a
-    ld      a,(man_y)
-    ld      (ix+V_PY),a
+    call    player_place
     ld      a,2
     ld      (ix+V_TPRIME),a
     ld      (ix+V_TIME),a
@@ -19,6 +16,57 @@ player_init:
     ld      (ix+V_SPR_H),h
     xor     a
     ld      (player_firing),a
+    ret
+
+; Place the player at man_x/man_y, nudging along Y then X until the
+; sprite footprint is clear of walls.
+player_place:
+    ld      a,(man_x)
+    ld      (ix+V_PX),a
+    ld      a,(man_y)
+    ld      (ix+V_PY),a
+
+    ld      d,8                             ; X attempts
+.xtry:
+    ld      a,(man_y)
+    ld      (ix+V_PY),a
+    ld      e,10                            ; Y attempts
+.ytry:
+    ld      b,(ix+V_PX)
+    ld      c,(ix+V_PY)
+    ld      hl,spr_player
+    push    de
+    call    collide_sprite
+    pop     de
+    ld      a,(draw_collide)
+    or      a
+    jr      z,.placed
+    ld      a,(ix+V_PY)
+    add     a,8
+    cp      170
+    jr      c,.keepy
+    ld      a,16
+.keepy:
+    ld      (ix+V_PY),a
+    dec     e
+    jr      nz,.ytry
+    ld      a,(ix+V_PX)
+    add     a,12
+    cp      230
+    jr      c,.keepx
+    ld      a,12
+.keepx:
+    ld      (ix+V_PX),a
+    dec     d
+    jr      nz,.xtry
+
+.placed:
+    ld      a,(ix+V_PX)
+    ld      (man_x),a
+    ld      (ix+V_OLDX),a
+    ld      a,(ix+V_PY)
+    ld      (man_y),a
+    ld      (ix+V_OLDY),a
     ret
 
 ; Erase then update then prepare draw

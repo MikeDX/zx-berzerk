@@ -7,7 +7,7 @@ maze_hwall:
     push    af
     push    bc
     ld      hl,spr_brick
-    call    or_sprite_shifted
+    call    or_sprite
     pop     bc
     ld      a,4
     add     a,b
@@ -24,7 +24,7 @@ maze_vwall:
     push    af
     push    bc
     ld      hl,spr_brick
-    call    or_sprite_shifted
+    call    or_sprite
     pop     bc
     ld      a,4
     add     a,c

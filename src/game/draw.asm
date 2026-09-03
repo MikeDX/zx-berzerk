@@ -1,9 +1,9 @@
 ; Wall-mask rendering
-; Maze lives in WALL_MASK ($C000) and on screen.
-; Sprites OR onto screen; erase restores sprite bits from the mask.
-; Collision tests against the mask only (never against other sprites).
+; Maze lives in WALL_MASK ($C000) and mirrors the screen bitmap.
+; Sprites OR onto the screen; erase restores their footprint from the mask.
+; Collision tests the mask only, never other sprites.
 
-WALL_MASK       EQU $C000                   ; 6144 bytes — mirror of bitmap
+WALL_MASK       EQU $C000                   ; 6144 bytes
 
 mask_capture:
     ld      hl,$4000
@@ -12,6 +12,7 @@ mask_capture:
     ldir
     ret
 
+; HL screen ($4000-$57FF) -> HL mask ($C000-$D7FF)
 screen_to_mask:
     ld      a,h
     add     a,$80
@@ -19,9 +20,10 @@ screen_to_mask:
     ret
 
 ; -----------------------------------------------------------------------
-; Pixel ops (bolts)
+; Single pixel ops (bolts)
 ; -----------------------------------------------------------------------
 
+; B=x, C=y. Carry set if the wall mask has ink here.
 pixel_hits_wall:
     push    bc
     push    hl
@@ -43,6 +45,7 @@ pixel_hits_wall:
     xor     a
     ret
 
+; B=x, C=y. OR one pixel onto the screen.
 plot_pixel:
     push    bc
     push    de
@@ -60,13 +63,14 @@ plot_pixel:
     pop     bc
     ret
 
+; B=x, C=y. Clear the pixel, putting back any wall underneath.
 restore_pixel:
     push    bc
     push    de
     push    hl
     ld      a,c
     cp      192
-    jr      nc,.out2
+    jr      nc,.out
     call    zx_pixel_addr
     call    pixel_bitmask
     ld      d,a
@@ -74,20 +78,20 @@ restore_pixel:
     call    screen_to_mask
     ld      a,(hl)
     and     d
-    ld      c,a
+    ld      c,a                             ; wall bit under the pixel
     pop     hl
     ld      a,d
     cpl
     and     (hl)
     or      c
     ld      (hl),a
-.out2:
+.out:
     pop     hl
     pop     de
     pop     bc
     ret
 
-; HL=screen addr for (B,C). Returns A=bit mask. Clobbers B.
+; HL = screen address for (B,C). Returns A = bit mask. Clobbers B.
 pixel_bitmask:
     ld      a,b
     and     7
@@ -101,42 +105,41 @@ pixel_bitmask:
     jr      .rot
 
 ; -----------------------------------------------------------------------
-; Sprite helpers
-; HL→sprite (w,h,data), B=x, C=y — width must be 1 byte
+; Sprite blitting: HL -> (width, height, rows...), B=x, C=y
+; Width must be 1 byte. Sprites are shifted to any pixel column, so each
+; row can touch two screen bytes.
 ; -----------------------------------------------------------------------
 
 sprite_setup:
     xor     a
     ld      (draw_collide),a
-    inc     hl
+    inc     hl                              ; skip width
     ld      a,(hl)
     inc     hl
     ld      (spr_hleft),a
+    ld      a,b
+    and     7
+    ld      (spr_shift),a
     ret
 
-; Read row byte; E=primary screen byte, D=overflow into next byte
-; Shift=0: entity sprites (data already positioned within the byte)
-sprite_row_raw:
-    ld      e,(hl)
-    ld      d,0
-    ret
-
-; Shift= spr_shift: left-aligned tiles (wall bricks at $F0…)
-sprite_row_shift:
+; HL -> row byte. Returns E = bits for first byte, D = bits spilling right.
+sprite_row_bits:
     ld      a,(hl)
     ld      e,a
     ld      d,0
     ld      a,(spr_shift)
     or      a
     ret     z
+    push    bc
     ld      b,a
 .sh:
     srl     e
     rr      d
     djnz    .sh
+    pop     bc
     ret
 
-; OR two bytes onto screen at spr_addr
+; OR E/D at spr_addr. Clobbers HL, A, B.
 blit_row:
     ld      hl,(spr_addr)
     ld      a,(hl)
@@ -151,7 +154,7 @@ blit_row:
     ld      (hl),a
     ret
 
-; Restore two bytes from mask at spr_addr using sprite bits E/D
+; screen = (screen & ~sprite) | (mask & sprite)
 restore_row:
     ld      hl,(spr_addr)
     ld      a,e
@@ -183,7 +186,7 @@ restore_row:
     ld      (hl),a
     ret
 
-; Test E/D against mask at spr_addr
+; Test E/D against the mask at spr_addr.
 test_row:
     ld      hl,(spr_addr)
     ld      a,(hl)
@@ -202,27 +205,44 @@ test_row:
     ld      (draw_collide),a
     ret
 
-; Shared row loop body: HL=row ptr, B=x, C=y
-; Caller sets spr_shift before call for shifted blits (walls)
-draw_row:
+; Draw sprite (no collision test)
+or_sprite:
+    call    sprite_setup
+.row:
+    ld      a,(spr_hleft)
+    or      a
+    ret     z
+    ld      a,c
+    cp      192
+    jr      nc,.adv
     push    bc
     push    hl
     call    zx_pixel_addr
     ld      (spr_addr),hl
     pop     hl
-    ld      a,(spr_shift)
-    or      a
-    jr      nz,.sh
-    call    sprite_row_raw
-    jr      .blit
-.sh:
-    call    sprite_row_shift
-.blit:
+    call    sprite_row_bits
+    push    hl
     call    blit_row
+    pop     hl
     pop     bc
-    ret
+.adv:
+    inc     hl
+    inc     c
+    ld      a,(spr_hleft)
+    dec     a
+    ld      (spr_hleft),a
+    jr      .row
 
-restore_row_setup:
+; Erase sprite footprint, restoring walls
+restore_sprite:
+    call    sprite_setup
+.row:
+    ld      a,(spr_hleft)
+    or      a
+    ret     z
+    ld      a,c
+    cp      192
+    jr      nc,.adv
     push    bc
     push    hl
     call    zx_pixel_addr
@@ -230,112 +250,40 @@ restore_row_setup:
     call    screen_to_mask
     ld      (spr_mask),hl
     pop     hl
-    ld      a,(spr_shift)
-    or      a
-    jr      nz,.sh
-    call    sprite_row_raw
-    jr      .rest
-.sh:
-    call    sprite_row_shift
-.rest:
+    call    sprite_row_bits
+    push    hl
     call    restore_row
+    pop     hl
     pop     bc
-    ret
+.adv:
+    inc     hl
+    inc     c
+    ld      a,(spr_hleft)
+    dec     a
+    ld      (spr_hleft),a
+    jr      .row
 
-test_row_setup:
+; Test sprite against walls; sets (draw_collide). Draws nothing.
+collide_sprite:
+    call    sprite_setup
+.row:
+    ld      a,(spr_hleft)
+    or      a
+    ret     z
+    ld      a,c
+    cp      192
+    jr      nc,.adv
     push    bc
     push    hl
     call    zx_pixel_addr
     call    screen_to_mask
     ld      (spr_addr),hl
     pop     hl
-    ld      a,(spr_shift)
-    or      a
-    jr      nz,.sh
-    call    sprite_row_raw
-    jr      .test
-.sh:
-    call    sprite_row_shift
-.test:
+    call    sprite_row_bits
+    push    hl
     call    test_row
+    pop     hl
     pop     bc
-    ret
-
-; Entity sprites — data already aligned to (x,y) pixel within the byte
-or_sprite:
-    xor     a
-    ld      (spr_shift),a
-    call    sprite_setup
-.row:
-    ld      a,(spr_hleft)
-    or      a
-    ret     z
-    ld      a,c
-    cp      192
-    jr      nc,.adv
-    call    draw_row
-.adv:
-    inc     hl
-    inc     c
-    ld      a,(spr_hleft)
-    dec     a
-    ld      (spr_hleft),a
-    jr      .row
-
-; Wall bricks — left-aligned $F0 nibble, shift by x mod 8
-or_sprite_shifted:
-    ld      a,b
-    and     7
-    ld      (spr_shift),a
-    call    sprite_setup
-.row:
-    ld      a,(spr_hleft)
-    or      a
-    ret     z
-    ld      a,c
-    cp      192
-    jr      nc,.adv
-    call    draw_row
-.adv:
-    inc     hl
-    inc     c
-    ld      a,(spr_hleft)
-    dec     a
-    ld      (spr_hleft),a
-    jr      .row
-
-restore_sprite:
-    xor     a
-    ld      (spr_shift),a
-    call    sprite_setup
-.row:
-    ld      a,(spr_hleft)
-    or      a
-    ret     z
-    ld      a,c
-    cp      192
-    jr      nc,.adv
-    call    restore_row_setup
-.adv:
-    inc     hl
-    inc     c
-    ld      a,(spr_hleft)
-    dec     a
-    ld      (spr_hleft),a
-    jr      .row
-
-collide_sprite:
-    xor     a
-    ld      (spr_shift),a
-    call    sprite_setup
-.row:
-    ld      a,(spr_hleft)
-    or      a
-    ret     z
-    ld      a,c
-    cp      192
-    jr      nc,.adv
-    call    test_row_setup
 .adv:
     inc     hl
     inc     c

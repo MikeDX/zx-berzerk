@@ -30,6 +30,8 @@ otto_vec:       ds VEC_SIZE
 player_bolts:   ds BOLT_SIZE * MAX_PBOLTS
 robot_bolts:    ds BOLT_SIZE * MAX_RBOLTS
 
+bolt_from_robot: db 0
+
 draw_collide:   db 0
 spr_shift:      db 0
 spr_hleft:      db 0
