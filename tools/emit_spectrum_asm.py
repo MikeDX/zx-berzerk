@@ -79,9 +79,24 @@ IN_HOOKS = {
     0x65: "IDLE_00",  # SW2 free-game bit0 active-HIGH → idle 0
 }
 
-# Force-emit ranges as remapped data words (listing mis-disassembles these).
+# Force-emit ranges as remapped little-endian data words.
 DATA_WORD_RANGES = [
     (0x1D31, 0x1D51),  # bytecode opcode → handler jump table
+    (0x2053, 0x2067),  # P.TAB — player direction → pattern table
+    (0x252D, 0x253F),  # ROBOT_ANIMATION_TABLES
+]
+
+# Strided LE pointer tables: remap word at offset 0 of each stride-byte entry.
+# (SR.TAB / S.TAB: PatternPtr, XDelta, YDelta, Dir, pad)
+DATA_STRIDED_WORD_RANGES = [
+    (0x2067, 0x209D, 6),  # SR.TAB — player shoot
+    (0x2944, 0x297A, 6),  # S.TAB — robot shoot
+]
+
+# Extra pattern-table roots not reachable from the index tables above.
+PATTERN_TABLE_SEEDS = [
+    0x103B,  # robot explosion (ld bc,$103B in BLAM)
+    0x120B,  # Evil Otto animation list
 ]
 
 # LTABLE ($1AED) pops its return address as a 4-language pointer table.
@@ -98,6 +113,103 @@ def discover_ltable_ranges(rom: bytes) -> list[tuple[int, int]]:
             t = a + 3
             out.append((t, t + LTABLE_TABLE_BYTES))
     return out
+
+
+def is_arcade_prom_ptr(w: int) -> bool:
+    """True for still-arcade PROM pointers (not already Spectrum-remapped)."""
+    return 0x1000 <= w < 0x4000
+
+
+def coalesce_ranges(ranges: list[tuple[int, int]]) -> list[tuple[int, int]]:
+    if not ranges:
+        return []
+    ranges = sorted(ranges)
+    out = [ranges[0]]
+    for lo, hi in ranges[1:]:
+        plo, phi = out[-1]
+        if lo <= phi:
+            out[-1] = (plo, max(phi, hi))
+        else:
+            out.append((lo, hi))
+    return out
+
+
+def remap_strided_le_words(rom: bytearray) -> int:
+    """Remap LE pointer at the start of each fixed-stride table entry."""
+    n = 0
+    for start, end, stride in DATA_STRIDED_WORD_RANGES:
+        for a in range(start, end, stride):
+            if a + 1 >= end:
+                break
+            w = rom[a] | (rom[a + 1] << 8)
+            if not is_arcade_prom_ptr(w):
+                continue
+            nw = map_addr(w)
+            if nw != w:
+                rom[a] = nw & 0xFF
+                rom[a + 1] = (nw >> 8) & 0xFF
+                n += 1
+    return n
+
+
+def pattern_table_seeds(rom: bytes) -> set[int]:
+    seeds = set(PATTERN_TABLE_SEEDS)
+    for a in range(0x2053, 0x2067, 2):
+        seeds.add(rom[a] | (rom[a + 1] << 8))
+    for a in range(0x252D, 0x253F, 2):
+        seeds.add(rom[a] | (rom[a + 1] << 8))
+    for start, end, stride in DATA_STRIDED_WORD_RANGES:
+        for a in range(start, end, stride):
+            seeds.add(rom[a] | (rom[a + 1] << 8))
+    return {s for s in seeds if is_arcade_prom_ptr(s)}
+
+
+def remap_pattern_animation_tables(rom: bytearray) -> tuple[int, list[tuple[int, int]]]:
+    """Remap sprite pattern tables: BE frame ptrs, then LE restart after $00.
+
+    WRITE_PATTERN / COLLISION load frame pointers as big-endian
+    (`ld a,(hl); ld l,(hl+1); ld h,a`). Animation advance treats a lone $00
+    as end-of-list and the next two bytes as a little-endian restart pointer.
+    """
+    n = 0
+    covered: list[tuple[int, int]] = []
+    visited: set[int] = set()
+    queue = list(pattern_table_seeds(rom))
+
+    while queue:
+        pc = queue.pop()
+        if pc in visited or not is_arcade_prom_ptr(pc):
+            continue
+        visited.add(pc)
+        p = pc
+        while p + 1 < 0x4000:
+            if rom[p] == 0:
+                # End marker; following word is LE restart (may overlap prior frame).
+                if p + 2 < 0x4000:
+                    w = rom[p + 1] | (rom[p + 2] << 8)
+                    if is_arcade_prom_ptr(w):
+                        nw = map_addr(w)
+                        if nw != w:
+                            rom[p + 1] = nw & 0xFF
+                            rom[p + 2] = (nw >> 8) & 0xFF
+                            n += 1
+                        if w not in visited:
+                            queue.append(w)
+                covered.append((pc, p + 3))
+                break
+            # Big-endian frame pointer → sprite bitmap
+            w = (rom[p] << 8) | rom[p + 1]
+            if is_arcade_prom_ptr(w):
+                nw = map_addr(w)
+                if nw != w:
+                    rom[p] = (nw >> 8) & 0xFF
+                    rom[p + 1] = nw & 0xFF
+                    n += 1
+            p += 2
+        else:
+            covered.append((pc, p))
+
+    return n, coalesce_ranges(covered)
 
 RE_HEX_ADDR = re.compile(r"\$([0-9A-Fa-f]{4})\b")
 RE_IN_PORT = re.compile(
@@ -352,6 +464,14 @@ def emit_berzerk_asm(path: Path) -> dict:
     seen_labels: dict[str, int] = {}
 
     ltable_ranges = discover_ltable_ranges(rom)
+    # Pattern tables before LE index remaps so seeds still see arcade addrs.
+    pat_n, pattern_ranges = remap_pattern_animation_tables(rom)
+    strided_n = remap_strided_le_words(rom)
+    # Already remapped in-place — emit as raw bytes (do not LE-word remap again).
+    raw_ranges = coalesce_ranges(
+        pattern_ranges
+        + [(lo, hi) for lo, hi, _ in DATA_STRIDED_WORD_RANGES]
+    )
     word_ranges = list(DATA_WORD_RANGES) + ltable_ranges
     word_ranges.sort()
 
@@ -363,6 +483,8 @@ def emit_berzerk_asm(path: Path) -> dict:
         "rewrites": 0,
         "clashes": len(clashes),
         "ltable_tables": len(ltable_ranges),
+        "pattern_ptrs": pat_n,
+        "strided_ptrs": strided_n,
     }
 
     a("; --- Program image @ ZX_PROM (layout-preserving) ---")
@@ -387,6 +509,25 @@ def emit_berzerk_asm(path: Path) -> dict:
 
         zx = map_addr(addr)
         insn = by_addr.get(addr)
+
+        # Raw ranges already pointer-fixed in `rom` (pattern / strided tables).
+        raw = None
+        for lo, hi in raw_ranges:
+            if lo <= addr < hi:
+                raw = (lo, hi)
+                break
+        if raw is not None:
+            lo, hi = raw
+            if addr == lo:
+                a(f"    ORG ${map_addr(lo):04X}            ; pattern/strided arcade ${lo:04X}-${hi-1:04X}")
+                data = rom[lo:hi]
+                for base in range(0, len(data), 16):
+                    row = ",".join(f"${b:02X}" for b in data[base:base + 16])
+                    a(f"    db  {row}")
+                stats["data_records"] += 1
+            addr = hi
+            skip_until = hi
+            continue
 
         # Force word tables the listing mis-disassembled as code.
         forced = None
@@ -527,7 +668,8 @@ def emit_berzerk_asm(path: Path) -> dict:
         a("; --- I/O trampoline islands (arcade $0C00 gap) ---")
         for block in islands:
             a(block)
-            a("")
+
+    a("")
 
     irq = map_addr(0x26AB)
     a("; --- IM2 vectors (I=$37; Spectrum bus $FF, arcade $FC) ---")
@@ -542,6 +684,7 @@ def emit_berzerk_asm(path: Path) -> dict:
 
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n")
+    stats["rewrites"] += pat_n + strided_n
     return stats
 
 
@@ -571,7 +714,9 @@ def main() -> int:
         f"insns={stats['insns']} data={stats['data_records']} "
         f"entry_hooks={stats['hooks']} in_hooks={stats['in_hooks']} "
         f"rewrites={stats['rewrites']} clashes={stats['clashes']} "
-        f"ltables={stats['ltable_tables']}"
+        f"ltables={stats['ltable_tables']} "
+        f"pattern_ptrs={stats['pattern_ptrs']} "
+        f"strided_ptrs={stats['strided_ptrs']}"
     )
     print(f"ARC_COLD=${map_addr(0x1602):04X}  ARC_IRQ=${map_addr(0x26AB):04X}")
     return 0
