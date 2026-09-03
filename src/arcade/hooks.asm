@@ -401,3 +401,19 @@ hook_maze:
     pop     af
     ld      hl,($A745)
     jp      ARC_MAZE_CONT
+
+; IRQ calls these with MAN_PTR/V.PTR = 0 during room start and room exit.
+; Spectrum $0000 is ROM — treating it as a VECTOR freezes the machine.
+hook_erase_pattern:
+    ld      a,h
+    or      l
+    ret     z
+    ld      (ZX_SCRATCH_CMOS + ($0870 - $0800)),hl
+    jp      ARC_ERASE_CONT
+
+hook_move_animate:
+    ld      a,h
+    or      l
+    ret     z
+    ld      (ZX_SCRATCH_CMOS + ($0870 - $0800)),hl
+    jp      ARC_MOVE_CONT

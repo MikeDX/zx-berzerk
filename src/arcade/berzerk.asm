@@ -440,7 +440,7 @@ TODOs:
     ORG $6100
     jr   $613D
     ORG $6102
-    ld   bc,$A0C0
+    ld   bc,$08C0
     ORG $6105
     ld   hl,$0000
     ORG $6108
@@ -514,7 +514,7 @@ TODOs:
     ORG $6143
     ld   ix,$7000
     ORG $6147
-    ld   bc,$A000
+    ld   bc,$0800
     ORG $614A
     ld   h,$00
     ORG $614C
@@ -715,7 +715,7 @@ TODOs:
     rst  $38
 COLOUR_TEST_MODE:
     ORG $6200
-    ld   bc,$7048
+    ld   bc,$1048
     ORG $6203
     in   a,(c)
     ORG $6205
@@ -1079,13 +1079,13 @@ COLOUR_TEST_MODE:
     ORG $638F
     exx
     ORG $6390
-    ld   bc,$A000
+    ld   bc,$0800
     ORG $6393
     jr   $6399
     ORG $6395
     exx
     ORG $6396
-    ld   bc,$8000
+    ld   bc,$2000
     ORG $6399
     exx
     ORG $639A
@@ -1905,7 +1905,7 @@ BK_SCROLL_UP:
     ORG $669C
     push hl
     ORG $669D
-    ld   bc,$79C0
+    ld   bc,$19C0
     ORG $66A0
     ld   de,$A800
     ORG $66A3
@@ -2033,7 +2033,7 @@ CROSSHAIR_PATTERN_TEST_MODE:
     ORG $6743
     inc  hl
     ORG $6744
-    ld   bc,$7BFD
+    ld   bc,$1BFD
     ORG $6747
     ex   de,hl
     ORG $6748
@@ -2071,7 +2071,7 @@ CROSSHAIR_PATTERN_TEST_MODE:
     ORG $6769
     ld   de,$A801
     ORG $676C
-    ld   bc,$7BFF
+    ld   bc,$1BFF
     ORG $676F
     ld   (hl),$FF
     ORG $6771
@@ -2474,13 +2474,13 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $722F
     nop
     ORG $7230
-    ld   bc,$7802
+    ld   bc,$1802
     ORG $7233
     jr   $71B9
     ORG $7235
     nop
     ORG $7236
-    ld   bc,$7003
+    ld   bc,$1003
     ORG $7239
     jr   c,$724B
     ORG $723B
@@ -2488,7 +2488,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $723C
     nop
     ORG $723D
-    ld   bc,$7804
+    ld   bc,$1804
     ORG $7240
     inc  a
     ORG $7241
@@ -2498,7 +2498,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $7244
     nop
     ORG $7245
-    ld   bc,$9805
+    ld   bc,$3805
     ORG $7248
     ld   a,h
     ORG $7249
@@ -2510,7 +2510,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $724D
     nop
     ORG $724E
-    ld   bc,$9C06
+    ld   bc,$3C06
     ORG $7251
     ld   a,(hl)
     ORG $7252
@@ -2526,7 +2526,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $7257
     nop
     ORG $7258
-    ld   bc,$9807
+    ld   bc,$3807
     ORG $725B
     ld   a,h
     ORG $725C
@@ -2538,7 +2538,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $7262
     nop
     ORG $7263
-    ld   bc,$9C08
+    ld   bc,$3C08
     ORG $7266
     ld   a,(hl)
     ORG $7267
@@ -2558,7 +2558,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $726E
     nop
     ORG $726F
-    ld   bc,$9C08
+    ld   bc,$3C08
     ORG $7272
     ld   a,(hl)
     ORG $7273
@@ -2576,7 +2576,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $727A
     nop
     ORG $727B
-    ld   bc,$9C08
+    ld   bc,$3C08
     ORG $727E
     ld   a,(hl)
     ORG $727F
@@ -2594,7 +2594,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $7286
     add  a,b
     ORG $7287
-    ld   bc,$9C08
+    ld   bc,$3C08
     ORG $728A
     ld   a,(hl)
     ORG $728B
@@ -2612,7 +2612,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $7292
     ld   b,b
     ORG $7293
-    ld   bc,$9C08
+    ld   bc,$3C08
     ORG $7296
     ld   a,(hl)
     ORG $7297
@@ -2626,7 +2626,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $729C
     inc  a
     ORG $729D
-    ld   bc,$9C08
+    ld   bc,$3C08
     ORG $72A0
     ld   a,(hl)
     ORG $72A1
@@ -2787,7 +2787,7 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ORG $73B4
     add  a,b
     ORG $73B5
-    ld   bc,$7810
+    ld   bc,$1810
     ORG $73B8
     jr   $73BA
     ORG $73BA
@@ -3587,7 +3587,7 @@ COLLISION_DETECTION:
     ORG $76F3
     cp   a
     ORG $76F4
-    ld   bc,$A1BF
+    ld   bc,$09BF
     ORG $76F7
     rst  $38
     ORG $76F8
@@ -3603,7 +3603,7 @@ COLLISION_DETECTION:
     ORG $76FD
     rst  $38
     ORG $76FE
-    ld   bc,$A0D4
+    ld   bc,$08D4
     ORG $7701
     cp   a
     ORG $7702
@@ -6057,7 +6057,7 @@ D.TAB:
     ORG $80A9
     call $7FD4
     ORG $80AC
-    ld   bc,$7812
+    ld   bc,$1812
     ORG $80AF
     ld   a,($A776) ; read NUMBER_OF_PLAYERS
     ORG $80B2
@@ -6339,13 +6339,15 @@ S.U:
     ORG $81EC
     push hl
     ORG $81ED
-    ld   a,$1B
-    ORG $81EF
-    ld   hl,$0100
+    jp  $8209              ; skip video scroll → $2209
+    ORG $81F0
+    db  $00
+    ORG $81F1
+    db  $01
     ORG $81F2
     add  hl,de
     ORG $81F3
-    ld   bc,$7900
+    ld   bc,$1900
     ORG $81F6
     push de
     ORG $81F7
@@ -6419,9 +6421,11 @@ SCROLL_DOWN:
     push hl
 S.D:
     ORG $823E
-    ld   a,$1A
-    ORG $8240
-    ld   bc,$7900
+    jp  $8209              ; skip video scroll → $2209
+    ORG $8241
+    db  $00
+    ORG $8242
+    db  $19
     ORG $8243
     ld   hl,$FF00
     ORG $8246
@@ -6477,9 +6481,11 @@ S.L:
     ORG $827A
     push hl
     ORG $827B
-    ld   a,$20
-    ORG $827D
-    ld   bc,$79FF
+    jp  $8298              ; skip video scroll → $2298
+    ORG $827E
+    db  $FF
+    ORG $827F
+    db  $19
     ORG $8280
     ld   hl,$0001
     ORG $8283
@@ -6557,9 +6563,11 @@ S.R:
     ORG $82C9
     push hl
     ORG $82CA
-    ld   a,$20
-    ORG $82CC
-    ld   bc,$7A00
+    jp  $82E5              ; skip video scroll → $22E5
+    ORG $82CD
+    db  $00
+    ORG $82CE
+    db  $1A
     ORG $82CF
     ld   hl,$FFFF
     ORG $82D2
@@ -6629,7 +6637,7 @@ S.R:
     ORG $8311
     or   a
     ORG $8312
-    ei
+    nop                         ; was EI; DI through room exit
     ORG $8313
     ret
 SHOW_SCORE:
@@ -7765,7 +7773,7 @@ BOTTOM_OF_SCREEN_INTERRUPT:
     ret
 ERASE_PATTERN:
     ORG $872D
-    ld   ($A070),hl
+    jp  HOOK_ERASE_PATTERN              ; arcade $272D hooked
     ORG $8730
     push hl
     ORG $8731
@@ -7909,7 +7917,7 @@ WRITE_PATTERN:
     ret
 MOVE_ANIMATE_VECTOR:
     ORG $87A9
-    ld   ($A070),hl ; set V.PTR to point to next VECTOR structure
+    jp  HOOK_MOVE_ANIMATE              ; arcade $27A9 hooked
     ORG $87AC
     bit  2,(hl) ; test if MOVE bit is set in VECTOR.Status
     ORG $87AE
@@ -8615,7 +8623,7 @@ PRINT_CHAR:
     ORG $89E5
     add  hl,bc ; HL = C * 9
     ORG $89E6
-    ld   bc,$8F1E
+    ld   bc,$2F1E
     ORG $89E9
     add  hl,bc ; now HL = pointer to start of character bitmap (9 bytes)
     ORG $89EA
@@ -10837,7 +10845,7 @@ SFIRE:
     ORG $93F3
     ex   af,af'
     ORG $93F4
-    ld   bc,$6F0B
+    ld   bc,$0F0B
     ORG $93F7
     nop
     ORG $93F8
@@ -10887,7 +10895,7 @@ SFIRE:
     ORG $9414
     ex   af,af'
     ORG $9415
-    ld   bc,$A20B
+    ld   bc,$0A0B
     ORG $9418
     nop
     ORG $9419
@@ -11291,7 +11299,7 @@ SBLAM:
     ORG $951D
     ex   af,af'
     ORG $951E
-    ld   bc,$A00B
+    ld   bc,$080B
     ORG $9521
     nop
     ORG $9522
@@ -11407,7 +11415,7 @@ SBLAM:
     ORG $956E
     ex   af,af'
     ORG $956F
-    ld   bc,$740B
+    ld   bc,$140B
     ORG $9572
     nop
     ORG $9573
@@ -12216,13 +12224,13 @@ COLOUR_MAN:
     ORG $97B2
     sub  b
     ORG $97B3
-    ld   bc,$9C01
+    ld   bc,$3C01
     ORG $97B6
     rst  $38
     ORG $97B7
     nop
     ORG $97B8
-    ld   bc,$9201
+    ld   bc,$3201
     ORG $97BB
     rst  $38
     ORG $97BC

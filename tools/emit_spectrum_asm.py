@@ -65,6 +65,8 @@ HOOK_OUT_MAGIC = ZX_HAL + 0x1B
 HOOK_BOLT_PIXEL = ZX_HAL + 0x1E
 HOOK_COLOUR_FILL = ZX_HAL + 0x21
 HOOK_MAZE = ZX_HAL + 0x24
+HOOK_ERASE_PATTERN = ZX_HAL + 0x27
+HOOK_MOVE_ANIMATE = ZX_HAL + 0x2A
 
 ENTRY_HOOKS = {
     0x2817: "HOOK_DRAW_SPRITE",
@@ -81,6 +83,23 @@ ENTRY_HOOKS = {
     0x1578: ("HOOK_BOLT_PIXEL", 5),
     0x3657: "HOOK_COLOUR_FILL",
     0x2540: "HOOK_MAZE",
+    # IRQ erase/move with MAN_PTR=0 must not treat Spectrum ROM as a VECTOR.
+    0x272D: "HOOK_ERASE_PATTERN",
+    0x27A9: "HOOK_MOVE_ANIMATE",
+}
+
+# Room-exit scroll LDIRs ZX_VIDEO (never shown during the copy) for ~1s+ and
+# runs with MAN_PTR cleared + EI — IRQ freezes. Jump to post-scroll maze/seal.
+SCROLL_SKIPS = {
+    0x21ED: 0x2209,  # S.U → call $2540
+    0x223E: 0x2209,  # S.D → same
+    0x227B: 0x2298,  # S.L → ld a,$06; maze
+    0x22CA: 0x22E5,  # S.R → ld a,$60; maze
+}
+
+# Exit cleanup ($22FD) DI's then EI's before scroll/maze; keep DI until $20D7.
+NOP_OPS = {
+    0x2312,  # ei
 }
 
 # Ports → HAL. Active-low inputs idle as $FF. SYSTEM has coin/start keys.
@@ -310,16 +329,32 @@ def clean_mnemonic(text: str) -> str:
     return text.strip()
 
 
+# ld bc,nn is almost always a block count or packed bytes (B=count, C=data).
+# Remap only RAM pointers and known PROM table pointers loaded into BC.
+# Do NOT remap sprite-table rows that assemble as ld bc,$3C08 etc.
+LD_BC_PTRS = {
+    0x103B,  # BLAM explosion pattern list
+    0x2606,  # maze gen: push bc then RET to continuation (room start)
+    0x187F,  # DEFAULT_PLAYER_STATE (test-mode ldir source)
+}
+
+
 def rewrite_text_addrs(text: str) -> tuple[str, int]:
     """Rewrite $XXXX in a mnemonic.
 
     JP/CALL/JR/DJNZ targets always remap across the arcade map (including
     PROM $0000–$07FF). LD-style immediates only remap when they look like
     pointers (>= $0800), so counts like ld bc,$0400 stay put.
+
+    Important: only restrict *immediate* `ld bc,$nnnn`. Indirect
+    `ld bc,($nnnn)` is always a pointer (e.g. V.PTR at $0870) and must remap.
     """
-    first = text.strip().split(None, 1)[0].lower() if text.strip() else ""
-    # jp nz / jr z / call c — first token is the opcode
+    stripped = text.strip()
+    first = stripped.split(None, 1)[0].lower() if stripped else ""
+    rest = stripped.split(None, 1)[1].lower() if stripped and " " in stripped else ""
     ctrl = first in ("jp", "call", "jr", "djnz")
+    # Immediate only — `ld bc,($0870)` must not use the count rule.
+    ld_bc_imm = first == "ld" and rest.startswith("bc,$")
     n = 0
 
     def repl(m: re.Match) -> str:
@@ -327,6 +362,10 @@ def rewrite_text_addrs(text: str) -> tuple[str, int]:
         old = int(m.group(1), 16)
         if ctrl:
             if old >= 0x8800:
+                return m.group(0)
+        elif ld_bc_imm:
+            # $1900 etc. were remapped as PROM pointers; ldir then smashed RAM.
+            if not (0x4000 <= old < 0x8800 or old in LD_BC_PTRS):
                 return m.group(0)
         elif not is_pointer_imm(old):
             return m.group(0)
@@ -380,6 +419,8 @@ HOOK_OUT_MAGIC       EQU ${HOOK_OUT_MAGIC:04X}
 HOOK_BOLT_PIXEL      EQU ${HOOK_BOLT_PIXEL:04X}
 HOOK_COLOUR_FILL     EQU ${HOOK_COLOUR_FILL:04X}
 HOOK_MAZE            EQU ${HOOK_MAZE:04X}
+HOOK_ERASE_PATTERN   EQU ${HOOK_ERASE_PATTERN:04X}
+HOOK_MOVE_ANIMATE    EQU ${HOOK_MOVE_ANIMATE:04X}
 
 ARC_COLD             EQU ${map_addr(0x1602):04X}
 ARC_ATTRACT          EQU ${map_addr(0x164B):04X}
@@ -389,6 +430,8 @@ ARC_ROOM_MOVE        EQU ${map_addr(0x2160):04X}
 ARC_ROOM_JOBS        EQU ${map_addr(0x21A3):04X}
 ARC_IRQ              EQU ${map_addr(0x26AB):04X}
 ARC_MAZE_CONT        EQU ${map_addr(0x2543):04X}
+ARC_ERASE_CONT       EQU ${map_addr(0x2730):04X}
+ARC_MOVE_CONT        EQU ${map_addr(0x27AC):04X}
 """
     )
 
@@ -475,9 +518,10 @@ def emit_berzerk_asm(path: Path) -> dict:
         "HOOK_DRAW_SPRITE", "HOOK_CLEAR_SCREEN", "HOOK_RTOAX", "HOOK_IN_P1",
         "HOOK_IN_STATUS", "HOOK_NMI", "HOOK_PRINT_CHAR", "HOOK_IN_SYSTEM",
         "HOOK_GAME_LOOP", "HOOK_OUT_MAGIC", "HOOK_BOLT_PIXEL",
-        "HOOK_COLOUR_FILL", "HOOK_MAZE",
+        "HOOK_COLOUR_FILL", "HOOK_MAZE", "HOOK_ERASE_PATTERN", "HOOK_MOVE_ANIMATE",
         "ARC_COLD", "ARC_ATTRACT", "ARC_START_GAME", "ARC_ROOM_START", "ARC_IRQ",
         "ARC_ROOM_MOVE", "ARC_ROOM_JOBS", "ARC_MAZE_CONT",
+        "ARC_ERASE_CONT", "ARC_MOVE_CONT",
     }
     # Collect code labels so EQUs that share a name don't collide.
     code_labels = {sanitize_label(lab) for i in insns for lab in i.labels}
@@ -607,6 +651,22 @@ def emit_berzerk_asm(path: Path) -> dict:
 
         # Entry hooks: JP veneer (3 bytes). Must not let the next listing
         # record overwrite the JP operand (common when the first opcode is 1 byte).
+        if addr in SCROLL_SKIPS:
+            dest = map_addr(SCROLL_SKIPS[addr])
+            a(f"    ORG ${zx:04X}")
+            a(f"    jp  ${dest:04X}              ; skip video scroll → ${SCROLL_SKIPS[addr]:04X}")
+            stats["hooks"] += 1
+            skip_until = addr + 3
+            addr = skip_until
+            continue
+
+        if addr in NOP_OPS:
+            a(f"    ORG ${zx:04X}")
+            a(f"    nop                         ; was EI; DI through room exit")
+            stats["hooks"] += 1
+            addr = insn.addr + 1
+            continue
+
         if addr in ENTRY_HOOKS:
             spec = ENTRY_HOOKS[addr]
             if isinstance(spec, tuple):

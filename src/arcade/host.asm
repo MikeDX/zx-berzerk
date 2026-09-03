@@ -43,6 +43,10 @@ basend:
     jp      hook_colour_fill
     ASSERT $ == HOOK_MAZE
     jp      hook_maze
+    ASSERT $ == HOOK_ERASE_PATTERN
+    jp      hook_erase_pattern
+    ASSERT $ == HOOK_MOVE_ANIMATE
+    jp      hook_move_animate
 
 host_start:
     di
