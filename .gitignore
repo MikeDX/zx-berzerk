@@ -1,0 +1,7 @@
+/build/
+/tools/bin/
+*.lst
+*.sym
+*.lab
+*.sld
+.DS_Store
