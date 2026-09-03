@@ -375,7 +375,7 @@ ARC_ATTRACT          EQU ${map_addr(0x164B):04X}
 ARC_START_GAME       EQU ${map_addr(0x17B8):04X}
 ARC_ROOM_START       EQU ${map_addr(0x209D):04X}
 ARC_ROOM_MOVE        EQU ${map_addr(0x2160):04X}
-ARC_ROOM_JOBS        EQU ${map_addr(0x21C9):04X}
+ARC_ROOM_JOBS        EQU ${map_addr(0x21A3):04X}
 ARC_IRQ              EQU ${map_addr(0x26AB):04X}
 """
     )
@@ -707,6 +707,16 @@ def emit_berzerk_asm(path: Path) -> dict:
 
         # Data
         data = bytearray(insn.data)
+        # Parser used to drop `ld iy,nn` when a hex byte repeated; still remap
+        # those 4-byte IX/IY loads if a record lands here.
+        if len(data) == 4 and data[0] in (0xDD, 0xFD) and data[1] == 0x21:
+            w = data[2] | (data[3] << 8)
+            if is_pointer_imm(w):
+                nw = map_addr(w)
+                if nw != w:
+                    data[2] = nw & 0xFF
+                    data[3] = (nw >> 8) & 0xFF
+                    stats["rewrites"] += 1
         # Do NOT remap arbitrary data records as pointer words — ASCII strings
         # like "Hi" ($6948) look like magic-RAM addresses and get corrupted.
         # Jump tables are handled via DATA_WORD_RANGES / LTABLE discovery above.

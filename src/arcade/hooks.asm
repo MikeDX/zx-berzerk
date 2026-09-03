@@ -204,7 +204,8 @@ hook_nmi:
 ; Room loop $2157: arcade `bit 2,(MAN_PTR); ret z` with a NULL pointer reads
 ; address 0. On the Spectrum that is ROM ($F3, MOVE bit clear) so we RET out
 ; of the room, $22F1 wipes vectors, and only the maze walls remain.
-; With no player yet, keep pumping jobs until MAN_INIT sets MAN_PTR.
+; With no player yet, tick jobs at $21A3 (delay bit + dispatcher) until
+; MAN_INIT sets MAN_PTR. Jumping at $21C9 skipped that and starved spawn.
 hook_game_loop:
     ld      ix,(ZX_SCRATCH_CMOS + ($0876 - $0800))
     push    ix

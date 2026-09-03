@@ -139,7 +139,20 @@ def parse(path=REF):
             if not by:
                 cursor = addr
                 continue
-            tail = rest.split(by[-1], 1)[1].strip()
+            # Consume hex bytes in order from `rest` so a repeated byte
+            # (`FD 21 17 21 ld iy,$2117`) does not truncate the mnemonic.
+            # Keep original spacing after the bytes (glued comments need
+            # two spaces for the emitter to strip them).
+            def tail_after_hex(rest_s, hex_toks):
+                idx = 0
+                for b in hex_toks:
+                    p = rest_s.find(b, idx)
+                    if p < 0:
+                        return rest_s[idx:].strip()
+                    idx = p + len(b)
+                return rest_s[idx:].strip()
+
+            tail = tail_after_hex(rest, by)
             code = is_instruction(tail)
             if not code:
                 by = [t for t in toks if RE_HEXBYTE.match(t)]

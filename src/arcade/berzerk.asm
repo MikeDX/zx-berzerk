@@ -217,8 +217,8 @@ TODOs:
     db  $00,$08
     ORG $6077            ; arcade $0077 data
     db  $A3,$00
-    ORG $6079            ; arcade $0079 data
-    db  $01,$00,$00
+    ORG $6079
+    ld   bc,$0000
     ORG $607C
     dec  c
     ORG $607D
@@ -229,8 +229,8 @@ TODOs:
     in   a,($66) ; read led_off_r
     ORG $6083
     ld   a,$01
-    ORG $6085            ; arcade $0085 data
-    db  $01,$41,$01
+    ORG $6085
+    ld   bc,$0141
     ORG $6088
     ld   de,$F247
     ORG $608B
@@ -263,8 +263,8 @@ TODOs:
     dec  a
     ORG $609F
     jr   z,$608B
-    ORG $60A1            ; arcade $00A1 data
-    db  $01,$00,$00
+    ORG $60A1
+    ld   bc,$0000
     ORG $60A4
     dec  c
     ORG $60A5
@@ -441,8 +441,8 @@ TODOs:
     jr   $613D
     ORG $6102
     ld   bc,$A0C0
-    ORG $6105            ; arcade $0105 data
-    db  $21,$00,$00
+    ORG $6105
+    ld   hl,$0000
     ORG $6108
     ld   d,$08
     ORG $610A
@@ -581,8 +581,8 @@ TODOs:
     and  a
     ORG $6180
     jr   nz,$6199
-    ORG $6182            ; arcade $0182 data
-    db  $DD,$21,$00,$00
+    ORG $6182
+    ld   ix,$0000
     ORG $6186
     ld   e,$80
     ORG $6188
@@ -617,8 +617,8 @@ TODOs:
     jr   $61A0
     ORG $61AB
     ld   d,$AA
-    ORG $61AD            ; arcade $01AD data
-    db  $31,$FF,$FF
+    ORG $61AD
+    ld   sp,$FFFF
     ORG $61B0
     ld   bc,($0077)
     ORG $61B4
@@ -824,10 +824,10 @@ COLOUR_TEST_MODE:
     rrc  a
     ORG $6262
     djnz $6256
-    ORG $6264            ; arcade $0264 data
-    db  $21,$11,$11
-    ORG $6267            ; arcade $0267 data
-    db  $11,$11,$11
+    ORG $6264
+    ld   hl,$7111
+    ORG $6267
+    ld   de,$7111
     ORG $626A
     ld   sp,$8800
     ORG $626D
@@ -918,14 +918,14 @@ COLOUR_TEST_MODE:
     jp   $6079
     ORG $62B8
     ld   hl,$C3FF
-    ORG $62BB            ; arcade $02BB data
-    db  $11,$00,$00
+    ORG $62BB
+    ld   de,$0000
     ORG $62BE
     ld   ix,$02C5
     ORG $62C2
     jp   $6395
-    ORG $62C5            ; arcade $02C5 data
-    db  $01,$00,$00
+    ORG $62C5
+    ld   bc,$0000
     ORG $62C8
     ld   hl,$A400
     ORG $62CB
@@ -976,14 +976,14 @@ COLOUR_TEST_MODE:
     jp   $6079
     ORG $6312
     ld   hl,$F7FF
-    ORG $6315            ; arcade $0315 data
-    db  $11,$00,$00
+    ORG $6315
+    ld   de,$0000
     ORG $6318
     ld   ix,$031F
     ORG $631C
     jp   $6395
-    ORG $631F            ; arcade $031F data
-    db  $01,$00,$00
+    ORG $631F
+    ld   bc,$0000
     ORG $6322
     ld   hl,$F000
     ORG $6325
@@ -1394,8 +1394,8 @@ COLOUR_TEST_MODE:
     ld   ix,$04CA
     ORG $648D
     ld   hl,$DC00
-    ORG $6490            ; arcade $0490 data
-    db  $01,$01,$01
+    ORG $6490
+    ld   bc,$0101
     ORG $6493
     ld   a,e
     ORG $6494
@@ -1466,8 +1466,8 @@ COLOUR_TEST_MODE:
     jr   $649E
     ORG $64D0
     cpl
-    ORG $64D1            ; arcade $04D1 data
-    db  $18,$18
+    ORG $64D1
+    jr   $64EB
     ORG $64D3
     xor  a
     ORG $64D4
@@ -1482,8 +1482,8 @@ COLOUR_TEST_MODE:
     jr   $649E
     ORG $64DC
     xor  b
-    ORG $64DD            ; arcade $04DD data
-    db  $18,$18
+    ORG $64DD
+    jr   $64F7
     ORG $64DF
     cpl
     ORG $64E0
@@ -1757,8 +1757,8 @@ BOOKKEEPING:
     inc  hl
     ORG $6637
     push hl
-    ORG $6638            ; arcade $0638 data
-    db  $21,$00,$00
+    ORG $6638
+    ld   hl,$0000
     ORG $663B
     push hl ; allocate 6 bytes of temp storage..
     ORG $663C
@@ -2345,8 +2345,8 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ld   b,$60
     ORG $71BC
     ld   (bc),a
-    ORG $71BD            ; arcade $11BD data
-    db  $11,$00,$00
+    ORG $71BD
+    ld   de,$0000
     ORG $71C0
     nop
     ORG $71C1
@@ -2371,12 +2371,12 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ld   c,b
     ORG $71CC
     ex   af,af'
-    ORG $71CD            ; arcade $11CD data
-    db  $10,$10
+    ORG $71CD
+    djnz $71DF
     ORG $71CF
     ex   af,af'
-    ORG $71D0            ; arcade $11D0 data
-    db  $22,$44,$44
+    ORG $71D0
+    ld   ($A844),hl
     ORG $71D3
     ld   b,d
     ORG $71D4
@@ -2529,8 +2529,8 @@ WAIT_FOR_1P_FIRE_BUTTON:
     ld   bc,$9807
     ORG $725B
     ld   a,h
-    ORG $725C            ; arcade $125C data
-    db  $FE,$FE
+    ORG $725C
+    cp   $FE
     ORG $725E
     cp   $7C
     ORG $7260
@@ -2748,8 +2748,8 @@ WAIT_FOR_1P_FIRE_BUTTON:
     sbc  a,c
     ORG $7399
     sbc  a,d
-    ORG $739A            ; arcade $139A data
-    db  $18,$18
+    ORG $739A
+    jr   $73B4
     ORG $739C
     inc  h
     ORG $739D
@@ -2766,16 +2766,16 @@ WAIT_FOR_1P_FIRE_BUTTON:
     add  a,b
     ORG $73A3
     ld   bc,$0010
-    ORG $73A6            ; arcade $13A6 data
-    db  $18,$18
+    ORG $73A6
+    jr   $73C0
     ORG $73A8
     nop
     ORG $73A9
     inc  a
     ORG $73AA
     ld   a,($DBFA)
-    ORG $73AD            ; arcade $13AD data
-    db  $18,$18
+    ORG $73AD
+    jr   $73C7
     ORG $73AF
     jr   z,$73F9
     ORG $73B1
@@ -2794,14 +2794,14 @@ WAIT_FOR_1P_FIRE_BUTTON:
     inc  a
     ORG $73BB
     ld   a,($DA3A)
-    ORG $73BE            ; arcade $13BE data
-    db  $18,$18
-    ORG $73C0            ; arcade $13C0 data
-    db  $18,$18
-    ORG $73C2            ; arcade $13C2 data
-    db  $18,$18
-    ORG $73C4            ; arcade $13C4 data
-    db  $18,$18
+    ORG $73BE
+    jr   $73D8
+    ORG $73C0
+    jr   $73DA
+    ORG $73C2
+    jr   $73DC
+    ORG $73C4
+    jr   $73DE
     ORG $73C6
     jr   c,$743A
     ORG $73C8
@@ -3149,8 +3149,8 @@ HANDLE_PLAYER_BOLTS:
     inc  (iy+$01)
     ORG $7538
     xor  a
-    ORG $7539            ; arcade $1539 data
-    db  $FD,$B6,$FD
+    ORG $7539
+    or   (iy-$03) ; test if BOLT.Length is zero
     ORG $753C
     ret  z ; exit if so
     ORG $753D
@@ -3163,12 +3163,12 @@ HANDLE_PLAYER_BOLTS:
     call $7553 ; call MOVE_AND_DRAW_BOLT
     ORG $7547
     call $757E ; call CHECK_IF_BOLT_OFFSCREEN
-    ORG $754A            ; arcade $154A data
-    db  $FD,$35,$FD
+    ORG $754A
+    dec  (iy-$03) ; decrement BOLT.Length
     ORG $754D
     ret  nz
-    ORG $754E            ; arcade $154E data
-    db  $FD,$36,$00,$00
+    ORG $754E
+    ld   (iy+$00),$00
     ORG $7552
     ret
 MOVE_AND_DRAW_BOLT:
@@ -3241,8 +3241,8 @@ CHECK_IF_ZERO_OR_E:
     ORG $759F
     ret ; and we're out
 HANDLE_BOLT_COLLISION:
-    ORG $75A0            ; arcade $15A0 data
-    db  $FD,$36,$00,$00
+    ORG $75A0
+    ld   (iy+$00),$00 ; Set BOLT.Direction to 0, meaning "Inactive"
     ORG $75A4
     ld   ix,($A076) ; load IX with contents of MAN_PTR
     ORG $75A8
@@ -3480,8 +3480,8 @@ COLLISION_DETECTION:
     ld   a,($A740)
     ORG $768E
     ld   ($A775),a
-    ORG $7691            ; arcade $1691 data
-    db  $21,$00,$00
+    ORG $7691
+    ld   hl,$0000
     ORG $7694
     ld   ($A73E),hl
     ORG $7697
@@ -3528,8 +3528,8 @@ COLLISION_DETECTION:
     pop  af
     ORG $76CC
     ret
-    ORG $76CD            ; arcade $16CD data
-    db  $01,$02,$02
+    ORG $76CD
+    ld   bc,$0202
     ORG $76D0
     ld   e,$64
     ORG $76D2
@@ -3732,8 +3732,8 @@ NMI_HANDLER:
     ORG $7760
     jr   $7748 ; do another byte for speech
 STOP_TALKING:
-    ORG $7762            ; arcade $1762 data
-    db  $21,$00,$00
+    ORG $7762
+    ld   hl,$0000 ; NULL pointer
     ORG $7765
     ld   ($A098),hl ; update VOICE_PC
     ORG $7768
@@ -3848,8 +3848,8 @@ V.LOOP:
     djnz $77AD
     ORG $77B7
     ret
-    ORG $77B8            ; arcade $17B8 data
-    db  $06,$06
+    ORG $77B8
+    ld   b,$06
     ORG $77BA
     ld   hl,$A0BE ; load HL with address of CMOS_NUM_PLAYS
     ORG $77BD
@@ -3972,8 +3972,8 @@ V.LOOP:
     call $8C51
     ORG $784E
     jp   $764B
-    ORG $7851            ; arcade $1851 data
-    db  $21,$00,$00
+    ORG $7851
+    ld   hl,$0000
     ORG $7854
     ld   ($A73E),hl
     ORG $7857
@@ -4021,8 +4021,8 @@ V.LOOP:
     ORG $787E
     ret
 DEFAULT_PLAYER_STATE:
-    ORG $787F            ; arcade $187F data
-    db  $01,$00,$00
+    ORG $787F
+    ld   bc,$0000
     ORG $7882
     ld   e,$64
     ORG $7884
@@ -4104,8 +4104,8 @@ DEFAULT_PLAYER_STATE:
 PRINT_CREDITS:
     ORG $78CD
     push hl ; create space for a word on the stack
-    ORG $78CE            ; arcade $18CE data
-    db  $21,$00,$00
+    ORG $78CE
+    ld   hl,$0000
     ORG $78D1
     add  hl,sp ; HL = SP
     ORG $78D2
@@ -4288,8 +4288,8 @@ DECREMENT_CREDITS:
     ret
     ORG $795B
     ld   de,$8211
-    ORG $795E            ; arcade $195E data
-    db  $22,$33,$33
+    ORG $795E
+    ld   ($9333),hl
     ORG $7961
     ld   b,h
     ORG $7962
@@ -4310,8 +4310,8 @@ DECREMENT_CREDITS:
     xor  d
     ORG $796A
     xor  d
-    ORG $796B            ; arcade $196B data
-    db  $EE,$EE
+    ORG $796B
+    xor  $EE
     ORG $796D
     nop
     ORG $796E
@@ -4326,8 +4326,8 @@ DECREMENT_CREDITS:
     ld   (hl),a
     ORG $7975
     nop
-    ORG $7976            ; arcade $1976 data
-    db  $21,$11,$21
+    ORG $7976
+    ld   hl,$8111
     ORG $7979
     ld   de,$C532
     ORG $797C
@@ -4446,8 +4446,8 @@ DECREMENT_CREDITS:
     inc  de
     ORG $7A0A
     pop  hl
-    ORG $7A0B            ; arcade $1A0B data
-    db  $06,$06
+    ORG $7A0B
+    ld   b,$06
     ORG $7A0D
     call $8A4A
     ORG $7A10
@@ -4544,8 +4544,8 @@ CLEAR_SCREEN:
     ld   sp,$DC00
     ORG $7A64
     ld   b,$E0
-    ORG $7A66            ; arcade $1A66 data
-    db  $11,$00,$00
+    ORG $7A66
+    ld   de,$0000
     ORG $7A69
     push de ; write 0...
     ORG $7A6A
@@ -5146,8 +5146,8 @@ LTABLE:
     db  $A7,$7D,$B1,$7D,$BD,$7D,$CB,$7D,$E4,$7D,$F4,$7D,$09,$7E,$1C,$7E
     ORG $7D51
     db  $0B
-    ORG $7D52            ; arcade $1D52 data
-    db  $21,$00,$00
+    ORG $7D52
+    ld   hl,$0000
     ORG $7D55
     ld   ($A087),hl
     ORG $7D58
@@ -5507,8 +5507,8 @@ CREATE_JOB:
     push hl ; reserve 4 bytes..
     ORG $7E28
     push hl ; ..on stack
-    ORG $7E29            ; arcade $1E29 data
-    db  $21,$00,$00
+    ORG $7E29
+    ld   hl,$0000
     ORG $7E2C
     add  hl,sp ; HL = SP
     ORG $7E2D
@@ -5555,8 +5555,8 @@ CREATE_JOB:
     exx ; swap to normal register set
     ORG $7E58
     jp   (hl) ; jump to return address popped @ $1E22
-    ORG $7E59            ; arcade $1E59 data
-    db  $21,$00,$00
+    ORG $7E59
+    ld   hl,$0000
     ORG $7E5C
     add  hl,sp ; HL = SP
     ORG $7E5D
@@ -5591,8 +5591,8 @@ ACTIVATE_HEAD_JOB:
 STOP_JOB:
     ORG $7E78
     ld   iy,($A072)
-    ORG $7E7C            ; arcade $1E7C data
-    db  $21,$00,$00
+    ORG $7E7C
+    ld   hl,$0000
     ORG $7E7F
     add  hl,sp ; HL = SP
     ORG $7E80
@@ -5905,16 +5905,16 @@ PLAYER_DEAD:
 MAN_INIT:
     ORG $7FD4
     pop  iy ; pop return address off stack into IY
-    ORG $7FD6            ; arcade $1FD6 data
-    db  $21,$00,$00
+    ORG $7FD6
+    ld   hl,$0000
     ORG $7FD9
     ld   b,$07
     ORG $7FDB
     push hl
     ORG $7FDC
     djnz $7FDB
-    ORG $7FDE            ; arcade $1FDE data
-    db  $DD,$21,$00,$00
+    ORG $7FDE
+    ld   ix,$0000
     ORG $7FE2
     add  ix,sp ; IX = SP
     ORG $7FE4
@@ -5955,14 +5955,14 @@ MAN_INIT:
     exx
     ORG $8010
     ld   b,$07
-    ORG $8012            ; arcade $2012 data
-    db  $11,$00,$00
+    ORG $8012
+    ld   de,$0000
     ORG $8015
     push de
     ORG $8016
     djnz $8015
-    ORG $8018            ; arcade $2018 data
-    db  $21,$00,$00
+    ORG $8018
+    ld   hl,$0000
     ORG $801B
     add  hl,sp ; HL = SP
     ORG $801C
@@ -6090,8 +6090,8 @@ D.TAB:
     ld   c,a
     ORG $80CA
     djnz $80B8
-    ORG $80CC            ; arcade $20CC data
-    db  $21,$00,$00
+    ORG $80CC
+    ld   hl,$0000
     ORG $80CF
     ld   ($A076),hl ; set MAN_PTR to NULL
     ORG $80D2
@@ -6138,8 +6138,8 @@ D.TAB:
     sub  $0A
     ORG $8100
     ld   ($A74D),a ; set RWAIT
-    ORG $8103            ; arcade $2103 data
-    db  $FD,$21,$17,$21
+    ORG $8103
+    ld   iy,$8117
     ORG $8107
     ld   hl,$FFF0
     ORG $810A
@@ -6200,8 +6200,8 @@ D.TAB:
     add  a,c
     ORG $813D
     ld   c,a
-    ORG $813E            ; arcade $213E data
-    db  $FD,$21,$45,$21
+    ORG $813E
+    ld   iy,$8145
     ORG $8142
     jp   $83B8 ; jump to ROBOT
     ORG $8145
@@ -6354,8 +6354,8 @@ S.U:
     ldir
     ORG $81F9
     pop  de
-    ORG $81FA            ; arcade $21FA data
-    db  $01,$00,$01
+    ORG $81FA
+    ld   bc,$0100
     ORG $81FD
     dec  hl
     ORG $81FE
@@ -6378,8 +6378,8 @@ S.U:
     ld   de,$001A
     ORG $8210
     ld   c,$02
-    ORG $8212            ; arcade $2212 data
-    db  $06,$06
+    ORG $8212
+    ld   b,$06
     ORG $8214
     ld   (hl),$FF
     ORG $8216
@@ -6434,8 +6434,8 @@ S.D:
     lddr ; execute scroll
     ORG $824A
     pop  de
-    ORG $824B            ; arcade $224B data
-    db  $01,$00,$01
+    ORG $824B
+    ld   bc,$0100
     ORG $824E
     inc  hl
     ORG $824F
@@ -6562,8 +6562,8 @@ S.R:
     ld   a,$20
     ORG $82CC
     ld   bc,$7A00
-    ORG $82CF            ; arcade $22CF data
-    db  $21,$FF,$FF
+    ORG $82CF
+    ld   hl,$FFFF
     ORG $82D2
     add  hl,de
     ORG $82D3
@@ -6606,8 +6606,8 @@ S.R:
     ld   (iy-$01),h
     ORG $82F7
     ld   (iy-$02),l
-    ORG $82FA            ; arcade $22FA data
-    db  $21,$00,$00
+    ORG $82FA
+    ld   hl,$0000
     ORG $82FD
     di
     ORG $82FE
@@ -6643,8 +6643,8 @@ SHOW_SCORE:
     ld   de,$D500
     ORG $831B
     ld   hl,$A73E ; load HL with address of P1_SCORE
-    ORG $831E            ; arcade $231E data
-    db  $06,$06
+    ORG $831E
+    ld   b,$06 ; max number of digits in score
     ORG $8320
     call $8A40 ; call PRINT_DIGITS
     ORG $8323
@@ -6657,8 +6657,8 @@ SHOW_SCORE:
     ld   de,$D5B0
     ORG $832C
     ld   hl,$A741 ; load HL with address of P2_SCORE
-    ORG $832F            ; arcade $232F data
-    db  $06,$06
+    ORG $832F
+    ld   b,$06 ; max number of digits in score
     ORG $8331
     jp   $8A40 ; jump to PRINT_DIGITS
 GET_PLAYER_SCORE_PTR:
@@ -7045,8 +7045,8 @@ BLAM:
     ld   (hl),$01 ; set VECTOR.TPRIME
     ORG $847E
     push ix
-    ORG $8480            ; arcade $2480 data
-    db  $01,$05,$01
+    ORG $8480
+    ld   bc,$0105 ; 50 PTS
     ORG $8483
     call $8341 ; call UPDATE_SCORE
     ORG $8486
@@ -7065,8 +7065,8 @@ BLAM:
     ld   a,($A772) ; read RSAVED
     ORG $8494
     push af ; see SCLOP in Frenzy's source code.
-    ORG $8495            ; arcade $2495 data
-    db  $01,$01,$01
+    ORG $8495
+    ld   bc,$0101 ; 10 PTS
     ORG $8498
     call $8341 ; call UPDATE_SCORE
     ORG $849B
@@ -8273,8 +8273,8 @@ SHOOT:
     dec  hl
     ORG $88A5
     ld   a,d ; load A with X Delta
-    ORG $88A6            ; arcade $28A6 data
-    db  $FE,$FE
+    ORG $88A6
+    cp   -2
     ORG $88A8
     jp   nc,$88D8 ; make shot go vertical
     ORG $88AB
@@ -9149,10 +9149,10 @@ GENERATE_ROBOT_SPEECH:
     inc  hl ; bump HL to next byte in SPEECH_BUFFER
     ORG $8BB8
     ex   de,hl
-    ORG $8BB9            ; arcade $2BB9 data
-    db  $21,$2C,$2C
-    ORG $8BBC            ; arcade $2BBC data
-    db  $06,$06
+    ORG $8BB9
+    ld   hl,$8C2C ; load HL with address of ROBOT_FIRST_WORD_SPEECH_TABLE
+    ORG $8BBC
+    ld   b,$06 ; there are 6 words available to choose from in the table
     ORG $8BBE
     call $8B6B ; call WRITE_RANDOM_SENTENCE_TO_BUFFER - just writes a single spoken word.
     ORG $8BC1
@@ -9452,8 +9452,8 @@ INTRUDER_ALERT_INTRUDER_ALERT:
     dec  c
     ORG $8CA0
     jr   z,$8CB6
-    ORG $8CA2            ; arcade $2CA2 data
-    db  $21,$00,$00
+    ORG $8CA2
+    ld   hl,$0000
     ORG $8CA5
     add  hl,bc
     ORG $8CA6
@@ -9897,12 +9897,12 @@ INCREMENT_BY_1:
     nop
     ORG $9046
     nop
-    ORG $9047            ; arcade $3047 data
-    db  $10,$10
-    ORG $9049            ; arcade $3049 data
-    db  $10,$10
-    ORG $904B            ; arcade $304B data
-    db  $10,$10
+    ORG $9047
+    djnz $9059
+    ORG $9049
+    djnz $905B
+    ORG $904B
+    djnz $905D
     ORG $904D
     djnz $904F
     ORG $904F
@@ -10005,10 +10005,10 @@ INCREMENT_BY_1:
     inc  b
     ORG $9087
     ex   af,af'
-    ORG $9088            ; arcade $3088 data
-    db  $10,$10
-    ORG $908A            ; arcade $308A data
-    db  $10,$10
+    ORG $9088
+    djnz $909A
+    ORG $908A
+    djnz $909C
     ORG $908C
     djnz $9096
     ORG $908E
@@ -10033,8 +10033,8 @@ INCREMENT_BY_1:
     nop
     ORG $909A
     ex   af,af'
-    ORG $909B            ; arcade $309B data
-    db  $2A,$1C,$1C
+    ORG $909B
+    ld   hl,($7C1C)
     ORG $909E
     ld   hl,($0008)
     ORG $90A1
@@ -10061,8 +10061,8 @@ INCREMENT_BY_1:
     nop
     ORG $90AD
     nop
-    ORG $90AE            ; arcade $30AE data
-    db  $18,$18
+    ORG $90AE
+    jr   $90C8
     ORG $90B0
     ex   af,af'
     ORG $90B1
@@ -10097,8 +10097,8 @@ INCREMENT_BY_1:
     nop
     ORG $90C2
     nop
-    ORG $90C3            ; arcade $30C3 data
-    db  $18,$18
+    ORG $90C3
+    jr   $90DD
     ORG $90C5
     nop
     ORG $90C6
@@ -10717,12 +10717,12 @@ INCREMENT_BY_1:
     db  $30,$49,$06,$00,$00,$00,$00,$00,$00
     ORG $9395
     ld   d,l
-    ORG $9396            ; arcade $3396 data
-    db  $2A,$55,$2A
+    ORG $9396
+    ld   hl,($8A55)
     ORG $9399
     ld   d,l
-    ORG $939A            ; arcade $339A data
-    db  $2A,$55,$2A
+    ORG $939A
+    ld   hl,($8A55)
     ORG $939D
     ld   d,l
     ORG $939E
@@ -10731,8 +10731,8 @@ INCREMENT_BY_1:
     nop
     ORG $93A0
     inc  e
-    ORG $93A1            ; arcade $33A1 data
-    db  $2A,$08,$08
+    ORG $93A1
+    ld   hl,($A008)
     ORG $93A4
     inc  d
     ORG $93A5
@@ -10798,8 +10798,8 @@ SFIRE:
     nop
     ORG $93D8
     dec  b
-    ORG $93D9            ; arcade $33D9 data
-    db  $06,$06
+    ORG $93D9
+    ld   b,$06
     ORG $93DB
     ld   c,$03
     ORG $93DD
@@ -10820,8 +10820,8 @@ SFIRE:
     ld   a,e
     ORG $93E5
     ex   af,af'
-    ORG $93E6            ; arcade $33E6 data
-    db  $32,$00,$32
+    ORG $93E6
+    ld   ($9200),a
     ORG $93E9
     nop
     ORG $93EA
@@ -11132,8 +11132,8 @@ SBLAM:
     ld   a,e
     ORG $94B2
     ex   af,af'
-    ORG $94B3            ; arcade $34B3 data
-    db  $01,$00,$01
+    ORG $94B3
+    ld   bc,$0100
     ORG $94B6
     nop
     ORG $94B7
@@ -11158,8 +11158,8 @@ SBLAM:
     sub  l
     ORG $94C4
     ex   af,af'
-    ORG $94C5            ; arcade $34C5 data
-    db  $06,$06
+    ORG $94C5
+    ld   b,$06
     ORG $94C7
     sub  e
     ORG $94C8
@@ -11256,8 +11256,8 @@ SBLAM:
     ex   af,af'
     ORG $9508
     nop
-    ORG $9509            ; arcade $3509 data
-    db  $06,$06
+    ORG $9509
+    ld   b,$06
     ORG $950B
     rlca
     ORG $950C
@@ -12235,8 +12235,8 @@ COLOUR_MAN:
     djnz $97BF
     ORG $97BE
     ld   bc,$FF2D
-    ORG $97C1            ; arcade $37C1 data
-    db  $11,$02,$02
+    ORG $97C1
+    ld   de,$0202
     ORG $97C4
     inc  hl
     ORG $97C5
