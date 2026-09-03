@@ -4,24 +4,22 @@ Port of Stern's Berzerk to the ZX Spectrum 48K (128K if needed later).
 
 Arcade reverse-engineering reference: `ref/berzerk.asm` (Scott Tunstall).
 
+**Port goal:** run the original arcade logic with Spectrum I/O, not a lookalike rewrite.
+See [docs/PORT.md](docs/PORT.md).
+
 ## Requirements
 
 - **sjasmplus** — Z80 assembler at `tools/bin/sjasmplus` or on `PATH`
 - **ZEsarUX** — emulator (looks for `/Applications/Games/zesarux.app` or `/Applications/zesarux.app`)
+- **Python 3** — listing converter
 - **make**
-
-```bash
-mkdir -p tools/bin
-cp /path/to/sjasmplus tools/bin/
-```
 
 ## Build
 
 ```bash
+make convert  # ref/berzerk.asm → src/arcade/* + src/game/romdata.asm
 make          # → build/berzerk.tap  build/berzerk.sna
 make run      # assemble + load .sna in ZEsarUX (48K)
-make tap      # assemble + insert .tap in ZEsarUX
-make clean
 ```
 
 ## Controls
@@ -34,15 +32,15 @@ make clean
 | Right  | P        | Right    |
 | Fire   | Space    | Fire     |
 
-Hold fire + direction to shoot. Touching walls, robot shots, or Otto costs a life.
+Attract: push fire to start. Hold fire + direction to shoot.
 
 ## Layout
 
 ```
-src/main.asm           entry + BASIC loader
-src/game/              maze, player, robots, Otto, bolts, HUD
+docs/PORT.md           arcade flow, memory map, hook plan
+ref/berzerk.asm        arcade disassembly (input to converter)
+tools/convert_ref.py   listing → ROM image / symbols / I/O map
+src/arcade/            generated PROM image + hook stubs (Phase 2)
+src/game/              hand-ported shell (Phase 1 — to be retired)
 src/zx/                Spectrum HAL (screen, input)
-ref/berzerk.asm        arcade disassembly (reference only)
-tools/sjasm/           sjasmplus helpers (BasicLib)
-build/                 generated .tap / .sna
 ```

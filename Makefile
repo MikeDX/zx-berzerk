@@ -26,11 +26,15 @@ TAP         := $(BUILD)/$(PROJECT).tap
 LST         := $(BUILD)/$(PROJECT).lst
 SYM         := $(BUILD)/$(PROJECT).sym
 
-.PHONY: all assemble run tap clean check-tools
+.PHONY: all assemble run tap clean check-tools convert
 
 all: assemble
 
 assemble: check-tools $(SNA) $(TAP)
+
+convert:
+	python3 tools/convert_ref.py --emit src/arcade
+	python3 tools/convert_ref.py src/game/romdata.asm
 
 check-tools:
 	@test -n "$(SJASMPLUS)" || { \

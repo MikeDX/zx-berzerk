@@ -16,7 +16,18 @@ player_init:
     xor     a
     ld      (player_fire_cd),a
     call    cdir                            ; still pose, velocity 0
-    jp      player_place
+    call    player_place
+    ; First blit without wall refusal — otherwise a spawn overlap leaves the
+    ; humanoid never drawn and every later step is rejected.
+    call    vec_resolve_sprite
+    call    entity_draw_pos
+    ld      l,(ix+V_SPR_L)
+    ld      h,(ix+V_SPR_H)
+    call    or_sprite
+    call    entity_stash_old
+    set     0,(ix+V_STATUS)
+    res     1,(ix+V_STATUS)
+    ret
 
 ; Place at man_x/man_y, nudging until the resolved sprite is clear of walls.
 player_place:
