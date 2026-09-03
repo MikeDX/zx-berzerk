@@ -27,9 +27,9 @@ The durable artefact is a **recompilable, remapped** assembly image plus a
 generated address map.
 
 ```bash
-make headless          # run attract/boot under arcade map; print access report
-make headless-trace    # longer run + write build/arcade_access.json
-make arcade            # (legacy) binary relocate + host — not the goal path
+make spectrum-asm      # ref/berzerk.asm → src/arcade/berzerk.asm + mem_map.inc
+make headless          # arcade-map trace (validation)
+make headless-trace    # longer run + build/arcade_access.json
 make run               # Phase-1 hand-ported shell
 ```
 
@@ -54,26 +54,26 @@ keep for the host. Arcade working set that must live in RAM:
 
 | Guest region | ≈Size | Notes |
 |--------------|------:|-------|
-| PROM (used) | ~14K | pack gaps; not a flat 16K if unused |
-| Scratch `$0800`+`$4000` | 2K | merge |
-| Video | 6K | 256×192 shadow (clip/scale from 223) |
-| Magic | 6K | shadow; collision in software |
-| Colour | 0–2K | stub or omit early |
+| PROM (used) | ~14K | layout-preserving at `ZX_PROM` |
+| Scratch `$0800`+`$4000` | 2K | `$A000` / `$A400` |
+| Video | 6K | 256×192 shadow (clip from 223) |
+| Magic | 6K+1K | scratch + image shadow |
+| Colour | 2K | stub |
 | **Subtotal** | **~28–30K** | fits with room for HAL + stack |
 
-Proposed host map (adjust once traces settle):
+Locked map (`tools/emit_spectrum_asm.py` / `mem_map.inc`):
 
 | Spectrum | Role |
 |----------|------|
-| `$6000–$9FFF` | Remapped PROM code/data |
-| `$A000–$A7FF` | Combined arcade scratch |
-| `$A800–$BFFF` | Video shadow (192×32) |
-| `$C000–$D7FF` | Magic shadow |
-| `$D800–$F7FF` | ZX HAL (hooks, blit, input, IM2) |
+| `$6000–$9FFF` | Remapped PROM (`ZX_PROM` + arcade offset) |
+| `$A000–$A3FF` | Scratch / CMOS (`$0800`) |
+| `$A400–$A7FF` | Scratch pad (`$4000`) |
+| `$A800–$BFFF` | Video shadow 192×32 |
+| `$C000–$C3FF` | Magic scratch (`$6000`) |
+| `$C400–$DBFF` | Magic image 192×32 |
+| `$DC00–$EFFF` | ZX HAL (hooks, blit, input) |
+| `$F000–$F7FF` | Colour stub |
 | `$F800–$FFFF` | Stack / host vars |
-
-Final labels/`EQU`s are **generated** from the access report + remap table,
-not guessed by a byte walker.
 
 ## Boot / game flow (addresses from `ref/berzerk.asm`)
 
@@ -122,25 +122,21 @@ status port `$4E` bit 7.
 ref/berzerk.asm
       │
       ▼
-tools/convert_ref.py       → PROM image + symbols + I/O checklist
-tools/headless_berzerk.py  → arcade-map run + access report
-      │                     → (later) remap table + patched sources
-      ▼
-src/arcade/*               → Spectrum HAL + remapped game
+tools/emit_spectrum_asm.py → src/arcade/berzerk.asm + mem_map.inc
+tools/headless_berzerk.py  → access report (validate arcade behaviour)
       │
       ▼
-build/arcade.sna
+src/arcade/host + HAL     → build/arcade.sna
 ```
 
 **Phase 1:** hand-ported playable shell (`make run`) — still available.
 
 **Phase 2:** PROM image + symbols + I/O map (`convert_ref`).
 
-**Phase 3 (now):** headless arcade emulator + access tracing; iterate remaps
-until writes stay inside the Spectrum budget.
+**Phase 3 (now):** `make spectrum-asm` emits remapped `src/arcade/berzerk.asm`;
+headless traces validate behaviour; wire HAL and assemble the host.
 
-**Phase 4:** assemble remapped sources + HAL; delete `src/game/*` hand port
-when the host is playable.
+**Phase 4:** playable host; delete `src/game/*` hand port.
 
 ## Hook points (must stay 1:1 with listing)
 

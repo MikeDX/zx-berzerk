@@ -2,8 +2,10 @@
 #
 # Targets:
 #   make / make run       Phase-1 hand-ported shell
-#   make arcade           relocate arcade PROM + build host
-#   make run-arcade       boot relocated PROM in ZEsarUX
+#   make spectrum-asm     ref/berzerk.asm → src/arcade/berzerk.asm (Spectrum map)
+#   make headless         arcade-map trace (validation)
+#   make arcade           legacy binary relocate + host
+#   make run-arcade       boot legacy host in ZEsarUX
 #   make convert          regenerate listing artefacts
 #   make clean
 
@@ -28,11 +30,15 @@ LST         := $(BUILD)/$(PROJECT).lst
 SYM         := $(BUILD)/$(PROJECT).sym
 
 .PHONY: all assemble arcade run run-arcade tap clean check-tools convert smoke-arcade \
-	headless headless-trace
+	headless headless-trace spectrum-asm
 
 all: assemble
 
 assemble: check-tools $(SNA) $(TAP)
+
+# Primary path: remapped assemblable game from the arcade listing.
+spectrum-asm:
+	python3 tools/emit_spectrum_asm.py -o src/arcade/berzerk.asm --map-inc src/arcade/mem_map.inc
 
 arcade: check-tools convert-reloc $(BUILD)/arcade.sna $(BUILD)/arcade.tap
 
