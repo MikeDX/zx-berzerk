@@ -10,8 +10,6 @@ Arcade reverse-engineering reference: `ref/berzerk.asm` (Scott Tunstall).
 - **ZEsarUX** — emulator (looks for `/Applications/Games/zesarux.app` or `/Applications/zesarux.app`)
 - **make**
 
-If you have a sjasmplus binary elsewhere:
-
 ```bash
 mkdir -p tools/bin
 cp /path/to/sjasmplus tools/bin/
@@ -26,7 +24,7 @@ make tap      # assemble + insert .tap in ZEsarUX
 make clean
 ```
 
-## Controls (phase-0 demo)
+## Controls
 
 | Action | Keyboard | Kempston |
 |--------|----------|----------|
@@ -36,16 +34,15 @@ make clean
 | Right  | P        | Right    |
 | Fire   | Space    | Fire     |
 
-Keys are remappable via the `keymap` table in `src/zx/input.asm` (redefine UI later).
+Hold fire + direction to shoot. Touching walls, robot shots, or Otto costs a life.
 
 ## Layout
 
 ```
-src/main.asm       entry, BASIC loader, artefacts
-src/zx/            Spectrum HAL (screen, input, …)
-src/demo.asm       phase-0 smoke test
-ref/berzerk.asm    arcade disassembly (reference only)
-tools/sjasm/       sjasmplus helpers (BasicLib)
-tools/bin/         optional local sjasmplus binary (gitignored)
-build/             generated images
+src/main.asm           entry + BASIC loader
+src/game/              maze, player, robots, Otto, bolts, HUD
+src/zx/                Spectrum HAL (screen, input)
+ref/berzerk.asm        arcade disassembly (reference only)
+tools/sjasm/           sjasmplus helpers (BasicLib)
+build/                 generated .tap / .sna
 ```

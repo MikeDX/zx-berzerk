@@ -43,7 +43,13 @@ $(BUILD)/.dir:
 	@touch $@
 
 # sjasmplus writes SNA/TAP via directives inside main.asm
-$(SNA) $(TAP): $(SRC) src/zx/screen.asm src/zx/input.asm src/demo.asm tools/sjasm/BasicLib.asm $(BUILD)/.dir
+$(SNA) $(TAP): $(SRC) \
+	src/zx/screen.asm src/zx/input.asm \
+	src/game/consts.asm src/game/vars.asm src/game/tables.asm src/game/sprites.asm \
+	src/game/draw.asm src/game/util.asm src/game/entity.asm src/game/maze.asm \
+	src/game/bolts.asm src/game/player.asm src/game/robots.asm src/game/otto.asm \
+	src/game/hud.asm src/game/game.asm \
+	tools/sjasm/BasicLib.asm $(BUILD)/.dir
 	$(SJASMPLUS) --nologo --fullpath \
 	  --lst=$(LST) --sym=$(SYM) \
 	  -i$(CURDIR) \
