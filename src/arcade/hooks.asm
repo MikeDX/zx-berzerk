@@ -12,12 +12,12 @@ hook_clear_screen:
     call    zx_cls
     ld      hl,ZX_VIDEO
     ld      de,ZX_VIDEO+1
-    ld      bc,$1800-1
+    ld      bc,$1C00-1              ; 224 lines
     ld      (hl),0
     ldir
     ld      hl,ZX_MAGIC
     ld      de,ZX_MAGIC+1
-    ld      bc,$1800-1
+    ld      bc,$1800-1              ; 192 lines
     ld      (hl),0
     ldir
     xor     a
@@ -61,6 +61,8 @@ hook_rtoax:
     ret
 
 hook_draw_sprite:
+    ; Magic plane only — Spectrum bitmap is presented by frame_blit.
+    ; Drawing to both caused XOR flicker on every erase/draw.
     push    af
     push    bc
     push    de
@@ -79,13 +81,6 @@ hook_draw_sprite:
     ld      b,a
     ld      a,(draw_y)
     ld      c,a
-    call    xor_sprite
-    push    ix
-    pop     hl
-    ld      a,(draw_x)
-    ld      b,a
-    ld      a,(draw_y)
-    ld      c,a
     call    magic_xor_sprite
     pop     ix
     pop     hl
@@ -98,11 +93,13 @@ magic_dest_xy:
     push    de
     pop     hl
     ld      a,h
+    cp      ZX_VIDEO >> 8
+    jr      c,.video                    ; below video → treat as video
     cp      ZX_MAGIC >> 8
-    jr      nc,.magic
+    jr      c,.video                    ; $A8..$C3
     cp      ZX_MAGIC_SCRATCH >> 8
-    jr      c,.video
-    ld      bc,ZX_MAGIC_SCRATCH
+    jr      c,.magic                    ; $C4..$DB
+    ld      bc,ZX_MAGIC_SCRATCH         ; $DC..
     jr      .sub
 .magic:
     ld      bc,ZX_MAGIC
@@ -144,9 +141,13 @@ hook_in_p1:
 
 hook_in_status:
     ; Preserve HL — IRQ samples $4E before saving HL.
-    ; frame_blit not called here yet (IM2 + long blit → $0038 in smoke).
-    ; Shadows fill during demo; present path still TODO (job-shell exit).
     push    hl
+    ; Present shadows even from IRQ (frame_blit has its own stack).
+    ld      a,(blit_div)
+    inc     a
+    ld      (blit_div),a
+    and     3                       ; every 4th status poll
+    call    z,frame_blit
     ld      hl,ZX_SCRATCH_CMOS + ($0876 - $0800)  ; MAN_PTR
     ld      a,(hl)
     inc     hl
@@ -227,7 +228,7 @@ hook_in_safe:
     ld      a,$FF
     ret
 
-; Spectrum ROM font stand-in (arcade ordinal $1F = © → '*').
+; Spectrum ROM font → screen + magic (so frame_blit keeps HUD text).
 hook_print_char:
     push    af
     push    bc
@@ -244,14 +245,18 @@ hook_print_char:
     jr      c,.out
 .glyph:
     push    af
-    call    magic_dest_xy
+    call    magic_dest_xy               ; B=x C=y pixels
+    ld      a,b
+    ld      (draw_x),a
+    ld      a,c
+    ld      (draw_y),a
     ld      a,b
     rrca
     rrca
     rrca
     and     31
-    ld      b,a
-    ld      a,c
+    ld      b,a                         ; col
+    ld      a,(draw_y)
     cp      192
     jr      c,.yok
     ld      a,191
@@ -262,9 +267,18 @@ hook_print_char:
     and     31
     cp      24
     jr      nc,.pop_out
-    ld      c,a
+    ld      c,a                         ; row
     pop     af
+    push    af
     call    zx_print_char
+    pop     af
+    ld      b,a
+    ld      a,(draw_x)
+    ld      d,a
+    ld      a,(draw_y)
+    ld      e,a
+    ld      a,b
+    call    magic_print_char
     jr      .out
 .pop_out:
     pop     af

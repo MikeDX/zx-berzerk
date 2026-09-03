@@ -69,10 +69,9 @@ Locked map (`tools/emit_spectrum_asm.py` / `mem_map.inc`):
 | `$6000–$9FFF` | Remapped PROM (`ZX_PROM` + arcade offset) |
 | `$A000–$A3FF` | Scratch / CMOS (`$0800`) |
 | `$A400–$A7FF` | Scratch pad (`$4000`) |
-| `$A800–$BFFF` | Video shadow 192×32 |
-| `$C000–$C3FF` | Magic scratch (`$6000`) |
+| `$A800–$C3FF` | Video 224×32 (arcade fills `$1BFF` fit; show top 192) |
 | `$C400–$DBFF` | Magic image 192×32 |
-| `$DC00–$DFFF` | Guard (magic write overrun) |
+| `$DC00–$DFFF` | Magic scratch + write guard |
 | `$E000–$EFFF` | ZX HAL (hooks, blit, input) |
 | `$F000–$F7FF` | Colour stub |
 | `$F800–$FFFF` | Stack / host vars |
@@ -138,11 +137,10 @@ src/arcade/host + HAL     → build/arcade.sna
 **Phase 3 (now):** `make` / `make run` build and boot the remapped host
 (`src/arcade/host.asm` + `berzerk.asm` + HAL at `$DC00`).
 
-**Phase 4 (in progress):** HAL presents hardware only; arcade code stays 1:1 via
-`emit_spectrum_asm.py` → sjasmplus. Constraints: 256×192 vs 223 lines; DIP `$60`
-must idle `$00` (else crosshair test LDIRs through HAL); magic plane must not
-abut HAL (`$DC00–$DFFF` guard, HAL at `$E000`). Coin=`0`/Enter, Start=`1`/`2`.
-Loop: remap → smoke → fix. Frame present of video⊕magic still TODO.
+**Phase 4 (in progress):** HAL presents hardware only; arcade code stays 1:1.
+Video buffer is 224 lines (`$A800–$C3FF`) so arcade `$1BFF` fills fit; Spectrum
+shows top 192 via `frame_blit` (video⊕magic). Sprites update magic only (no
+screen XOR flicker). Coin=`0`/Enter, Start=`1`/`2`. Loop: remap → smoke → fix.
 
 ## Hook points (must stay 1:1 with listing)
 

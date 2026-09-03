@@ -803,7 +803,7 @@ COLOUR_TEST_MODE:
     ORG $624E
     ld   de,$A000
     ORG $6251
-    ld   hl,$BFFE
+    ld   hl,$C3FE
     ORG $6254
     ld   a,$80
     ORG $6256
@@ -919,7 +919,7 @@ COLOUR_TEST_MODE:
     ORG $62B5
     jp   $6079
     ORG $62B8
-    ld   hl,$BFFF
+    ld   hl,$C3FF
     ORG $62BB            ; arcade $02BB data
     db  $11,$00,$00
     ORG $62BE
@@ -943,7 +943,7 @@ COLOUR_TEST_MODE:
     ORG $62DC
     jp   $6395
     ORG $62DF
-    ld   hl,$BFFF
+    ld   hl,$C3FF
     ORG $62E2
     ld   de,$B9AA
     ORG $62E5
@@ -959,7 +959,7 @@ COLOUR_TEST_MODE:
     ORG $62F6
     jp   $6395
     ORG $62F9
-    ld   hl,$BFFF
+    ld   hl,$C3FF
     ORG $62FC
     ld   de,$FF00
     ORG $62FF
@@ -1317,7 +1317,7 @@ COLOUR_TEST_MODE:
     ORG $6441
     ld   d,(hl)
     ORG $6442
-    ld   hl,$C000
+    ld   hl,$DC00
     ORG $6445
     ld   d,$01
     ORG $6447
@@ -1397,7 +1397,7 @@ COLOUR_TEST_MODE:
     ORG $6489
     ld   ix,$04CA
     ORG $648D
-    ld   hl,$C000
+    ld   hl,$DC00
     ORG $6490            ; arcade $0490 data
     db  $01,$01,$01
     ORG $6493
@@ -4729,7 +4729,7 @@ DECREMENT_CREDITS:
     ORG $7A3F
     call $7A45 ; call WRITE_FF_64_TIMES_HL
     ORG $7A42
-    ld   hl,$BFE0
+    ld   hl,$C180
 WRITE_FF_64_TIMES_HL:
     ORG $7A45
     ld   a,$FF
@@ -4765,7 +4765,7 @@ CLEAR_SCREEN:
     ORG $7A5D
     ld   ($A700),sp
     ORG $7A61
-    ld   sp,$C000
+    ld   sp,$DC00
     ORG $7A64
     ld   b,$E0
     ORG $7A66            ; arcade $1A66 data
@@ -6655,9 +6655,9 @@ SR.TAB:
     ORG $81DB
     jr   z,$81E6
     ORG $81DD
-    ld   hl,$BFED
+    ld   hl,$C3AD
     ORG $81E0
-    ld   de,$BFFF
+    ld   de,$C3DF
     ORG $81E3
     jp   $823D
 SCROLL_UP:
@@ -6742,9 +6742,9 @@ S.U:
     jp   $81EC ; jump to S.U to scroll up
 SCROLL_DOWN:
     ORG $8237
-    ld   hl,$BFED
+    ld   hl,$C1AD
     ORG $823A
-    ld   de,$BFFF
+    ld   de,$C1FF
     ORG $823D
     push hl
 S.D:
@@ -6795,7 +6795,7 @@ S.D:
     ORG $826B
     ld   hl,$B31F
     ORG $826E
-    ld   de,$BFE0
+    ld   de,$C3E0
     ORG $8271
     jp   $82C9 ; jump to S.R to scroll right
 SCROLL_LEFT:
@@ -6882,7 +6882,7 @@ SCROLL_RIGHT:
     ORG $82C3
     ld   hl,$B11F
     ORG $82C6
-    ld   de,$BFE0
+    ld   de,$C200
 S.R:
     ORG $82C9
     push hl
@@ -7592,7 +7592,7 @@ ROBOT_ANIMATION_TABLES:
     ORG $854A
     jr   nz,$8551
     ORG $854C
-    ld   hl,$BFEA
+    ld   hl,$C26A
     ORG $854F
     jr   $8554
     ORG $8551
@@ -9989,7 +9989,7 @@ INTRUDER_ALERT_INTRUDER_ALERT:
     ORG $8CFC
     ld   b,$00
     ORG $8CFE
-    ld   hl,$C078
+    ld   hl,$DC78
     ORG $8D01
     call $89A3 ; call CALCULATE_MAGIC_IMAGE_RAM_ADDRESS
     ORG $8D04

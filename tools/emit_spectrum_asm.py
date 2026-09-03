@@ -32,11 +32,10 @@ from reloc_rom import insn_len  # noqa: E402
 ZX_PROM = 0x6000  # arcade $0000–$3FFF → $6000–$9FFF
 ZX_SCRATCH_CMOS = 0xA000  # arcade $0800–$0BFF
 ZX_SCRATCH_PAD = 0xA400  # arcade $4000–$43FF
-ZX_VIDEO = 0xA800  # arcade $4400–$5BFF (192 lines × 32)
-ZX_MAGIC_SCRATCH = 0xC000  # arcade $6000–$63FF
-ZX_MAGIC = 0xC400  # arcade $6400–$7BFF (192 lines × 32)
-# Gap $DC00–$DFFF: magic row stride/flush can touch past $DBFF; do not pack HAL
-# against the magic plane.
+# Video holds full arcade bitmap height so ld bc,$1BFF fills do not overrun.
+ZX_VIDEO = 0xA800  # arcade $4400… — 224 lines × 32 = $1C00 → ends $C400
+ZX_MAGIC = 0xC400  # arcade $6400 — 192 visible lines × 32 = $1800 → ends $DC00
+ZX_MAGIC_SCRATCH = 0xDC00  # arcade $6000–$0BFF; absorbs magic row overrun
 ZX_HAL = 0xE000  # host hooks / blit / input
 ZX_COLOR = 0xF000  # arcade $8000–$87FF
 ZX_STACK = 0xFFFE
@@ -45,9 +44,11 @@ ZX_STACK = 0xFFFE
 # lives at ZX_PROM+$3700 = $9700, so I must be $97 — not $37 (Spectrum ROM).
 ZX_IM2_PAGE = (ZX_PROM >> 8) + 0x37  # $97
 
-VIDEO_LINES = 192
+VIDEO_LINES = 224  # storage (arcade 223 + pad); Spectrum shows top 192
 VIDEO_STRIDE = 32
-VIDEO_SIZE = VIDEO_LINES * VIDEO_STRIDE  # $1800
+VIDEO_SIZE = VIDEO_LINES * VIDEO_STRIDE  # $1C00
+MAGIC_LINES = 192
+MAGIC_SIZE = MAGIC_LINES * VIDEO_STRIDE  # $1800
 
 HOOK_DRAW_SPRITE = ZX_HAL + 0x00
 HOOK_CLEAR_SCREEN = ZX_HAL + 0x03
@@ -117,13 +118,14 @@ def map_addr(a: int) -> int:
     if a < 0x4400 + VIDEO_SIZE:
         return ZX_VIDEO + (a - 0x4400)
     if a < 0x6000:
+        # Arcade lines past our buffer → last stored line
         return ZX_VIDEO + VIDEO_SIZE - VIDEO_STRIDE + (a & 0x1F)
     if a < 0x6400:
         return ZX_MAGIC_SCRATCH + (a - 0x6000)
-    if a < 0x6400 + VIDEO_SIZE:
+    if a < 0x6400 + MAGIC_SIZE:
         return ZX_MAGIC + (a - 0x6400)
     if a < 0x8000:
-        return ZX_MAGIC + VIDEO_SIZE - VIDEO_STRIDE + (a & 0x1F)
+        return ZX_MAGIC + MAGIC_SIZE - VIDEO_STRIDE + (a & 0x1F)
     if a < 0x8800:
         return ZX_COLOR + (a - 0x8000)
     return a

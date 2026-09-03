@@ -79,6 +79,9 @@ spr_w:          db 0
 spr_addr:       dw 0
 spr_mask:       dw 0
 spr_row:        db 0,0,0
+blit_save_sp:   dw 0
+                ds 64
+blit_stack:
 
 host_end:
     ASSERT host_end <= ZX_COLOR

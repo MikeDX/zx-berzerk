@@ -1,10 +1,14 @@
 ; XOR blit for arcade Magic-RAM semantics (draw == erase == XOR).
 
-; Composite ZX_VIDEO XOR ZX_MAGIC → Spectrum bitmap ($4000), 256×192.
-; Arcade display = video plane + magic XOR plane; we approximate that here.
+; Composite ZX_VIDEO XOR ZX_MAGIC → Spectrum bitmap ($4000), top 192 lines.
+; Uses a private stack so it is safe from the IRQ scratch SP ($A040).
 frame_blit:
+    push    af
+    ld      a,i                     ; P = IFF2
     di
     push    af
+    ld      (blit_save_sp),sp
+    ld      sp,blit_stack
     push    bc
     push    de
     push    hl
@@ -38,8 +42,12 @@ frame_blit:
     pop     hl
     pop     de
     pop     bc
+    ld      sp,(blit_save_sp)
     pop     af
-    ; leave IFFs as DI — callers re-enable; avoids IM1/$0038 if entered badly
+    jp      po,.noid
+    ei
+.noid:
+    pop     af
     ret
 
 sprite_setup:
@@ -220,3 +228,59 @@ magic_xor_sprite:
     dec     a
     ld      (spr_hleft),a
     jr      .row
+
+; A = ASCII, D = x pixels, E = y pixels — OR 8×8 ROM glyph into ZX_MAGIC.
+magic_print_char:
+    push    af
+    push    bc
+    push    de
+    push    hl
+    ld      c,a
+    ld      a,e
+    cp      192
+    jr      nc,.done
+    ld      l,a
+    ld      h,0
+    add     hl,hl
+    add     hl,hl
+    add     hl,hl
+    add     hl,hl
+    add     hl,hl
+    ld      a,d
+    rrca
+    rrca
+    rrca
+    and     31
+    ld      e,a
+    ld      d,0
+    add     hl,de
+    ld      de,ZX_MAGIC
+    add     hl,de
+    ; HL = magic dest; build glyph pointer in DE
+    push    hl
+    ld      h,0
+    ld      l,c
+    add     hl,hl
+    add     hl,hl
+    add     hl,hl
+    ld      bc,$3D00-256
+    add     hl,bc
+    ex      de,hl                       ; DE = glyph
+    pop     hl                          ; HL = magic dest
+    ld      b,8
+.mp_rows:
+    ld      a,(de)
+    or      (hl)
+    ld      (hl),a
+    inc     de
+    push    de
+    ld      de,32
+    add     hl,de
+    pop     de
+    djnz    .mp_rows
+.done:
+    pop     hl
+    pop     de
+    pop     bc
+    pop     af
+    ret
